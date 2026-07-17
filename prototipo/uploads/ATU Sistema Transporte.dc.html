@@ -1,0 +1,1132 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+  input,select,button,textarea{font-family:inherit}
+  :root{
+    --bg:#EEF2F6; --surface:#FFFFFF; --surface-2:#F5F8FB; --surface-3:#EAF0F5;
+    --border:#DCE4EC; --border-strong:#C6D2DD;
+    --text:#15242F; --text-2:#46586A; --text-3:#6E8090;
+    --primary:#0E5A8A; --primary-strong:#0A4870; --primary-soft:#E3EEF6; --primary-contrast:#FFFFFF;
+    --ok:#15803D; --ok-bg:#E4F4EA; --warn:#B45309; --warn-bg:#FBEFDD; --bad:#C0392B; --bad-bg:#FAE6E3; --neutral:#5E6E7E; --neutral-bg:#EBEFF3;
+    --shadow:0 1px 2px rgba(16,36,52,.05), 0 6px 18px rgba(16,36,52,.06);
+    --shadow-lg:0 18px 50px rgba(16,36,52,.22);
+  }
+  [data-theme="dark"]{
+    --bg:#0A131B; --surface:#111D27; --surface-2:#15232F; --surface-3:#1C2D3A;
+    --border:#243646; --border-strong:#2F4659;
+    --text:#E8EFF4; --text-2:#AFC1CF; --text-3:#7E92A2;
+    --primary:#2E90C9; --primary-strong:#49A6DC; --primary-soft:#14303F; --primary-contrast:#04121C;
+    --ok:#3FC078; --ok-bg:#102A1C; --warn:#E0A042; --warn-bg:#2B2112; --bad:#E27062; --bad-bg:#2C1816; --neutral:#9BADBB; --neutral-bg:#1B2935;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 22px rgba(0,0,0,.4);
+    --shadow-lg:0 22px 60px rgba(0,0,0,.6);
+  }
+  button{transition:filter .15s ease}
+  button:hover{filter:brightness(.97)}
+  ::-webkit-scrollbar{width:10px;height:10px}
+  ::-webkit-scrollbar-thumb{background:var(--border-strong);border-radius:8px}
+  ::-webkit-scrollbar-track{background:transparent}
+  @keyframes atu-fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  @keyframes atu-pop{from{opacity:0;transform:translateY(14px) scale(.985)}to{opacity:1;transform:none}}
+  ::placeholder{color:var(--text-3)}
+</style>
+</helmet>
+
+<div data-theme="{{ theme }}" style="min-height:100vh;background:var(--bg);color:var(--text)">
+
+<!-- ================= LOGIN ================= -->
+<sc-if value="{{ isLogin }}" hint-placeholder-val="{{ true }}">
+<div style="min-height:100vh;display:flex;align-items:stretch">
+  <!-- brand panel -->
+  <div style="flex:1;display:flex;flex-direction:column;justify-content:space-between;padding:48px 52px;background:linear-gradient(155deg,var(--primary) 0%, var(--primary-strong) 100%);color:#fff;position:relative;overflow:hidden;min-width:0" data-login-brand="{{ brandStyle }}">
+    <div style="display:flex;align-items:center;gap:14px">
+      <div style="width:52px;height:52px;border-radius:14px;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.28);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:20px;letter-spacing:.5px">ATU</div>
+      <div>
+        <div style="font-weight:800;font-size:18px;line-height:1.1">ATU</div>
+        <div style="font-size:12px;opacity:.82;font-weight:500">Autoridad de Transporte Urbano</div>
+      </div>
+    </div>
+    <div style="max-width:420px">
+      <div style="font-size:13px;font-weight:700;letter-spacing:2px;opacity:.8;text-transform:uppercase;margin-bottom:14px">Lima y Callao</div>
+      <h1 style="font-size:34px;line-height:1.18;font-weight:800;margin:0 0 16px">Registro y fiscalización del padrón de transporte</h1>
+      <p style="font-size:15px;line-height:1.6;opacity:.88;margin:0 0 28px">Plataforma para gobiernos regionales y municipalidades provinciales: gestione empresas autorizadas, vehículos y vigencias de TUC en un solo lugar.</p>
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div style="display:flex;align-items:center;gap:12px;font-size:14px;font-weight:500"><span style="width:30px;height:30px;border-radius:9px;background:rgba(255,255,255,.16);display:flex;align-items:center;justify-content:center">🏢</span> Padrón de empresas y transportistas</div>
+        <div style="display:flex;align-items:center;gap:12px;font-size:14px;font-weight:500"><span style="width:30px;height:30px;border-radius:9px;background:rgba(255,255,255,.16);display:flex;align-items:center;justify-content:center">🚍</span> Vehículos y Tarjeta Única de Circulación</div>
+        <div style="display:flex;align-items:center;gap:12px;font-size:14px;font-weight:500"><span style="width:30px;height:30px;border-radius:9px;background:rgba(255,255,255,.16);display:flex;align-items:center;justify-content:center">📊</span> Alertas de vigencia y tableros</div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;font-size:12px;opacity:.8">
+      <span style="display:inline-flex;height:16px;border-radius:3px;overflow:hidden;border:1px solid rgba(255,255,255,.3)"><span style="width:8px;background:#D91023"></span><span style="width:8px;background:#fff"></span><span style="width:8px;background:#D91023"></span></span>
+      Sistema oficial · Gobierno del Perú
+    </div>
+  </div>
+  <!-- form -->
+  <div style="flex:1;display:flex;align-items:center;justify-content:center;padding:40px 28px;min-width:0" data-login-form="{{ formWrapStyle }}">
+    <div style="width:100%;max-width:404px">
+      <div style="display:flex;justify-content:flex-end;margin-bottom:18px">
+        <button onClick="{{ toggleTheme }}" style="display:inline-flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:999px;padding:7px 12px;font-size:12.5px;font-weight:600;color:var(--text-2);cursor:pointer;box-shadow:var(--shadow)">{{ themeIcon }} {{ themeLabel }}</button>
+      </div>
+      <h2 style="font-size:24px;font-weight:800;margin:0 0 6px">Iniciar sesión</h2>
+      <p style="color:var(--text-3);font-size:14px;margin:0 0 26px">Acceda con las credenciales de su entidad</p>
+
+      <label style="display:block;font-size:12.5px;font-weight:700;color:var(--text-2);margin-bottom:7px">Tipo de entidad</label>
+      <select value="{{ loginEntity }}" onChange="{{ onEntityChange }}" style="width:100%;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 12px;font-size:14px;color:var(--text);margin-bottom:18px;cursor:pointer">
+        <sc-for list="{{ entityOpts }}" as="o" hint-placeholder-count="4"><option value="{{ o.value }}">{{ o.label }}</option></sc-for>
+      </select>
+
+      <label style="display:block;font-size:12.5px;font-weight:700;color:var(--text-2);margin-bottom:7px">Usuario o correo</label>
+      <input type="text" value="admin@muni-arequipa.gob.pe" placeholder="usuario@entidad.gob.pe" style="width:100%;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 12px;font-size:14px;color:var(--text);margin-bottom:18px">
+
+      <label style="display:block;font-size:12.5px;font-weight:700;color:var(--text-2);margin-bottom:7px">Contraseña</label>
+      <div style="position:relative;margin-bottom:16px">
+        <input type="{{ pwdType }}" value="ATU·2026" style="width:100%;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 44px 12px 12px;font-size:14px;color:var(--text)">
+        <button onClick="{{ togglePwd }}" style="position:absolute;right:6px;top:50%;transform:translateY(-50%);background:transparent;border:none;color:var(--text-3);cursor:pointer;padding:8px;font-size:13px;font-weight:600">{{ pwdToggleLabel }}</button>
+      </div>
+
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px">
+        <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text-2);cursor:pointer"><input type="checkbox" checked="{{ true }}" style="width:16px;height:16px;accent-color:var(--primary)"> Recordarme</label>
+        <a href="#" style="font-size:13px;color:var(--primary);font-weight:600;text-decoration:none">¿Olvidó su contraseña?</a>
+      </div>
+
+      <button onClick="{{ doLogin }}" style="width:100%;background:var(--primary);color:var(--primary-contrast);border:none;border-radius:10px;padding:14px;font-size:15px;font-weight:700;cursor:pointer;box-shadow:0 8px 20px rgba(14,90,138,.28)">Ingresar al sistema</button>
+      <p style="text-align:center;color:var(--text-3);font-size:12px;margin:22px 0 0">¿Problemas para acceder? Contacte a soporte ATU · mesadeayuda@atu.gob.pe</p>
+    </div>
+  </div>
+</div>
+</sc-if>
+
+<!-- ================= APP SHELL ================= -->
+<sc-if value="{{ isApp }}" hint-placeholder-val="{{ true }}">
+<div style="min-height:100vh;display:flex;flex-direction:column">
+
+  <!-- header -->
+  <header style="height:62px;flex:none;display:flex;align-items:center;gap:14px;padding:0 18px;background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:40">
+    <button onClick="{{ onHamburger }}" aria-label="Menú" style="width:40px;height:40px;border-radius:10px;border:1px solid var(--border);background:var(--surface-2);color:var(--text-2);cursor:pointer;display:flex;align-items:center;justify-content:center;flex:none">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+    </button>
+    <div style="display:flex;align-items:center;gap:11px;min-width:0">
+      <div style="width:38px;height:38px;border-radius:10px;background:var(--primary);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px;flex:none">ATU</div>
+      <div style="min-width:0">
+        <div style="font-weight:800;font-size:14.5px;line-height:1.1;white-space:nowrap">Padrón de Transporte</div>
+        <div style="font-size:11px;color:var(--text-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Autoridad de Transporte Urbano</div>
+      </div>
+    </div>
+    <div style="flex:1"></div>
+    <button onClick="{{ toggleTheme }}" aria-label="Tema" style="width:40px;height:40px;border-radius:10px;border:1px solid var(--border);background:var(--surface-2);color:var(--text-2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;flex:none">{{ themeIcon }}</button>
+    <div onClick="{{ goPerfil }}" title="Ver mi perfil" style="display:flex;align-items:center;gap:10px;padding:4px 6px 4px 6px;border-radius:10px;border-left:1px solid var(--border);margin-left:4px;cursor:pointer">
+      <div style="text-align:right" data-user-meta="{{ userMetaStyle }}">
+        <div style="font-size:13px;font-weight:700;line-height:1.1">{{ user.name }}</div>
+        <div style="font-size:11px;color:var(--text-3);max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ user.entity }}</div>
+      </div>
+      <div style="width:38px;height:38px;border-radius:50%;background:var(--primary-soft);color:var(--primary);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;border:1px solid var(--border);flex:none">{{ user.initials }}</div>
+    </div>
+  </header>
+
+  <div style="flex:1;display:flex;min-height:0;position:relative">
+    <!-- backdrop (mobile drawer) -->
+    <sc-if value="{{ showBackdrop }}" hint-placeholder-val="{{ false }}">
+      <div onClick="{{ closeDrawer }}" style="position:fixed;inset:62px 0 0 0;background:rgba(8,16,24,.5);z-index:30;animation:atu-fade .2s ease"></div>
+    </sc-if>
+
+    <!-- sidebar -->
+    <aside style="{{ sidebarStyle }}">
+      <nav style="flex:1;display:flex;flex-direction:column;gap:4px;padding:14px 12px">
+        <div style="font-size:10.5px;font-weight:700;letter-spacing:1.2px;color:var(--text-3);text-transform:uppercase;padding:6px 10px 8px;{{ hideStr }}">Navegación</div>
+        <sc-for list="{{ navItems }}" as="n" hint-placeholder-count="3">
+          <button onClick="{{ n.onClick }}" title="{{ n.label }}" style="{{ n.style }}">
+            <span style="flex:none;display:flex" data-icon="{{ n.key }}">{{ n.icon }}</span>
+            <span style="{{ navTextStyle }}">{{ n.label }}</span>
+            <sc-if value="{{ n.showBadge }}" hint-placeholder-val="{{ false }}"><span style="margin-left:auto;background:var(--bad);color:#fff;font-size:10.5px;font-weight:700;border-radius:999px;padding:1px 7px;{{ hideStr }}">{{ n.badge }}</span></sc-if>
+          </button>
+        </sc-for>
+      </nav>
+      <div style="padding:12px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:4px">
+        <button onClick="{{ goPerfil }}" title="Mi perfil" style="{{ perfilNavStyle }}">
+          <span style="flex:none;display:flex"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z"/></svg></span>
+          <span style="{{ navTextStyle }}">Mi perfil</span>
+        </button>
+        <button onClick="{{ doLogout }}" title="Cerrar sesión" style="width:100%;display:flex;align-items:center;gap:12px;padding:11px 12px;border-radius:11px;border:none;background:transparent;color:var(--text-2);font-size:13.5px;font-weight:600;cursor:pointer">
+          <span style="flex:none;display:flex"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg></span>
+          <span style="{{ navTextStyle }}">Cerrar sesión</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- main -->
+    <main style="flex:1;min-width:0;overflow-x:hidden;padding:22px clamp(16px,3vw,32px) 60px">
+
+      <!-- ===== DASHBOARD ===== -->
+      <sc-if value="{{ screenDashboard }}" hint-placeholder-val="{{ false }}">
+      <section data-screen-label="Dashboard" style="max-width:1280px;margin:0 auto">
+        <div style="display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:22px">
+          <div>
+            <div style="font-size:12px;font-weight:700;letter-spacing:1px;color:var(--primary);text-transform:uppercase;margin-bottom:6px">Panel de control</div>
+            <h1 style="font-size:26px;font-weight:800;margin:0">Situación del padrón</h1>
+            <p style="color:var(--text-3);font-size:13.5px;margin:6px 0 0">{{ user.entity }} · actualizado al 23/06/2026</p>
+          </div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
+            <select value="{{ dashFilters.tipo }}" onChange="{{ onDashTipo }}" style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 12px;font-size:13.5px;color:var(--text);cursor:pointer;font-weight:600">
+              <sc-for list="{{ tipoOpts }}" as="o" hint-placeholder-count="4"><option value="{{ o.value }}">{{ o.label }}</option></sc-for>
+            </select>
+            <select value="{{ dashFilters.rango }}" onChange="{{ onDashRango }}" style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 12px;font-size:13.5px;color:var(--text);cursor:pointer;font-weight:600">
+              <sc-for list="{{ rangoOpts }}" as="o" hint-placeholder-count="4"><option value="{{ o.value }}">{{ o.label }}</option></sc-for>
+            </select>
+          </div>
+        </div>
+
+        <!-- KPIs -->
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;margin-bottom:18px">
+          <sc-for list="{{ kpis }}" as="k" hint-placeholder-count="5">
+            <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow);padding:16px 16px 15px;position:relative;overflow:hidden">
+              <div style="position:absolute;left:0;top:0;bottom:0;width:4px;background:{{ k.accent }}"></div>
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px">
+                <span style="font-size:12.5px;font-weight:600;color:var(--text-3);line-height:1.25">{{ k.label }}</span>
+                <span style="font-size:18px">{{ k.icon }}</span>
+              </div>
+              <div style="font-size:28px;font-weight:800;letter-spacing:-.5px;line-height:1">{{ k.value }}</div>
+              <div style="font-size:12px;font-weight:600;margin-top:8px;color:{{ k.subColor }}">{{ k.sub }}</div>
+            </div>
+          </sc-for>
+        </div>
+
+        <!-- charts -->
+        <div style="display:grid;grid-template-columns:{{ chartGridCols }};gap:14px;margin-bottom:18px">
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow);padding:18px">
+            <div style="font-size:14px;font-weight:700;margin-bottom:2px">Empresas por tipo de servicio</div>
+            <div style="font-size:12px;color:var(--text-3);margin-bottom:8px">Distribución del padrón autorizado</div>
+            <div style="height:240px;position:relative"><canvas id="atuChServicio"></canvas></div>
+          </div>
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow);padding:18px">
+            <div style="font-size:14px;font-weight:700;margin-bottom:2px">Vehículos por categoría vehicular</div>
+            <div style="font-size:12px;color:var(--text-3);margin-bottom:8px">Clasificación RNV (M / N)</div>
+            <div style="height:240px;position:relative"><canvas id="atuChCategoria"></canvas></div>
+          </div>
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow);padding:18px">
+            <div style="font-size:14px;font-weight:700;margin-bottom:2px">Estado de TUC</div>
+            <div style="font-size:12px;color:var(--text-3);margin-bottom:8px">Tarjetas Únicas de Circulación</div>
+            <div style="height:240px;position:relative"><canvas id="atuChTuc"></canvas></div>
+          </div>
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow);padding:18px">
+            <div style="font-size:14px;font-weight:700;margin-bottom:2px">Tendencia de vencimientos</div>
+            <div style="font-size:12px;color:var(--text-3);margin-bottom:8px">TUC que vencen por mes — 2026</div>
+            <div style="height:240px;position:relative"><canvas id="atuChTendencia"></canvas></div>
+          </div>
+        </div>
+
+        <!-- alertas -->
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow);overflow:hidden">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 18px;border-bottom:1px solid var(--border)">
+            <div style="display:flex;align-items:center;gap:10px">
+              <span style="width:30px;height:30px;border-radius:9px;background:var(--warn-bg);color:var(--warn);display:flex;align-items:center;justify-content:center">⚠️</span>
+              <div><div style="font-size:14.5px;font-weight:700">Alertas de vigencia</div><div style="font-size:12px;color:var(--text-3)">Empresas y vehículos por vencer o vencidos</div></div>
+            </div>
+            <span style="font-size:12px;font-weight:700;color:var(--warn);background:var(--warn-bg);padding:5px 11px;border-radius:999px">{{ alertCount }} alertas</span>
+          </div>
+          <div style="display:flex;flex-direction:column">
+            <sc-for list="{{ alertas }}" as="a" hint-placeholder-count="5">
+              <div style="display:flex;align-items:center;gap:14px;padding:13px 18px;border-bottom:1px solid var(--border)">
+                <span style="width:34px;height:34px;border-radius:9px;background:var(--surface-3);display:flex;align-items:center;justify-content:center;font-size:16px;flex:none">{{ a.icon }}</span>
+                <div style="min-width:0;flex:1">
+                  <div style="font-size:13.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ a.nombre }}</div>
+                  <div style="font-size:12px;color:var(--text-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ a.detalle }}</div>
+                </div>
+                <span style="font-size:11.5px;font-weight:700;padding:4px 10px;border-radius:999px;white-space:nowrap;background:{{ a.badgeBg }};color:{{ a.badgeFg }}">{{ a.estadoText }}</span>
+                <span style="font-size:12px;font-weight:600;color:var(--text-2);width:120px;text-align:right;white-space:nowrap" data-alert-due="{{ alertDueStyle }}">{{ a.dueText }}</span>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </section>
+      </sc-if>
+
+      <!-- ===== EMPRESAS ===== -->
+      <sc-if value="{{ screenEmpresas }}" hint-placeholder-val="{{ false }}">
+      <section data-screen-label="Empresas de Transporte" style="max-width:1280px;margin:0 auto">
+        <div style="display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:18px">
+          <div>
+            <div style="font-size:12px;font-weight:700;letter-spacing:1px;color:var(--primary);text-transform:uppercase;margin-bottom:6px">Padrón</div>
+            <h1 style="font-size:26px;font-weight:800;margin:0">Empresas de transporte</h1>
+            <p style="color:var(--text-3);font-size:13.5px;margin:6px 0 0">{{ empCount }} registros · {{ user.entity }}</p>
+          </div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
+            <button onClick="{{ openUploadEmp }}" style="display:inline-flex;align-items:center;gap:8px;background:var(--surface);color:var(--text-2);border:1px solid var(--border);border-radius:10px;padding:10px 14px;font-size:13.5px;font-weight:600;cursor:pointer"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg> Carga masiva</button>
+            <button onClick="{{ exportAction }}" style="display:inline-flex;align-items:center;gap:8px;background:var(--surface);color:var(--text-2);border:1px solid var(--border);border-radius:10px;padding:10px 14px;font-size:13.5px;font-weight:600;cursor:pointer"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg> Exportar</button>
+            <button onClick="{{ addAction }}" style="display:inline-flex;align-items:center;gap:8px;background:var(--primary);color:var(--primary-contrast);border:none;border-radius:10px;padding:10px 16px;font-size:13.5px;font-weight:700;cursor:pointer;box-shadow:0 6px 16px rgba(14,90,138,.22)"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg> Agregar empresa</button>
+          </div>
+        </div>
+
+        <!-- toolbar -->
+        <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:16px">
+          <div style="position:relative;flex:1;min-width:200px">
+            <span style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--text-3);display:flex"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg></span>
+            <input type="text" value="{{ empFilters.q }}" onInput="{{ onEmpSearch }}" placeholder="Buscar por razón social o RUC…" style="width:100%;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:11px 12px 11px 38px;font-size:14px;color:var(--text)">
+          </div>
+          <select value="{{ empFilters.tipo }}" onChange="{{ onEmpTipo }}" style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:11px 12px;font-size:13.5px;color:var(--text);cursor:pointer;font-weight:600">
+            <sc-for list="{{ tipoOpts }}" as="o" hint-placeholder-count="4"><option value="{{ o.value }}">{{ o.label }}</option></sc-for>
+          </select>
+          <select value="{{ empFilters.estado }}" onChange="{{ onEmpEstado }}" style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:11px 12px;font-size:13.5px;color:var(--text);cursor:pointer;font-weight:600">
+            <sc-for list="{{ estadoEmpOpts }}" as="o" hint-placeholder-count="5"><option value="{{ o.value }}">{{ o.label }}</option></sc-for>
+          </select>
+          <div style="{{ viewToggleStyle }}">
+            <button onClick="{{ setEmpGrid }}" title="Grilla" style="{{ empGridBtnStyle }}"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></button>
+            <button onClick="{{ setEmpList }}" title="Listado" style="{{ empListBtnStyle }}"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg></button>
+          </div>
+        </div>
+
+        <!-- GRID (table) -->
+        <sc-if value="{{ empShowTable }}" hint-placeholder-val="{{ true }}">
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow);overflow:hidden">
+          <div style="overflow-x:auto">
+            <div style="min-width:920px">
+              <div style="display:grid;grid-template-columns:2.4fr 1.3fr 1.3fr 1.6fr 1fr 0.9fr;gap:8px;padding:13px 16px;background:var(--surface-2);border-bottom:1px solid var(--border);font-size:11.5px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.5px">
+                <div>Razón social / Transportista</div><div>RUC · Partida</div><div>Servicio · Resolución</div><div>Vigencia</div><div>Estado</div><div style="text-align:right">Vehículos</div>
+              </div>
+              <sc-for list="{{ empresas }}" as="e" hint-placeholder-count="6">
+                <div style="display:grid;grid-template-columns:2.4fr 1.3fr 1.3fr 1.6fr 1fr 0.9fr;gap:8px;padding:13px 16px;border-bottom:1px solid var(--border);align-items:center;font-size:13px">
+                  <div style="min-width:0">
+                    <div style="font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ e.razon }}</div>
+                    <span style="display:inline-block;margin-top:4px;font-size:10.5px;font-weight:700;color:var(--text-3);background:var(--surface-3);padding:2px 8px;border-radius:999px">{{ e.personaLabel }}</span>
+                  </div>
+                  <div style="min-width:0">
+                    <div style="font-family:'JetBrains Mono',monospace;font-size:12.5px;font-weight:600">{{ e.ruc }}</div>
+                    <div style="font-size:11.5px;color:var(--text-3);font-family:'JetBrains Mono',monospace">{{ e.partida }}</div>
+                  </div>
+                  <div style="min-width:0">
+                    <div style="font-weight:600">{{ e.tipoLabel }}</div>
+                    <div style="font-size:11.5px;color:var(--text-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ e.acto }}</div>
+                  </div>
+                  <div style="min-width:0">
+                    <div style="font-family:'JetBrains Mono',monospace;font-size:12px">{{ e.iniF }} →</div>
+                    <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text-2)">{{ e.finF }}</div>
+                  </div>
+                  <div style="display:flex;flex-direction:column;gap:4px;align-items:flex-start">
+                    <span style="font-size:11.5px;font-weight:700;padding:3px 10px;border-radius:999px;background:{{ e.badgeBg }};color:{{ e.badgeFg }}">{{ e.estadoText }}</span>
+                    <sc-if value="{{ e.porVencer }}" hint-placeholder-val="{{ false }}"><span style="font-size:10.5px;font-weight:700;color:var(--warn)">{{ e.venceTxt }}</span></sc-if>
+                  </div>
+                  <div style="display:flex;align-items:center;justify-content:flex-end;gap:6px">
+                    <button onClick="{{ e.onVer }}" style="display:inline-flex;align-items:center;gap:6px;background:var(--primary-soft);color:var(--primary);border:none;border-radius:8px;padding:7px 11px;font-size:12.5px;font-weight:700;cursor:pointer;white-space:nowrap">{{ e.vehCount }} <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg></button>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+        </sc-if>
+
+        <!-- LIST (cards) -->
+        <sc-if value="{{ empShowCards }}" hint-placeholder-val="{{ false }}">
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px">
+          <sc-for list="{{ empresas }}" as="e" hint-placeholder-count="6">
+            <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow);padding:16px;display:flex;flex-direction:column;gap:12px">
+              <div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start">
+                <div style="min-width:0">
+                  <div style="font-weight:700;font-size:14.5px;line-height:1.25">{{ e.razon }}</div>
+                  <span style="display:inline-block;margin-top:6px;font-size:10.5px;font-weight:700;color:var(--text-3);background:var(--surface-3);padding:2px 8px;border-radius:999px">{{ e.personaLabel }}</span>
+                </div>
+                <span style="font-size:11.5px;font-weight:700;padding:3px 10px;border-radius:999px;white-space:nowrap;background:{{ e.badgeBg }};color:{{ e.badgeFg }}">{{ e.estadoText }}</span>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px 12px;font-size:12.5px">
+                <div><div style="color:var(--text-3);font-size:11px;margin-bottom:2px">RUC</div><div style="font-family:'JetBrains Mono',monospace;font-weight:600">{{ e.ruc }}</div></div>
+                <div><div style="color:var(--text-3);font-size:11px;margin-bottom:2px">Servicio</div><div style="font-weight:600">{{ e.tipoLabel }}</div></div>
+                <div><div style="color:var(--text-3);font-size:11px;margin-bottom:2px">Resolución</div><div style="font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ e.acto }}</div></div>
+                <div><div style="color:var(--text-3);font-size:11px;margin-bottom:2px">Vigencia</div><div style="font-family:'JetBrains Mono',monospace;font-size:11.5px">{{ e.iniF }} – {{ e.finF }}</div></div>
+              </div>
+              <sc-if value="{{ e.porVencer }}" hint-placeholder-val="{{ false }}"><div style="font-size:11.5px;font-weight:700;color:var(--warn);background:var(--warn-bg);padding:5px 10px;border-radius:8px">⚠️ {{ e.venceTxt }}</div></sc-if>
+              <button onClick="{{ e.onVer }}" style="display:flex;align-items:center;justify-content:center;gap:8px;background:var(--primary-soft);color:var(--primary);border:none;border-radius:10px;padding:10px;font-size:13px;font-weight:700;cursor:pointer">Ver {{ e.vehCount }} vehículos <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg></button>
+            </div>
+          </sc-for>
+        </div>
+        </sc-if>
+
+        <sc-if value="{{ empEmpty }}" hint-placeholder-val="{{ false }}">
+          <div style="text-align:center;padding:60px 20px;color:var(--text-3)"><div style="font-size:34px;margin-bottom:10px">🔍</div><div style="font-weight:700;color:var(--text-2)">Sin resultados</div><div style="font-size:13px">Ajuste los filtros o la búsqueda</div></div>
+        </sc-if>
+      </section>
+      </sc-if>
+
+      <!-- ===== VEHICULOS ===== -->
+      <sc-if value="{{ screenVehiculos }}" hint-placeholder-val="{{ false }}">
+      <section data-screen-label="Vehículos por empresa" style="max-width:1280px;margin:0 auto">
+        <button onClick="{{ goEmpresas }}" style="display:inline-flex;align-items:center;gap:7px;background:transparent;border:none;color:var(--primary);font-size:13px;font-weight:700;cursor:pointer;padding:4px 0;margin-bottom:12px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg> Empresas de transporte</button>
+
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow);padding:18px 18px;margin-bottom:18px;display:flex;flex-wrap:wrap;gap:18px;align-items:center;justify-content:space-between">
+          <div style="min-width:0">
+            <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+              <h1 style="font-size:21px;font-weight:800;margin:0">{{ selEmp.razon }}</h1>
+              <span style="font-size:11.5px;font-weight:700;padding:3px 10px;border-radius:999px;background:{{ selEmp.badgeBg }};color:{{ selEmp.badgeFg }}">{{ selEmp.estadoText }}</span>
+            </div>
+            <div style="display:flex;gap:14px;flex-wrap:wrap;margin-top:8px;font-size:12.5px;color:var(--text-3)">
+              <span>RUC <b style="font-family:'JetBrains Mono',monospace;color:var(--text-2)">{{ selEmp.ruc }}</b></span>
+              <span>{{ selEmp.tipoLabel }}</span>
+              <span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ selEmp.acto }}</span>
+            </div>
+          </div>
+          <div style="display:flex;gap:10px">
+            <div style="text-align:center;padding:8px 16px;border-radius:11px;background:var(--surface-2);border:1px solid var(--border)"><div style="font-size:22px;font-weight:800;line-height:1">{{ selEmp.vTotal }}</div><div style="font-size:11px;color:var(--text-3);margin-top:2px">Total</div></div>
+            <div style="text-align:center;padding:8px 16px;border-radius:11px;background:var(--ok-bg)"><div style="font-size:22px;font-weight:800;line-height:1;color:var(--ok)">{{ selEmp.vVig }}</div><div style="font-size:11px;color:var(--ok);margin-top:2px">Vigentes</div></div>
+            <div style="text-align:center;padding:8px 16px;border-radius:11px;background:var(--bad-bg)"><div style="font-size:22px;font-weight:800;line-height:1;color:var(--bad)">{{ selEmp.vVenc }}</div><div style="font-size:11px;color:var(--bad);margin-top:2px">Vencidas</div></div>
+          </div>
+        </div>
+
+        <div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px">
+          <h2 style="font-size:16px;font-weight:700;margin:0">Vehículos registrados</h2>
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
+            <button onClick="{{ openUploadVeh }}" style="display:inline-flex;align-items:center;gap:8px;background:var(--surface);color:var(--text-2);border:1px solid var(--border);border-radius:10px;padding:9px 13px;font-size:13px;font-weight:600;cursor:pointer"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg> Carga masiva</button>
+            <button onClick="{{ exportAction }}" style="display:inline-flex;align-items:center;gap:8px;background:var(--surface);color:var(--text-2);border:1px solid var(--border);border-radius:10px;padding:9px 13px;font-size:13px;font-weight:600;cursor:pointer">Exportar</button>
+            <button onClick="{{ addAction }}" style="display:inline-flex;align-items:center;gap:8px;background:var(--primary);color:var(--primary-contrast);border:none;border-radius:10px;padding:9px 15px;font-size:13px;font-weight:700;cursor:pointer"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg> Agregar vehículo</button>
+          </div>
+        </div>
+
+        <!-- toolbar -->
+        <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:16px">
+          <div style="position:relative;flex:1;min-width:180px">
+            <span style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--text-3);display:flex"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg></span>
+            <input type="text" value="{{ vehFilters.q }}" onInput="{{ onVehSearch }}" placeholder="Buscar por placa o TUC…" style="width:100%;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:11px 12px 11px 38px;font-size:14px;color:var(--text)">
+          </div>
+          <select value="{{ vehFilters.cat }}" onChange="{{ onVehCat }}" style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:11px 12px;font-size:13.5px;color:var(--text);cursor:pointer;font-weight:600">
+            <sc-for list="{{ catOpts }}" as="o" hint-placeholder-count="7"><option value="{{ o.value }}">{{ o.label }}</option></sc-for>
+          </select>
+          <select value="{{ vehFilters.estado }}" onChange="{{ onVehEstado }}" style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:11px 12px;font-size:13.5px;color:var(--text);cursor:pointer;font-weight:600">
+            <sc-for list="{{ estadoVehOpts }}" as="o" hint-placeholder-count="5"><option value="{{ o.value }}">{{ o.label }}</option></sc-for>
+          </select>
+          <div style="{{ viewToggleStyle }}">
+            <button onClick="{{ setVehGrid }}" title="Grilla" style="{{ vehGridBtnStyle }}"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></button>
+            <button onClick="{{ setVehList }}" title="Listado" style="{{ vehListBtnStyle }}"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg></button>
+          </div>
+        </div>
+
+        <sc-if value="{{ vehShowTable }}" hint-placeholder-val="{{ true }}">
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow);overflow:hidden">
+          <div style="overflow-x:auto"><div style="min-width:760px">
+            <div style="display:grid;grid-template-columns:1.2fr 1fr 1.6fr 1.8fr 1.1fr 0.7fr;gap:8px;padding:13px 16px;background:var(--surface-2);border-bottom:1px solid var(--border);font-size:11.5px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.5px">
+              <div>Placa</div><div>Categoría</div><div>TUC</div><div>Vigencia</div><div>Estado TUC</div><div style="text-align:right">Acción</div>
+            </div>
+            <sc-for list="{{ vehiculos }}" as="v" hint-placeholder-count="5">
+              <div style="display:grid;grid-template-columns:1.2fr 1fr 1.6fr 1.8fr 1.1fr 0.7fr;gap:8px;padding:13px 16px;border-bottom:1px solid var(--border);align-items:center;font-size:13px">
+                <div style="font-family:'JetBrains Mono',monospace;font-weight:700;font-size:14px;letter-spacing:.5px">{{ v.placa }}</div>
+                <div><span style="font-size:12px;font-weight:700;background:var(--surface-3);padding:3px 9px;border-radius:7px">{{ v.cat }}</span> <span style="font-size:11px;color:var(--text-3)">{{ v.catLabel }}</span></div>
+                <div style="font-family:'JetBrains Mono',monospace;font-size:12.5px;font-weight:600">{{ v.tuc }}</div>
+                <div style="font-family:'JetBrains Mono',monospace;font-size:12px">{{ v.iniF }} – {{ v.finF }}</div>
+                <div style="display:flex;flex-direction:column;gap:3px;align-items:flex-start"><span style="font-size:11.5px;font-weight:700;padding:3px 10px;border-radius:999px;background:{{ v.badgeBg }};color:{{ v.badgeFg }}">{{ v.estadoText }}</span><sc-if value="{{ v.porVencer }}" hint-placeholder-val="{{ false }}"><span style="font-size:10.5px;font-weight:700;color:var(--warn)">{{ v.venceTxt }}</span></sc-if></div>
+                <div style="display:flex;justify-content:flex-end;gap:6px">
+                  <button onClick="{{ editAction }}" title="Editar" style="width:32px;height:32px;border-radius:8px;border:1px solid var(--border);background:var(--surface-2);color:var(--text-2);cursor:pointer;display:flex;align-items:center;justify-content:center"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>
+                </div>
+              </div>
+            </sc-for>
+          </div></div>
+        </div>
+        </sc-if>
+
+        <sc-if value="{{ vehShowCards }}" hint-placeholder-val="{{ false }}">
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px">
+          <sc-for list="{{ vehiculos }}" as="v" hint-placeholder-count="5">
+            <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow);padding:16px">
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px">
+                <div style="font-family:'JetBrains Mono',monospace;font-weight:700;font-size:19px;letter-spacing:1px">{{ v.placa }}</div>
+                <span style="font-size:11.5px;font-weight:700;padding:3px 10px;border-radius:999px;background:{{ v.badgeBg }};color:{{ v.badgeFg }}">{{ v.estadoText }}</span>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:12.5px">
+                <div><div style="color:var(--text-3);font-size:11px;margin-bottom:2px">Categoría</div><div style="font-weight:700">{{ v.cat }} · {{ v.catLabel }}</div></div>
+                <div><div style="color:var(--text-3);font-size:11px;margin-bottom:2px">TUC</div><div style="font-family:'JetBrains Mono',monospace;font-weight:600;font-size:11.5px">{{ v.tuc }}</div></div>
+                <div style="grid-column:1/-1"><div style="color:var(--text-3);font-size:11px;margin-bottom:2px">Vigencia</div><div style="font-family:'JetBrains Mono',monospace;font-size:11.5px">{{ v.iniF }} – {{ v.finF }}</div></div>
+              </div>
+              <sc-if value="{{ v.porVencer }}" hint-placeholder-val="{{ false }}"><div style="font-size:11.5px;font-weight:700;color:var(--warn);background:var(--warn-bg);padding:5px 10px;border-radius:8px;margin-top:12px">⚠️ {{ v.venceTxt }}</div></sc-if>
+            </div>
+          </sc-for>
+        </div>
+        </sc-if>
+
+        <sc-if value="{{ vehEmpty }}" hint-placeholder-val="{{ false }}">
+          <div style="text-align:center;padding:60px 20px;color:var(--text-3)"><div style="font-size:34px;margin-bottom:10px">🚍</div><div style="font-weight:700;color:var(--text-2)">Sin vehículos</div><div style="font-size:13px">No hay registros para los filtros aplicados</div></div>
+        </sc-if>
+      </section>
+      </sc-if>
+
+      <!-- ===== PERFIL ===== -->
+      <sc-if value="{{ screenPerfil }}" hint-placeholder-val="{{ false }}">
+      <section data-screen-label="Perfil del funcionario" style="max-width:980px;margin:0 auto">
+        <div style="display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:18px">
+          <div>
+            <div style="font-size:12px;font-weight:700;letter-spacing:1px;color:var(--primary);text-transform:uppercase;margin-bottom:6px">Cuenta</div>
+            <h1 style="font-size:26px;font-weight:800;margin:0">Mi perfil</h1>
+            <p style="color:var(--text-3);font-size:13.5px;margin:6px 0 0">Gestione sus datos de contacto y seguridad</p>
+          </div>
+          <button onClick="{{ downloadFormato }}" style="display:inline-flex;align-items:center;gap:8px;background:transparent;color:var(--primary);border:1px dashed var(--primary);border-radius:10px;padding:10px 16px;font-size:13.5px;font-weight:700;cursor:pointer">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+            Descargar formato
+          </button>
+        </div>
+
+        <!-- identity banner -->
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow);padding:20px;margin-bottom:16px;display:flex;align-items:center;gap:18px;flex-wrap:wrap">
+          <div style="width:72px;height:72px;border-radius:18px;background:var(--primary);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:26px;flex:none">{{ pf.initials }}</div>
+          <div style="min-width:0;flex:1">
+            <div style="font-size:20px;font-weight:800;line-height:1.2">{{ pf.nombreCompleto }}</div>
+            <div style="font-size:13.5px;color:var(--text-2);margin-top:3px">{{ pf.cargo }}</div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
+              <span style="font-size:11.5px;font-weight:700;padding:4px 11px;border-radius:999px;background:var(--primary-soft);color:var(--primary)">{{ pf.entidad }}</span>
+              <span style="font-size:11.5px;font-weight:700;padding:4px 11px;border-radius:999px;background:var(--surface-3);color:var(--text-2)">Entidad {{ pf.tipoEntidadLabel }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- datos del funcionario -->
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow);overflow:hidden;margin-bottom:16px">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 20px;border-bottom:1px solid var(--border)">
+            <div>
+              <div style="font-size:15px;font-weight:800">Datos del funcionario</div>
+              <div style="font-size:12px;color:var(--text-3)">Documento y entidad no son editables</div>
+            </div>
+            <sc-if value="{{ perfilReadonly }}" hint-placeholder-val="{{ true }}">
+              <button onClick="{{ startEditPerfil }}" style="display:inline-flex;align-items:center;gap:7px;background:var(--primary);color:var(--primary-contrast);border:none;border-radius:9px;padding:9px 15px;font-size:13px;font-weight:700;cursor:pointer">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+                Editar
+              </button>
+            </sc-if>
+            <sc-if value="{{ perfilEditing }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;gap:8px">
+                <button onClick="{{ cancelEditPerfil }}" style="background:var(--surface);color:var(--text-2);border:1px solid var(--border);border-radius:9px;padding:9px 14px;font-size:13px;font-weight:600;cursor:pointer">Cancelar</button>
+                <button onClick="{{ savePerfil }}" style="display:inline-flex;align-items:center;gap:7px;background:var(--ok);color:#fff;border:none;border-radius:9px;padding:9px 15px;font-size:13px;font-weight:700;cursor:pointer">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+                  Guardar
+                </button>
+              </div>
+            </sc-if>
+          </div>
+
+          <div style="padding:20px;display:grid;grid-template-columns:{{ pfCols }};gap:18px 22px">
+            <!-- nombres -->
+            <div style="grid-column:1/-1">
+              <div style="font-size:11.5px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Nombres y apellidos</div>
+              <div style="font-size:15px;font-weight:600">{{ pf.nombreCompleto }}</div>
+            </div>
+            <!-- documento (locked) -->
+            <div>
+              <div style="display:flex;align-items:center;gap:7px;margin-bottom:6px"><span style="font-size:11.5px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.5px">Documento</span><span style="display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;color:var(--text-3);background:var(--surface-3);padding:2px 7px;border-radius:999px"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>No editable</span></div>
+              <div style="font-size:15px;font-weight:600;font-family:'JetBrains Mono',monospace">{{ pf.docTipo }} {{ pf.docNum }}</div>
+            </div>
+            <!-- entidad (locked) -->
+            <div>
+              <div style="display:flex;align-items:center;gap:7px;margin-bottom:6px"><span style="font-size:11.5px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.5px">Entidad</span><span style="display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;color:var(--text-3);background:var(--surface-3);padding:2px 7px;border-radius:999px"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>No editable</span></div>
+              <div style="font-size:15px;font-weight:600">{{ pf.entidad }}</div>
+            </div>
+            <!-- correo (editable) -->
+            <div>
+              <div style="font-size:11.5px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Correo electrónico</div>
+              <sc-if value="{{ perfilReadonly }}" hint-placeholder-val="{{ true }}"><div style="font-size:15px;font-weight:600">{{ pf.correo }}</div></sc-if>
+              <sc-if value="{{ perfilEditing }}" hint-placeholder-val="{{ false }}">
+                <input type="email" value="{{ pfDraft.correo }}" onInput="{{ onPfCorreo }}" style="width:100%;background:var(--surface-2);border:1px solid {{ correoBorder }};border-radius:9px;padding:10px 12px;font-size:14px;color:var(--text)">
+                <sc-if value="{{ correoError }}" hint-placeholder-val="{{ false }}"><div style="font-size:11.5px;color:var(--bad);margin-top:5px;font-weight:600">Ingrese un correo válido</div></sc-if>
+              </sc-if>
+            </div>
+            <!-- telefono (editable) -->
+            <div>
+              <div style="font-size:11.5px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Teléfono</div>
+              <sc-if value="{{ perfilReadonly }}" hint-placeholder-val="{{ true }}"><div style="font-size:15px;font-weight:600">{{ pf.telefono }}</div></sc-if>
+              <sc-if value="{{ perfilEditing }}" hint-placeholder-val="{{ false }}"><input type="tel" value="{{ pfDraft.telefono }}" onInput="{{ onPfTelefono }}" style="width:100%;background:var(--surface-2);border:1px solid var(--border);border-radius:9px;padding:10px 12px;font-size:14px;color:var(--text)"></sc-if>
+            </div>
+            <!-- cargo (editable) -->
+            <div style="grid-column:1/-1">
+              <div style="font-size:11.5px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Cargo</div>
+              <sc-if value="{{ perfilReadonly }}" hint-placeholder-val="{{ true }}"><div style="font-size:15px;font-weight:600">{{ pf.cargo }}</div></sc-if>
+              <sc-if value="{{ perfilEditing }}" hint-placeholder-val="{{ false }}"><input type="text" value="{{ pfDraft.cargo }}" onInput="{{ onPfCargo }}" style="width:100%;background:var(--surface-2);border:1px solid var(--border);border-radius:9px;padding:10px 12px;font-size:14px;color:var(--text)"></sc-if>
+            </div>
+          </div>
+        </div>
+
+        <!-- cambio de contraseña -->
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow);overflow:hidden">
+          <div style="display:flex;align-items:center;gap:11px;padding:16px 20px;border-bottom:1px solid var(--border)">
+            <span style="width:32px;height:32px;border-radius:9px;background:var(--primary-soft);color:var(--primary);display:flex;align-items:center;justify-content:center"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>
+            <div><div style="font-size:15px;font-weight:800">Seguridad</div><div style="font-size:12px;color:var(--text-3)">Cambiar contraseña de acceso</div></div>
+          </div>
+          <div style="padding:20px;max-width:560px">
+            <div style="margin-bottom:16px">
+              <label style="display:block;font-size:12.5px;font-weight:700;color:var(--text-2);margin-bottom:7px">Contraseña actual</label>
+              <input type="{{ pwInputType }}" value="{{ pwA }}" onInput="{{ onPwA }}" placeholder="••••••••" style="width:100%;background:var(--surface-2);border:1px solid var(--border);border-radius:9px;padding:11px 12px;font-size:14px;color:var(--text)">
+            </div>
+            <div style="display:grid;grid-template-columns:{{ pfCols }};gap:16px;margin-bottom:14px">
+              <div>
+                <label style="display:block;font-size:12.5px;font-weight:700;color:var(--text-2);margin-bottom:7px">Nueva contraseña</label>
+                <input type="{{ pwInputType }}" value="{{ pwN }}" onInput="{{ onPwN }}" placeholder="Mínimo 8 caracteres" style="width:100%;background:var(--surface-2);border:1px solid var(--border);border-radius:9px;padding:11px 12px;font-size:14px;color:var(--text)">
+              </div>
+              <div>
+                <label style="display:block;font-size:12.5px;font-weight:700;color:var(--text-2);margin-bottom:7px">Confirmar nueva contraseña</label>
+                <input type="{{ pwInputType }}" value="{{ pwC }}" onInput="{{ onPwC }}" placeholder="Repita la contraseña" style="width:100%;background:var(--surface-2);border:1px solid {{ pwConfirmBorder }};border-radius:9px;padding:11px 12px;font-size:14px;color:var(--text)">
+              </div>
+            </div>
+
+            <!-- strength -->
+            <sc-if value="{{ pwHasNew }}" hint-placeholder-val="{{ false }}">
+            <div style="margin-bottom:8px">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px"><span style="font-size:11.5px;color:var(--text-3);font-weight:600">Fortaleza</span><span style="font-size:11.5px;font-weight:700;color:{{ pwColor }}">{{ pwLabel }}</span></div>
+              <div style="height:7px;border-radius:999px;background:var(--surface-3);overflow:hidden"><div style="height:100%;width:{{ pwPct }};background:{{ pwColor }};border-radius:999px"></div></div>
+            </div>
+            </sc-if>
+
+            <!-- match -->
+            <sc-if value="{{ pwMismatch }}" hint-placeholder-val="{{ false }}"><div style="font-size:12px;font-weight:600;color:var(--bad);margin-bottom:12px">✕ Las contraseñas no coinciden</div></sc-if>
+            <sc-if value="{{ pwMatch }}" hint-placeholder-val="{{ false }}"><div style="font-size:12px;font-weight:600;color:var(--ok);margin-bottom:12px">✓ Las contraseñas coinciden</div></sc-if>
+
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-top:8px">
+              <label style="display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--text-2);cursor:pointer"><input type="checkbox" onChange="{{ togglePwView }}" style="width:15px;height:15px;accent-color:var(--primary)"> Mostrar contraseñas</label>
+              <button onClick="{{ updatePassword }}" style="{{ pwBtnStyle }}">Actualizar contraseña</button>
+            </div>
+            <p style="font-size:11px;color:var(--text-3);margin:14px 0 0">La contraseña se transmite cifrada y es almacenada de forma segura (hash) por el sistema.</p>
+          </div>
+        </div>
+      </section>
+      </sc-if>
+
+    </main>
+  </div>
+</div>
+</sc-if>
+
+<!-- ================= UPLOAD MODAL ================= -->
+<sc-if value="{{ uploadOpen }}" hint-placeholder-val="{{ false }}">
+<div onClick="{{ closeUpload }}" style="position:fixed;inset:0;z-index:80;background:rgba(8,16,24,.55);display:flex;align-items:center;justify-content:center;padding:18px;animation:atu-fade .2s ease">
+  <div onClick="{{ stop }}" style="width:100%;max-width:720px;max-height:90vh;overflow:auto;background:var(--surface);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow-lg);animation:atu-pop .28s ease both">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:18px 20px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--surface)">
+      <div style="display:flex;align-items:center;gap:11px">
+        <span style="width:34px;height:34px;border-radius:9px;background:var(--primary-soft);color:var(--primary);display:flex;align-items:center;justify-content:center">📄</span>
+        <div><div style="font-size:15px;font-weight:800">Carga masiva — {{ uploadTitle }}</div><div style="font-size:12px;color:var(--text-3)">Importar desde plantilla Excel (.xlsx)</div></div>
+      </div>
+      <button onClick="{{ closeUpload }}" style="width:34px;height:34px;border-radius:9px;border:1px solid var(--border);background:var(--surface-2);color:var(--text-2);cursor:pointer;font-size:18px;line-height:1">✕</button>
+    </div>
+
+    <div style="padding:20px">
+      <!-- step drop -->
+      <sc-if value="{{ uploadDrop }}" hint-placeholder-val="{{ true }}">
+      <div>
+        <div onClick="{{ simulateUpload }}" style="border:2px dashed var(--border-strong);border-radius:14px;padding:40px 20px;text-align:center;cursor:pointer;background:var(--surface-2)">
+          <div style="width:58px;height:58px;border-radius:14px;background:var(--primary-soft);color:var(--primary);display:flex;align-items:center;justify-content:center;margin:0 auto 14px"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg></div>
+          <div style="font-size:15px;font-weight:700;margin-bottom:5px">Arrastre el archivo aquí o haga clic para seleccionar</div>
+          <div style="font-size:12.5px;color:var(--text-3)">Formatos admitidos: .xlsx, .xls, .csv — máx. 5 MB</div>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;margin-top:16px;padding:14px;border-radius:12px;background:var(--surface-2);border:1px solid var(--border)">
+          <div style="display:flex;align-items:center;gap:10px"><span style="font-size:18px">⬇️</span><div><div style="font-size:13px;font-weight:700">¿Aún no tiene el formato?</div><div style="font-size:12px;color:var(--text-3)">Descargue la plantilla oficial con las columnas requeridas</div></div></div>
+          <button onClick="{{ downloadTemplate }}" style="background:var(--surface);color:var(--text);border:1px solid var(--border-strong);border-radius:9px;padding:9px 14px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap">Descargar plantilla</button>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- step preview -->
+      <sc-if value="{{ uploadPreview }}" hint-placeholder-val="{{ false }}">
+      <div>
+        <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:14px">
+          <div style="flex:1;min-width:120px;padding:12px 14px;border-radius:11px;background:var(--surface-2);border:1px solid var(--border)"><div style="font-size:22px;font-weight:800">{{ uploadTotal }}</div><div style="font-size:11.5px;color:var(--text-3)">Filas detectadas</div></div>
+          <div style="flex:1;min-width:120px;padding:12px 14px;border-radius:11px;background:var(--ok-bg)"><div style="font-size:22px;font-weight:800;color:var(--ok)">{{ uploadValid }}</div><div style="font-size:11.5px;color:var(--ok)">Válidas</div></div>
+          <div style="flex:1;min-width:120px;padding:12px 14px;border-radius:11px;background:var(--bad-bg)"><div style="font-size:22px;font-weight:800;color:var(--bad)">{{ uploadErrors }}</div><div style="font-size:11.5px;color:var(--bad)">Con error</div></div>
+        </div>
+        <div style="border:1px solid var(--border);border-radius:12px;overflow:hidden;overflow-x:auto">
+          <div style="min-width:560px">
+            <div style="display:flex;gap:10px;padding:11px 14px;background:var(--surface-2);border-bottom:1px solid var(--border);font-size:11px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.5px">
+              <sc-for list="{{ uploadCols }}" as="c" hint-placeholder-count="5"><div style="flex:1">{{ c }}</div></sc-for>
+              <div style="width:96px;text-align:right">Validación</div>
+            </div>
+            <sc-for list="{{ uploadRows }}" as="r" hint-placeholder-count="5">
+              <div style="display:flex;gap:10px;padding:11px 14px;border-bottom:1px solid var(--border);font-size:12.5px;align-items:center;background:{{ r.rowBg }}">
+                <sc-for list="{{ r.cells }}" as="c" hint-placeholder-count="5"><div style="flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:'JetBrains Mono',monospace;font-size:11.5px">{{ c }}</div></sc-for>
+                <div style="width:96px;text-align:right">
+                  <sc-if value="{{ r.ok }}" hint-placeholder-val="{{ true }}"><span style="font-size:11px;font-weight:700;color:var(--ok);background:var(--ok-bg);padding:3px 9px;border-radius:999px">✓ Válida</span></sc-if>
+                  <sc-if value="{{ r.bad }}" hint-placeholder-val="{{ false }}"><span title="{{ r.error }}" style="font-size:11px;font-weight:700;color:var(--bad);background:var(--bad-bg);padding:3px 9px;border-radius:999px">✕ Error</span></sc-if>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+        <sc-if value="{{ uploadHasError }}" hint-placeholder-val="{{ false }}">
+          <div style="margin-top:12px;font-size:12.5px;color:var(--bad);background:var(--bad-bg);padding:11px 14px;border-radius:10px">⚠️ {{ uploadErrors }} fila(s) con errores se omitirán. Pase el cursor sobre cada "Error" para ver el detalle, o corrija el archivo y vuelva a cargar.</div>
+        </sc-if>
+      </div>
+      </sc-if>
+    </div>
+
+    <div style="display:flex;justify-content:flex-end;gap:10px;padding:16px 20px;border-top:1px solid var(--border);position:sticky;bottom:0;background:var(--surface)">
+      <button onClick="{{ closeUpload }}" style="background:var(--surface);color:var(--text-2);border:1px solid var(--border);border-radius:9px;padding:11px 16px;font-size:13.5px;font-weight:600;cursor:pointer">Cancelar</button>
+      <sc-if value="{{ uploadPreview }}" hint-placeholder-val="{{ false }}">
+        <button onClick="{{ confirmUpload }}" style="background:var(--primary);color:var(--primary-contrast);border:none;border-radius:9px;padding:11px 18px;font-size:13.5px;font-weight:700;cursor:pointer">Importar {{ uploadValid }} registros</button>
+      </sc-if>
+    </div>
+  </div>
+</div>
+</sc-if>
+
+<!-- ================= TOAST ================= -->
+<sc-if value="{{ toastShow }}" hint-placeholder-val="{{ false }}">
+  <div style="position:fixed;left:50%;bottom:26px;transform:translateX(-50%);z-index:90;background:var(--text);color:var(--surface);padding:12px 20px;border-radius:12px;font-size:13.5px;font-weight:600;box-shadow:var(--shadow-lg);animation:atu-pop .3s ease both">{{ toastMsg }}</div>
+</sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:&quot;100%&quot;,&quot;height&quot;:&quot;100%&quot;}}">
+class Component extends DCLogic {
+  state = {
+    theme: 'light',
+    screen: 'login',
+    sidebarCollapsed: false,
+    drawerOpen: false,
+    vw: (typeof window!=='undefined'?window.innerWidth:1280),
+    loginEntity: 'Municipalidad Provincial de Arequipa',
+    showPwd: false,
+    selEmpId: 1,
+    empView: 'grid',
+    vehView: 'grid',
+    empFilters: { q:'', tipo:'todos', estado:'todos' },
+    vehFilters: { q:'', cat:'todas', estado:'todos' },
+    dashFilters: { tipo:'todos', rango:'60' },
+    uploadOpen: false, uploadCtx:'empresas', uploadStep:'drop',
+    toast: '',
+    perfilEditing:false,
+    pf:{ telefono:'+51 958 472 130', correo:'carlos.ramirez@muni-arequipa.gob.pe', cargo:'Jefe de la Unidad de Transporte y Vialidad' },
+    pfDraft:{ telefono:'', correo:'', cargo:'' },
+    pwA:'', pwN:'', pwC:'', pwShow:false,
+  };
+
+  today = new Date(2026,5,23);
+
+  E = [
+    {id:1,razon:'Transportes Cruz del Sur S.A.C.',ruc:'20100345678',persona:'juridica',partida:'P11023456',tipo:'pasajeros',acto:'R.D. N° 0452-2023-ATU/DIR',ini:'2023-03-15',fin:'2028-03-14',estado:'vigente'},
+    {id:2,razon:'Turismo Civa E.I.R.L.',ruc:'20512348765',persona:'juridica',partida:'P11098765',tipo:'turistico',acto:'R.D. N° 0871-2022-ATU/DIR',ini:'2022-08-01',fin:'2026-07-31',estado:'vigente'},
+    {id:3,razon:'Carga Andina del Perú S.A.C.',ruc:'20480091234',persona:'juridica',partida:'P12345001',tipo:'carga',acto:'R.D. N° 1290-2024-ATU/DIR',ini:'2024-01-10',fin:'2029-01-09',estado:'vigente'},
+    {id:4,razon:'E. de Transp. Flores Hnos. S.R.L.',ruc:'20131290456',persona:'juridica',partida:'P11005678',tipo:'pasajeros',acto:'R.D. N° 0233-2021-ATU/DIR',ini:'2021-05-20',fin:'2026-05-19',estado:'vencido'},
+    {id:5,razon:'Serv. Turísticos Inca Express S.A.C.',ruc:'20603457890',persona:'juridica',partida:'P13456789',tipo:'turistico',acto:'R.D. N° 0654-2023-ATU/DIR',ini:'2023-09-01',fin:'2026-08-15',estado:'vigente'},
+    {id:6,razon:'Juan Carlos Mendoza Quispe',ruc:'10456789012',persona:'natural',partida:'—',tipo:'carga',acto:'R.D. N° 1450-2024-ATU/DIR',ini:'2024-04-12',fin:'2027-04-11',estado:'vigente'},
+    {id:7,razon:'Transportes El Sol del Misti S.A.C.',ruc:'20455671234',persona:'juridica',partida:'P14001234',tipo:'pasajeros',acto:'R.D. N° 0098-2020-ATU/DIR',ini:'2020-02-01',fin:'2025-01-31',estado:'cancelado'},
+    {id:8,razon:'Logística y Carga Pacífico E.I.R.L.',ruc:'20559087612',persona:'juridica',partida:'P15009876',tipo:'carga',acto:'R.D. N° 0777-2023-ATU/DIR',ini:'2023-06-15',fin:'2028-06-14',estado:'suspendido'},
+    {id:9,razon:'Expreso Internacional Ormeño S.A.C.',ruc:'20100887766',persona:'juridica',partida:'P11003344',tipo:'pasajeros',acto:'R.D. N° 0512-2024-ATU/DIR',ini:'2024-07-01',fin:'2029-06-30',estado:'vigente'},
+    {id:10,razon:'María Elena Huamán Torres',ruc:'10712345678',persona:'natural',partida:'—',tipo:'turistico',acto:'R.D. N° 1102-2025-ATU/DIR',ini:'2025-03-01',fin:'2026-09-30',estado:'vigente'},
+  ];
+
+  V = [
+    {placa:'ABC-123',emp:1,cat:'M3',tuc:'TUC-2023-004581',ini:'2023-03-20',fin:'2028-03-19',estado:'vigente'},
+    {placa:'ABD-456',emp:1,cat:'M3',tuc:'TUC-2023-004582',ini:'2023-03-20',fin:'2026-07-10',estado:'vigente'},
+    {placa:'ABE-789',emp:1,cat:'M2',tuc:'TUC-2023-004590',ini:'2023-04-01',fin:'2028-03-31',estado:'vigente'},
+    {placa:'ABF-201',emp:1,cat:'M3',tuc:'TUC-2021-001120',ini:'2021-01-01',fin:'2026-05-30',estado:'vencida'},
+    {placa:'B2C-334',emp:2,cat:'M3',tuc:'TUC-2022-008701',ini:'2022-08-05',fin:'2026-07-31',estado:'vigente'},
+    {placa:'B2D-118',emp:2,cat:'M2',tuc:'TUC-2022-008702',ini:'2022-08-05',fin:'2026-07-31',estado:'vigente'},
+    {placa:'B2E-990',emp:2,cat:'M3',tuc:'TUC-2024-010044',ini:'2024-02-01',fin:'2029-01-31',estado:'vigente'},
+    {placa:'C3A-771',emp:3,cat:'N3',tuc:'TUC-2024-012001',ini:'2024-01-15',fin:'2029-01-14',estado:'vigente'},
+    {placa:'C3B-552',emp:3,cat:'N2',tuc:'TUC-2024-012002',ini:'2024-01-15',fin:'2029-01-14',estado:'vigente'},
+    {placa:'C3C-333',emp:3,cat:'N3',tuc:'TUC-2024-012010',ini:'2024-03-01',fin:'2026-08-20',estado:'vigente'},
+    {placa:'D4A-220',emp:4,cat:'M3',tuc:'TUC-2021-002301',ini:'2021-05-25',fin:'2026-05-19',estado:'vencida'},
+    {placa:'D4B-447',emp:4,cat:'M2',tuc:'TUC-2021-002302',ini:'2021-05-25',fin:'2026-05-19',estado:'vencida'},
+    {placa:'E5A-665',emp:5,cat:'M2',tuc:'TUC-2023-006540',ini:'2023-09-05',fin:'2026-08-15',estado:'vigente'},
+    {placa:'E5B-889',emp:5,cat:'M3',tuc:'TUC-2023-006541',ini:'2023-09-05',fin:'2028-09-04',estado:'vigente'},
+    {placa:'F6A-101',emp:6,cat:'N1',tuc:'TUC-2024-014501',ini:'2024-04-15',fin:'2027-04-14',estado:'vigente'},
+    {placa:'F6B-202',emp:6,cat:'N2',tuc:'TUC-2024-014502',ini:'2024-04-15',fin:'2027-04-14',estado:'suspendida'},
+    {placa:'G7A-303',emp:7,cat:'M3',tuc:'TUC-2020-000981',ini:'2020-02-05',fin:'2025-01-31',estado:'cancelada'},
+    {placa:'G7B-404',emp:7,cat:'M2',tuc:'TUC-2020-000982',ini:'2020-02-05',fin:'2025-01-31',estado:'cancelada'},
+    {placa:'H8A-505',emp:8,cat:'N3',tuc:'TUC-2023-007770',ini:'2023-06-20',fin:'2028-06-19',estado:'suspendida'},
+    {placa:'H8B-606',emp:8,cat:'N2',tuc:'TUC-2023-007771',ini:'2023-06-20',fin:'2028-06-19',estado:'suspendida'},
+    {placa:'J9A-707',emp:9,cat:'M3',tuc:'TUC-2024-005120',ini:'2024-07-05',fin:'2029-07-04',estado:'vigente'},
+    {placa:'J9B-808',emp:9,cat:'M3',tuc:'TUC-2024-005121',ini:'2024-07-05',fin:'2029-07-04',estado:'vigente'},
+    {placa:'J9C-909',emp:9,cat:'M2',tuc:'TUC-2024-005122',ini:'2024-07-05',fin:'2026-08-05',estado:'vigente'},
+    {placa:'J9D-011',emp:9,cat:'M3',tuc:'TUC-2024-005123',ini:'2024-07-05',fin:'2029-07-04',estado:'vigente'},
+    {placa:'K1A-112',emp:10,cat:'M1',tuc:'TUC-2025-011020',ini:'2025-03-05',fin:'2026-09-30',estado:'vigente'},
+    {placa:'K1B-223',emp:10,cat:'M2',tuc:'TUC-2025-011021',ini:'2025-03-05',fin:'2028-03-04',estado:'vigente'},
+  ];
+
+  tipoLabels = { pasajeros:'Pasajeros', turistico:'Turístico', carga:'Carga / Comercio' };
+  catLabels = { M1:'Auto', M2:'Minibús', M3:'Bus', N1:'Camioneta', N2:'Camión', N3:'Tracto' };
+  estLabels = { vigente:'Vigente', vencido:'Vencido', suspendido:'Suspendido', cancelado:'Cancelado', vencida:'Vencida', suspendida:'Suspendida', cancelada:'Cancelada' };
+
+  // ---- lifecycle ----
+  componentDidMount(){
+    this._onResize = () => this.setState({ vw: window.innerWidth });
+    window.addEventListener('resize', this._onResize);
+    this.scheduleCharts();
+  }
+  componentWillUnmount(){ window.removeEventListener('resize', this._onResize); this.destroyCharts(); }
+  ensureCharts(){
+    if(this.state.screen!=='dashboard') return;
+    const key = this.state.theme+'|'+this.state.dashFilters.tipo+'|'+(this.state.vw<760?'s':'l');
+    if(key===this._chartKey) return;
+    this._chartKey=key;
+    this.scheduleCharts();
+  }
+
+  // ---- helpers ----
+  css(str){ const o={}; (str||'').split(';').forEach(part=>{ const i=part.indexOf(':'); if(i<0) return; const k=part.slice(0,i).trim(); const v=part.slice(i+1).trim(); if(!k) return; o[k.replace(/-([a-z])/g,(m,c)=>c.toUpperCase())]=v; }); return o; }
+  fmt(d){ const p=d.split('-'); return p.length===3? (p[2]+'/'+p[1]+'/'+p[0]) : d; }
+  days(fin){ return Math.round((new Date(fin) - this.today)/86400000); }
+  tone(estado){
+    if(estado==='vigente') return 'ok';
+    if(estado==='suspendido'||estado==='suspendida') return 'neutral';
+    return 'bad';
+  }
+  badge(tone){
+    const m={ ok:{bg:'var(--ok-bg)',fg:'var(--ok)'}, warn:{bg:'var(--warn-bg)',fg:'var(--warn)'}, bad:{bg:'var(--bad-bg)',fg:'var(--bad)'}, neutral:{bg:'var(--neutral-bg)',fg:'var(--neutral)'} };
+    return m[tone]||m.neutral;
+  }
+  vehOf(empId){ return this.V.filter(v=>v.emp===empId); }
+  enrichEmp(e){
+    const vs=this.vehOf(e.id);
+    const dias=this.days(e.fin);
+    const porVencer = e.estado==='vigente' && dias>0 && dias<=60;
+    const b=this.badge(this.tone(e.estado));
+    return Object.assign({}, e, {
+      personaLabel: e.persona==='juridica'?'Persona jurídica':'Persona natural',
+      tipoLabel: this.tipoLabels[e.tipo],
+      iniF:this.fmt(e.ini), finF:this.fmt(e.fin),
+      estadoText:this.estLabels[e.estado], badgeBg:b.bg, badgeFg:b.fg,
+      porVencer, venceTxt:'Vence en '+dias+' días', dias,
+      vehCount:vs.length, onVer:()=>this.openVeh(e.id),
+    });
+  }
+  enrichVeh(v){
+    const dias=this.days(v.fin);
+    const porVencer = v.estado==='vigente' && dias>0 && dias<=60;
+    const b=this.badge(this.tone(v.estado));
+    return Object.assign({}, v, {
+      catLabel:this.catLabels[v.cat]||'',
+      iniF:this.fmt(v.ini), finF:this.fmt(v.fin),
+      estadoText:this.estLabels[v.estado], badgeBg:b.bg, badgeFg:b.fg,
+      porVencer, venceTxt:'Vence en '+dias+' días', dias,
+    });
+  }
+
+  // ---- handlers ----
+  toggleTheme=()=>this.setState(s=>({theme:s.theme==='light'?'dark':'light'}));
+  togglePwd=()=>this.setState(s=>({showPwd:!s.showPwd}));
+  onEntityChange=e=>this.setState({loginEntity:e.target.value});
+  doLogin=()=>{this._chartKey=null;this.setState({screen:'dashboard',drawerOpen:false});};
+  doLogout=()=>{this._chartKey=null;this.setState({screen:'login',drawerOpen:false});};
+  onHamburger=()=>{ if(this.state.vw<900) this.setState(s=>({drawerOpen:!s.drawerOpen})); else this.setState(s=>({sidebarCollapsed:!s.sidebarCollapsed})); };
+  closeDrawer=()=>this.setState({drawerOpen:false});
+  nav=(scr)=>{this._chartKey=null;this.setState({screen:scr,drawerOpen:false});};
+  goEmpresas=()=>this.nav('empresas');
+  openVeh=(id)=>{this._chartKey=null;this.setState({screen:'vehiculos',selEmpId:id,drawerOpen:false,vehFilters:{q:'',cat:'todas',estado:'todos'}});};
+
+  onEmpSearch=e=>{const v=e.target.value;this.setState(s=>({empFilters:Object.assign({},s.empFilters,{q:v})}));};
+  onEmpTipo=e=>{const v=e.target.value;this.setState(s=>({empFilters:Object.assign({},s.empFilters,{tipo:v})}));};
+  onEmpEstado=e=>{const v=e.target.value;this.setState(s=>({empFilters:Object.assign({},s.empFilters,{estado:v})}));};
+  setEmpGrid=()=>this.setState({empView:'grid'});
+  setEmpList=()=>this.setState({empView:'list'});
+
+  onVehSearch=e=>{const v=e.target.value;this.setState(s=>({vehFilters:Object.assign({},s.vehFilters,{q:v})}));};
+  onVehCat=e=>{const v=e.target.value;this.setState(s=>({vehFilters:Object.assign({},s.vehFilters,{cat:v})}));};
+  onVehEstado=e=>{const v=e.target.value;this.setState(s=>({vehFilters:Object.assign({},s.vehFilters,{estado:v})}));};
+  setVehGrid=()=>this.setState({vehView:'grid'});
+  setVehList=()=>this.setState({vehView:'list'});
+
+  onDashTipo=e=>{const v=e.target.value;this.setState(s=>({dashFilters:Object.assign({},s.dashFilters,{tipo:v})}));};
+  onDashRango=e=>{const v=e.target.value;this.setState(s=>({dashFilters:Object.assign({},s.dashFilters,{rango:v})}));};
+
+  openUploadEmp=()=>this.setState({uploadOpen:true,uploadCtx:'empresas',uploadStep:'drop'});
+  openUploadVeh=()=>this.setState({uploadOpen:true,uploadCtx:'vehiculos',uploadStep:'drop'});
+  closeUpload=()=>this.setState({uploadOpen:false});
+  stop=(e)=>{ e.stopPropagation(); };
+  simulateUpload=()=>this.setState({uploadStep:'preview'});
+  confirmUpload=()=>{ this.setState({uploadOpen:false}); this.toast('Registros importados correctamente'); };
+  downloadTemplate=()=>this.toast('Descargando plantilla oficial ATU (.xlsx)…');
+  addAction=()=>this.toast('Formulario de registro (demo)');
+  editAction=()=>this.toast('Editar registro (demo)');
+  exportAction=()=>this.toast('Exportando a Excel…');
+
+  toast(msg){ clearTimeout(this._t); this.setState({toast:msg}); this._t=setTimeout(()=>this.setState({toast:''}),2200); }
+
+  // ---- perfil ----
+  goPerfil=()=>{this._chartKey=null;this.setState({screen:'perfil',drawerOpen:false});};
+  startEditPerfil=()=>this.setState(s=>({perfilEditing:true, pfDraft:Object.assign({},s.pf)}));
+  cancelEditPerfil=()=>this.setState({perfilEditing:false});
+  savePerfil=()=>{ const d=this.state.pfDraft; if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(d.correo)){ this.toast('Corrija el correo electrónico'); return; } this.setState({pf:Object.assign({},d), perfilEditing:false}); this.toast('Datos actualizados correctamente'); };
+  onPfCorreo=e=>{const v=e.target.value;this.setState(s=>({pfDraft:Object.assign({},s.pfDraft,{correo:v})}));};
+  onPfTelefono=e=>{const v=e.target.value;this.setState(s=>({pfDraft:Object.assign({},s.pfDraft,{telefono:v})}));};
+  onPfCargo=e=>{const v=e.target.value;this.setState(s=>({pfDraft:Object.assign({},s.pfDraft,{cargo:v})}));};
+  onPwA=e=>{const v=e.target.value;this.setState({pwA:v});};
+  onPwN=e=>{const v=e.target.value;this.setState({pwN:v});};
+  onPwC=e=>{const v=e.target.value;this.setState({pwC:v});};
+  togglePwView=e=>this.setState({pwShow:e.target.checked});
+  pwStrength(p){ let s=0; if(!p) return 0; if(p.length>=8)s++; if(/[A-Z]/.test(p)&&/[a-z]/.test(p))s++; if(/\d/.test(p))s++; if(/[^A-Za-z0-9]/.test(p))s++; return s; }
+  updatePassword=()=>{ const {pwA,pwN,pwC}=this.state; if(!pwA){ this.toast('Ingrese su contraseña actual'); return; } if(this.pwStrength(pwN)<2){ this.toast('La nueva contraseña es demasiado débil'); return; } if(pwN!==pwC){ this.toast('Las contraseñas no coinciden'); return; } this.setState({pwA:'',pwN:'',pwC:''}); this.toast('Contraseña actualizada correctamente'); };
+  downloadFormato=()=>this.toast('Descargando formato en blanco (.xlsx)…');
+
+  // ---- charts ----
+  scheduleCharts(){
+    if(this.state.screen!=='dashboard') return;
+    if(typeof window==='undefined') return;
+    if(!window.Chart){ this._retry=(this._retry||0)+1; if(this._retry<60) setTimeout(()=>this.scheduleCharts(),100); return; }
+    this._retry=0;
+    setTimeout(()=>{ try{ this.buildCharts(); }catch(e){} }, 40);
+  }
+  destroyCharts(){ if(this._charts){ Object.values(this._charts).forEach(c=>{try{c.destroy();}catch(e){}}); } this._charts={}; }
+  palette(){
+    const dark=this.state.theme==='dark';
+    return {
+      serv: dark?['#3FA0DA','#7CC6EE','#4FCB8B']:['#0E5A8A','#3FA0DA','#159B5E'],
+      bar: dark?'#49A6DC':'#1E78AC',
+      tuc: dark?['#3FC078','#E27062','#9BADBB','#5E7184']:['#15803D','#C0392B','#5E6E7E','#334155'],
+      line: dark?'#49A6DC':'#0E5A8A',
+      lineFill: dark?'rgba(73,166,220,.18)':'rgba(14,90,138,.14)',
+      grid: dark?'#243646':'#E6EDF3',
+      tick: dark?'#AFC1CF':'#52647A',
+    };
+  }
+  getDash(){
+    const tf=this.state.dashFilters.tipo;
+    const emps=this.E.filter(e=> tf==='todos'||e.tipo===tf);
+    const empIds=new Set(emps.map(e=>e.id));
+    const vehs=this.V.filter(v=>empIds.has(v.emp));
+    return {emps,vehs};
+  }
+  buildCharts(){
+    if(!window.Chart) return;
+    this.destroyCharts();
+    const P=this.palette();
+    const {emps,vehs}=this.getDash();
+    Chart.defaults.font.family="'Plus Jakarta Sans',sans-serif";
+    Chart.defaults.color=P.tick;
+    const mk=(id,cfg)=>{ const el=document.getElementById(id); if(!el) return; this._charts[id]=new Chart(el,cfg); };
+    const legend={position:'bottom',labels:{boxWidth:10,boxHeight:10,usePointStyle:true,pointStyle:'circle',padding:14,font:{size:12}}};
+
+    // servicio doughnut
+    const sc={pasajeros:0,turistico:0,carga:0};
+    emps.forEach(e=>sc[e.tipo]++);
+    mk('atuChServicio',{type:'doughnut',data:{labels:['Pasajeros','Turístico','Carga / Comercio'],datasets:[{data:[sc.pasajeros,sc.turistico,sc.carga],backgroundColor:P.serv,borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,cutout:'62%',plugins:{legend}}});
+
+    // categoria bar
+    const cats=['M1','M2','M3','N1','N2','N3'];
+    const cc=cats.map(c=>vehs.filter(v=>v.cat===c).length);
+    mk('atuChCategoria',{type:'bar',data:{labels:cats,datasets:[{data:cc,backgroundColor:P.bar,borderRadius:6,maxBarThickness:42}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{color:P.tick,font:{weight:600}}},y:{beginAtZero:true,grid:{color:P.grid},ticks:{color:P.tick,precision:0,stepSize:2}}}}});
+
+    // tuc estado doughnut
+    const ts={vigente:0,vencida:0,suspendida:0,cancelada:0};
+    vehs.forEach(v=>{ if(ts[v.estado]!==undefined) ts[v.estado]++; });
+    mk('atuChTuc',{type:'doughnut',data:{labels:['Vigente','Vencida','Suspendida','Cancelada'],datasets:[{data:[ts.vigente,ts.vencida,ts.suspendida,ts.cancelada],backgroundColor:P.tuc,borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,cutout:'62%',plugins:{legend}}});
+
+    // tendencia line (TUC venciendo por mes 2026)
+    const months=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+    const counts=new Array(12).fill(0);
+    vehs.forEach(v=>{ const d=new Date(v.fin); if(d.getFullYear()===2026) counts[d.getMonth()]++; });
+    mk('atuChTendencia',{type:'line',data:{labels:months,datasets:[{data:counts,borderColor:P.line,backgroundColor:P.lineFill,fill:true,tension:.35,borderWidth:2.5,pointRadius:3,pointBackgroundColor:P.line}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{color:P.tick}},y:{beginAtZero:true,grid:{color:P.grid},ticks:{color:P.tick,precision:0,stepSize:1}}}}});
+  }
+
+  renderVals(){
+    const s=this.state;
+    this.ensureCharts();
+    const dark=s.theme==='dark';
+    const isMobile=s.vw<900;
+    const collapsed=!isMobile && s.sidebarCollapsed;
+    const navText = collapsed ? 'display:none' : '';
+
+    // sidebar style
+    let sidebarStyle;
+    const base='display:flex;flex-direction:column;background:var(--surface);border-right:1px solid var(--border);';
+    if(isMobile){
+      sidebarStyle = base+'position:fixed;left:0;top:62px;bottom:0;width:264px;z-index:35;transform:translateX('+(s.drawerOpen?'0':'-110%')+');box-shadow:'+(s.drawerOpen?'var(--shadow-lg)':'none')+';';
+    } else {
+      sidebarStyle = base+'width:'+(collapsed?'74px':'248px')+';flex:none;position:sticky;top:62px;height:calc(100vh - 62px)';
+    }
+
+    // nav items
+    const navBtn=(active)=> 'width:100%;display:flex;align-items:center;gap:12px;padding:11px 12px;border-radius:11px;border:none;cursor:pointer;font-size:13.5px;font-weight:600;text-align:left;'+(collapsed?'justify-content:center;':'')+(active?'background:var(--primary-soft);color:var(--primary);':'background:transparent;color:var(--text-2);');
+    const ic=(p)=>'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+p+'</svg>';
+    // count alerts for badge
+    const alerts=this.computeAlertas();
+    const navItems=[
+      {key:'dashboard',label:'Dashboard',icon:this.iconEl('M3 13h8V3H3zM13 21h8V3h-8zM3 21h8v-6H3z'),style:this.css(navBtn(s.screen==='dashboard')),onClick:()=>this.nav('dashboard'),showBadge:false,badge:''},
+      {key:'empresas',label:'Empresas de Transporte',icon:this.iconEl('M3 21h18M5 21V7l8-4v18M19 21V11l-6-4M9 9v.01M9 13v.01M9 17v.01'),style:this.css(navBtn(s.screen==='empresas')),onClick:()=>this.nav('empresas'),showBadge:false,badge:''},
+      {key:'vehiculos',label:'Vehículos',icon:this.iconEl('M5 17a2 2 0 1 0 4 0 2 2 0 0 0-4 0M15 17a2 2 0 1 0 4 0 2 2 0 0 0-4 0M5 17H3V6a1 1 0 0 1 1-1h11v12M9 17h6M15 9h4l2 4v4h-2'),style:this.css(navBtn(s.screen==='vehiculos')),onClick:()=>this.openVeh(s.selEmpId),showBadge:true,badge:String(alerts.length)},
+    ];
+
+    // ---- empresas ----
+    let emps=this.E.map(e=>this.enrichEmp(e));
+    const ef=s.empFilters;
+    const q=ef.q.trim().toLowerCase();
+    let empF=emps.filter(e=>{
+      if(ef.tipo!=='todos' && e.tipo!==ef.tipo) return false;
+      if(ef.estado!=='todos' && e.estado!==ef.estado) return false;
+      if(q && !(e.razon.toLowerCase().includes(q)||e.ruc.includes(q))) return false;
+      return true;
+    });
+    const empView = isMobile ? 'list' : s.empView;
+
+    // ---- selected empresa + vehiculos ----
+    const selRaw=this.E.find(e=>e.id===s.selEmpId)||this.E[0];
+    const selVehAll=this.vehOf(selRaw.id);
+    const selEmp=Object.assign(this.enrichEmp(selRaw),{
+      vTotal:selVehAll.length,
+      vVig:selVehAll.filter(v=>v.estado==='vigente').length,
+      vVenc:selVehAll.filter(v=>v.estado==='vencida'||v.estado==='cancelada').length,
+    });
+    const vf=s.vehFilters;
+    const vq=vf.q.trim().toLowerCase();
+    let vehF=selVehAll.map(v=>this.enrichVeh(v)).filter(v=>{
+      if(vf.cat!=='todas' && v.cat!==vf.cat) return false;
+      if(vf.estado!=='todos' && v.estado!==vf.estado) return false;
+      if(vq && !(v.placa.toLowerCase().includes(vq)||v.tuc.toLowerCase().includes(vq))) return false;
+      return true;
+    });
+    const vehView = isMobile ? 'list' : s.vehView;
+
+    // ---- dashboard ----
+    const {emps:dEmps,vehs:dVehs}=this.getDash();
+    const tucVig=dVehs.filter(v=>v.estado==='vigente').length;
+    const pct = dVehs.length? Math.round(tucVig/dVehs.length*100):0;
+    const porVencer60 = dVehs.filter(v=>{const d=this.days(v.fin);return v.estado==='vigente'&&d>0&&d<=60;}).length;
+    const porVencer30 = dVehs.filter(v=>{const d=this.days(v.fin);return v.estado==='vigente'&&d>0&&d<=30;}).length;
+    const autVenc = dEmps.filter(e=>e.estado==='vencido'||e.estado==='cancelado').length;
+    const kpis=[
+      {label:'Empresas registradas',value:String(dEmps.length),icon:'🏢',accent:'var(--primary)',sub:String(dEmps.filter(e=>e.estado==='vigente').length)+' con autorización vigente',subColor:'var(--text-3)'},
+      {label:'Vehículos en padrón',value:String(dVehs.length),icon:'🚍',accent:'#3FA0DA',sub:tucVig+' con TUC vigente',subColor:'var(--text-3)'},
+      {label:'TUC vigentes',value:pct+'%',icon:'✅',accent:'var(--ok)',sub:'del total de vehículos',subColor:'var(--ok)'},
+      {label:'Por vencer (60 días)',value:String(porVencer60),icon:'⏳',accent:'var(--warn)',sub:porVencer30+' vencen en 30 días',subColor:'var(--warn)'},
+      {label:'Autorizaciones vencidas',value:String(autVenc),icon:'⛔',accent:'var(--bad)',sub:'requieren regularización',subColor:'var(--bad)'},
+    ];
+    const alertas = alerts.map(a=>{const b=this.badge(a.tone);return Object.assign({},a,{badgeBg:b.bg,badgeFg:b.fg});});
+
+    // ---- upload ----
+    const upEmpCols=['Razón social','RUC','Servicio','Inicio','Fin'];
+    const upVehCols=['Placa','Categoría','TUC','Inicio','Fin'];
+    const upEmpRows=[
+      {cells:['Transportes Nuevo Horizonte S.A.C.','20604512389','Pasajeros','01/02/2026','31/01/2031'],ok:true},
+      {cells:['Turismo Valle Sagrado E.I.R.L.','20559123476','Turístico','15/03/2026','14/03/2031'],ok:true},
+      {cells:['Carga Express Sur S.A.C.','2055X1—','Carga','10/01/2026','09/01/2031'],ok:false,error:'RUC inválido (debe tener 11 dígitos)'},
+      {cells:['Roberto Díaz Salas','10458823910','Carga','05/04/2026','04/04/2029'],ok:true},
+      {cells:['Transportes La Merced S.R.L.','20481557003','Pasajeros','—','—'],ok:false,error:'Falta fecha de fin de vigencia'},
+    ];
+    const upVehRows=[
+      {cells:['ABC-987','M3','TUC-2026-020011','01/02/2026','31/01/2031'],ok:true},
+      {cells:['XYZ-654','M2','TUC-2026-020012','01/02/2026','31/01/2031'],ok:true},
+      {cells:['12-3456','N3','TUC-2026-020013','01/02/2026','31/01/2031'],ok:false,error:'Placa con formato inválido (ABC-123)'},
+      {cells:['DEF-220','N2','TUC-2026-020014','01/02/2026','31/01/2031'],ok:true},
+      {cells:['GHI-771','—','TUC-2026-020015','01/02/2026','31/01/2031'],ok:false,error:'Categoría vehicular requerida'},
+    ];
+    const upRowsRaw = s.uploadCtx==='empresas'?upEmpRows:upVehRows;
+    const uploadRows = upRowsRaw.map(r=>Object.assign({},r,{bad:!r.ok, rowBg: r.ok?'transparent':'var(--bad-bg)'}));
+    const uploadValid = upRowsRaw.filter(r=>r.ok).length;
+    const uploadErrors = upRowsRaw.length-uploadValid;
+
+    const viewToggle='display:flex;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:3px;gap:2px';
+    const tb=(active)=>'width:34px;height:32px;border-radius:7px;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;'+(active?'background:var(--primary);color:var(--primary-contrast);':'background:transparent;color:var(--text-3);');
+
+    // ---- perfil ----
+    const tipoEntidad = /gobierno regional/i.test(s.loginEntity) ? 'regional' : 'municipal';
+    const correoErr = s.perfilEditing && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(s.pfDraft.correo);
+    const pwScore = this.pwStrength(s.pwN);
+    const pwLabels=['Muy débil','Débil','Media','Fuerte','Muy fuerte'];
+    const pwColors=['var(--bad)','var(--bad)','var(--warn)','var(--ok)','var(--ok)'];
+    const pwMatch = s.pwN.length>0 && s.pwC.length>0 && s.pwN===s.pwC;
+    const pwMismatch = s.pwC.length>0 && s.pwN!==s.pwC;
+    const canUpdatePw = s.pwA.length>0 && pwScore>=2 && pwMatch;
+    const perfilNavActive = s.screen==='perfil';
+    const pfNav='width:100%;display:flex;align-items:center;gap:12px;padding:11px 12px;border-radius:11px;border:none;cursor:pointer;font-size:13.5px;font-weight:600;text-align:left;'+(collapsed?'justify-content:center;':'')+(perfilNavActive?'background:var(--primary-soft);color:var(--primary);':'background:transparent;color:var(--text-2);');
+
+
+    return {
+      theme:s.theme,
+      isLogin:s.screen==='login', isApp:s.screen!=='login',
+      screenDashboard:s.screen==='dashboard', screenEmpresas:s.screen==='empresas', screenVehiculos:s.screen==='vehiculos',
+      themeIcon: dark?'☀️':'🌙', themeLabel: dark?'Claro':'Oscuro',
+      toggleTheme:this.toggleTheme,
+      // login
+      entityOpts:[
+        {value:'Municipalidad Provincial de Arequipa',label:'Municipalidad Provincial de Arequipa'},
+        {value:'Municipalidad Provincial de Trujillo',label:'Municipalidad Provincial de Trujillo'},
+        {value:'Municipalidad Provincial del Cusco',label:'Municipalidad Provincial del Cusco'},
+        {value:'Gobierno Regional de Arequipa',label:'Gobierno Regional de Arequipa'},
+        {value:'Gobierno Regional de La Libertad',label:'Gobierno Regional de La Libertad'},
+      ],
+      loginEntity:s.loginEntity, onEntityChange:this.onEntityChange,
+      pwdType:s.showPwd?'text':'password', togglePwd:this.togglePwd, pwdToggleLabel:s.showPwd?'Ocultar':'Mostrar',
+      doLogin:this.doLogin, brandStyle:'', formWrapStyle:'', userMetaStyle:'',
+      // shell
+      user:{name:'Carlos Ramírez', entity:s.loginEntity, initials:'CR'},
+      onHamburger:this.onHamburger, showBackdrop:isMobile && s.drawerOpen, closeDrawer:this.closeDrawer,
+      sidebarStyle:this.css(sidebarStyle), navItems, navTextStyle:this.css(navText), hideStr:(collapsed?'display:none':''), doLogout:this.doLogout,
+      goEmpresas:this.goEmpresas,
+      // empresas
+      empresas:empF, empCount:empF.length,
+      empShowTable:empView==='grid' && empF.length>0, empShowCards:empView==='list' && empF.length>0, empEmpty:empF.length===0,
+      empFilters:s.empFilters, onEmpSearch:this.onEmpSearch, onEmpTipo:this.onEmpTipo, onEmpEstado:this.onEmpEstado,
+      setEmpGrid:this.setEmpGrid, setEmpList:this.setEmpList,
+      viewToggleStyle:this.css(viewToggle), empGridBtnStyle:this.css(tb(empView==='grid')), empListBtnStyle:this.css(tb(empView==='list')),
+      tipoOpts:[{value:'todos',label:'Todos los servicios'},{value:'pasajeros',label:'Pasajeros'},{value:'turistico',label:'Turístico'},{value:'carga',label:'Carga / Comercio'}],
+      estadoEmpOpts:[{value:'todos',label:'Todos los estados'},{value:'vigente',label:'Vigente'},{value:'vencido',label:'Vencido'},{value:'suspendido',label:'Suspendido'},{value:'cancelado',label:'Cancelado'}],
+      openUploadEmp:this.openUploadEmp, exportAction:this.exportAction, addAction:this.addAction,
+      // vehiculos
+      selEmp, vehiculos:vehF,
+      vehShowTable:vehView==='grid' && vehF.length>0, vehShowCards:vehView==='list' && vehF.length>0, vehEmpty:vehF.length===0,
+      vehFilters:s.vehFilters, onVehSearch:this.onVehSearch, onVehCat:this.onVehCat, onVehEstado:this.onVehEstado,
+      setVehGrid:this.setVehGrid, setVehList:this.setVehList,
+      vehGridBtnStyle:this.css(tb(vehView==='grid')), vehListBtnStyle:this.css(tb(vehView==='list')),
+      catOpts:[{value:'todas',label:'Todas las categorías'},{value:'M1',label:'M1 · Auto'},{value:'M2',label:'M2 · Minibús'},{value:'M3',label:'M3 · Bus'},{value:'N1',label:'N1 · Camioneta'},{value:'N2',label:'N2 · Camión'},{value:'N3',label:'N3 · Tracto'}],
+      estadoVehOpts:[{value:'todos',label:'Todos los estados'},{value:'vigente',label:'Vigente'},{value:'vencida',label:'Vencida'},{value:'suspendida',label:'Suspendida'},{value:'cancelada',label:'Cancelada'}],
+      openUploadVeh:this.openUploadVeh, editAction:this.editAction,
+      // dashboard
+      kpis, alertas, alertCount:alertas.length,
+      dashFilters:s.dashFilters, onDashTipo:this.onDashTipo, onDashRango:this.onDashRango,
+      rangoOpts:[{value:'30',label:'Próximos 30 días'},{value:'60',label:'Próximos 60 días'},{value:'90',label:'Próximos 90 días'},{value:'year',label:'Todo el año'}],
+      chartGridCols: s.vw<760?'1fr':'1fr 1fr',
+      alertDueStyle:'',
+      // upload
+      uploadOpen:s.uploadOpen, uploadDrop:s.uploadStep==='drop', uploadPreview:s.uploadStep==='preview',
+      uploadTitle: s.uploadCtx==='empresas'?'Empresas de transporte':'Vehículos',
+      uploadCols: s.uploadCtx==='empresas'?upEmpCols:upVehCols, uploadRows,
+      uploadTotal:upRowsRaw.length, uploadValid, uploadErrors, uploadHasError:uploadErrors>0,
+      closeUpload:this.closeUpload, stop:this.stop, simulateUpload:this.simulateUpload, confirmUpload:this.confirmUpload, downloadTemplate:this.downloadTemplate,
+      // toast
+      toastShow: !!s.toast, toastMsg:s.toast,
+      // perfil
+      screenPerfil:s.screen==='perfil', perfilEditing:s.perfilEditing, perfilReadonly:!s.perfilEditing,
+      goPerfil:this.goPerfil, downloadFormato:this.downloadFormato,
+      perfilNavStyle:this.css(pfNav),
+      pfCols: isMobile?'1fr':'1fr 1fr',
+      pf:{ initials:'CR', nombreCompleto:'Carlos Alberto Ramírez Quispe', docTipo:'DNI', docNum:'41785236', entidad:s.loginEntity, tipoEntidadLabel: tipoEntidad==='regional'?'regional':'municipal', correo:s.pf.correo, telefono:s.pf.telefono, cargo:s.pf.cargo },
+      pfDraft:{ correo:s.pfDraft.correo, telefono:s.pfDraft.telefono, cargo:s.pfDraft.cargo },
+      startEditPerfil:this.startEditPerfil, cancelEditPerfil:this.cancelEditPerfil, savePerfil:this.savePerfil,
+      onPfCorreo:this.onPfCorreo, onPfTelefono:this.onPfTelefono, onPfCargo:this.onPfCargo,
+      correoError:correoErr, correoBorder: correoErr?'var(--bad)':'var(--border)',
+      pwA:s.pwA, pwN:s.pwN, pwC:s.pwC, onPwA:this.onPwA, onPwN:this.onPwN, onPwC:this.onPwC,
+      pwInputType: s.pwShow?'text':'password', togglePwView:this.togglePwView,
+      pwHasNew: s.pwN.length>0, pwLabel:pwLabels[pwScore], pwColor:pwColors[pwScore], pwPct:(pwScore/4*100)+'%',
+      pwMatch, pwMismatch, pwConfirmBorder: pwMismatch?'var(--bad)':(pwMatch?'var(--ok)':'var(--border)'),
+      pwBtnStyle: this.css('border:none;border-radius:9px;padding:11px 18px;font-size:13.5px;font-weight:700;'+(canUpdatePw?'background:var(--primary);color:var(--primary-contrast);cursor:pointer;':'background:var(--surface-3);color:var(--text-3);cursor:not-allowed;')),
+    };
+  }
+
+  iconEl(path){ return React.createElement('svg',{width:20,height:20,viewBox:'0 0 24 24',fill:'none',stroke:'currentColor',strokeWidth:2,strokeLinecap:'round',strokeLinejoin:'round'},React.createElement('path',{d:path})); }
+
+  computeAlertas(){
+    const out=[];
+    this.E.forEach(e=>{
+      const d=this.days(e.fin);
+      if(e.estado==='vencido'||e.estado==='cancelado'){
+        out.push({icon:'🏢',nombre:e.razon,detalle:'Autorización · '+e.acto,tone:'bad',estadoText:this.estLabels[e.estado],dueText:'Venció '+this.fmt(e.fin),sortDays:d});
+      } else if(e.estado==='vigente' && d>0 && d<=60){
+        out.push({icon:'🏢',nombre:e.razon,detalle:'Autorización vence pronto',tone:'warn',estadoText:'Por vencer',dueText:'En '+d+' días',sortDays:d});
+      }
+    });
+    this.V.forEach(v=>{
+      const d=this.days(v.fin);
+      const emp=this.E.find(x=>x.id===v.emp);
+      if(v.estado==='vencida'){
+        out.push({icon:'🚍',nombre:v.placa+' · '+(emp?emp.razon:''),detalle:v.tuc,tone:'bad',estadoText:'Vencida',dueText:'Venció '+this.fmt(v.fin),sortDays:d});
+      } else if(v.estado==='vigente' && d>0 && d<=60){
+        out.push({icon:'🚍',nombre:v.placa+' · '+(emp?emp.razon:''),detalle:v.tuc+' · por vencer',tone:'warn',estadoText:'Por vencer',dueText:'En '+d+' días',sortDays:d});
+      }
+    });
+    out.sort((a,b)=>a.sortDays-b.sortDays);
+    return out;
+  }
+}
+</script>
+</body>
+</html>
