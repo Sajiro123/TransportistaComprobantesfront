@@ -4,12 +4,13 @@ import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../core/services/auth.service';
 import { ApiAuthService } from '../../core/services/api-auth.service';
 import { ApiUsuarioService } from '../../core/services/api-usuario.service';
-import { Usuario } from '../../core/models/models';
+import { ApiComprobanteService } from '../../core/services/api-comprobante.service';
+import { Usuario, PerfilTransportista } from '../../core/models/models';
 
 @Component({
-    selector: 'app-perfil-info',
-    imports: [CommonModule, FormsModule],
-    template: `
+  selector: 'app-perfil-info',
+  imports: [CommonModule, FormsModule],
+  template: `
     <div class="space-y-6">
       <!-- Header Section -->
       <div
@@ -91,186 +92,517 @@ import { Usuario } from '../../core/models/models';
           </div>
 
           <!-- Info Grid -->
-          <div
-            class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs leading-normal pt-4 border-t border-atu-border dark:border-[#30363D]"
-          >
-            <!-- Nombre Completo (solo lectura) -->
-            <div class="space-y-1">
-              <span
-                class="text-atu-text-3 dark:text-[#6E7681] font-semibold uppercase tracking-wider block text-[10px]"
-                >Nombre Completo</span
+          <!-- Tarjetas de Información -->
+          <div class="mt-4 flex flex-col gap-5">
+            <!-- Datos de la Empresa -->
+            <div
+              class="group bg-white dark:bg-[#0D1117] border border-atu-border dark:border-[#30363D] rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden relative"
+            >
+              <div class="absolute inset-0 bg-gradient-to-r from-atu-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
+              <div
+                class="flex items-center justify-between px-5 py-4 border-b border-atu-border/50 dark:border-[#30363D]/50 bg-gray-50/50 dark:bg-white/[0.02]"
               >
-              <strong
-                class="text-sm text-atu-text dark:text-[#E6EDF3] font-semibold block"
-              >
-                {{ usuario?.nombre }} {{ usuario?.primerApellido }}
-                {{ usuario?.segundoApellido }}
-              </strong>
-            </div>
-
-            <!-- DNI (solo lectura) -->
-            <div class="space-y-1">
-              <span
-                class="text-atu-text-3 dark:text-[#6E7681] font-semibold uppercase tracking-wider block text-[10px]"
-              >
-                {{ usuario?.tipoDocumento || 'DNI' }}
-              </span>
-              <div class="flex items-center gap-2 flex-wrap">
-                <strong
-                  class="text-sm text-atu-text dark:text-[#E6EDF3] font-semibold"
-                >
-                  {{ usuario?.numDocumento || '—' }}
-                </strong>
+                <div class="flex items-center gap-3">
+                  <div class="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 flex items-center justify-center">
+                    <i class="fa-solid fa-building text-sm"></i>
+                  </div>
+                  <span
+                    class="text-base font-extrabold text-atu-text dark:text-[#E6EDF3]"
+                    >Datos de la empresa</span
+                  >
+                </div>
                 <span
-                  class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-bold bg-atu-surface-2 dark:bg-[#21262D] text-atu-text-3 dark:text-[#6E7681] border border-atu-border dark:border-[#30363D]"
+                  class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10.5px] font-bold bg-gray-100 dark:bg-[#21262D] text-gray-500 dark:text-[#8B949E] border border-gray-200 dark:border-[#30363D]"
                 >
                   <i class="fa-solid fa-lock text-[9px]"></i> No editable
                 </span>
               </div>
-            </div>
-
-            <!-- Correo (editable en modo edición) -->
-            <div class="space-y-1.5">
-              <span
-                class="text-atu-text-3 dark:text-[#6E7681] font-semibold uppercase tracking-wider block text-[10px]"
-                >Correo Institucional</span
+              <div
+                class="p-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 gap-x-8 text-xs leading-normal"
               >
-              @if (editMode) {
-                <input
-                  type="email"
-                  [(ngModel)]="editEmail"
-                  placeholder="correo&#64;entidad.gob.pe"
-                  class="w-full border border-atu-primary dark:border-[#00A3E0] rounded-lg bg-white dark:bg-[#0D1117] px-3 py-2 text-sm text-atu-text dark:text-[#E6EDF3] focus:outline-none focus:ring-2 focus:ring-atu-primary/30 dark:focus:ring-[#00A3E0]/30 transition-all"
-                />
-              } @else {
-                <strong
-                  class="text-sm text-atu-text dark:text-[#E6EDF3] font-semibold block break-all"
-                  >{{ usuario?.email }}</strong
-                >
-              }
-            </div>
-
-            <!-- Teléfono (editable en modo edición) -->
-            <div class="space-y-1.5">
-              <span
-                class="text-atu-text-3 dark:text-[#6E7681] font-semibold uppercase tracking-wider block text-[10px]"
-                >Teléfono</span
-              >
-              @if (editMode) {
-                <input
-                  type="number"
-                  [(ngModel)]="editTelefono"
-                  placeholder="9XX XXX XXX"
-                  class="w-full border border-atu-primary dark:border-[#00A3E0] rounded-lg bg-white dark:bg-[#0D1117] px-3 py-2 text-sm text-atu-text dark:text-[#E6EDF3] focus:outline-none focus:ring-2 focus:ring-atu-primary/30 dark:focus:ring-[#00A3E0]/30 transition-all"
-                />
-              } @else {
-                <strong
-                  class="text-sm text-atu-text dark:text-[#E6EDF3] font-semibold block"
-                >
-                  {{ usuario?.telefono || '—' }}
-                </strong>
-              }
-            </div>
-
-            <!-- Entidad Gubernamental (solo lectura) -->
-            <div class="space-y-1">
-              <span
-                class="text-atu-text-3 dark:text-[#6E7681] font-semibold uppercase tracking-wider block text-[10px]"
-                >Entidad Gubernamental</span
-              >
-              <strong
-                class="text-sm text-atu-text dark:text-[#E6EDF3] font-semibold block"
-                >{{ usuario?.entidad }}</strong
-              >
-            </div>
-
-            <!-- Tipo de Entidad (solo lectura) -->
-            <div class="space-y-1">
-              <span
-                class="text-atu-text-3 dark:text-[#6E7681] font-semibold uppercase tracking-wider block text-[10px]"
-                >Tipo de Entidad</span
-              >
-              <strong
-                class="text-sm text-atu-text dark:text-[#E6EDF3] font-semibold block"
-              >
-                {{
-                  usuario?.tipoEntidad === 'regional'
-                    ? 'Gobierno Regional'
-                    : usuario?.tipoEntidad === 'municipal'
-                      ? 'Municipalidad Provincial'
-                      : usuario?.tipoEntidad || '—'
-                }}
-              </strong>
-            </div>
-
-            <!-- Cargo (editable en modo edición) -->
-            <div class="space-y-1.5">
-              <span
-                class="text-atu-text-3 dark:text-[#6E7681] font-semibold uppercase tracking-wider block text-[10px]"
-                >Cargo</span
-              >
-              @if (editMode) {
-                <input
-                  type="text"
-                  [(ngModel)]="editCargo"
-                  placeholder="Cargo institucional"
-                  class="w-full border border-atu-primary dark:border-[#00A3E0] rounded-lg bg-white dark:bg-[#0D1117] px-3 py-2 text-sm text-atu-text dark:text-[#E6EDF3] focus:outline-none focus:ring-2 focus:ring-atu-primary/30 dark:focus:ring-[#00A3E0]/30 transition-all"
-                />
-              } @else {
-                <strong
-                  class="text-sm text-atu-text dark:text-[#E6EDF3] font-semibold block"
-                >
-                  {{ usuario?.cargo || '—' }}
-                </strong>
-              }
-            </div>
-
-            <!-- Perfil / Rol (solo lectura) -->
-            @if (usuario?.perfilNombre) {
-              <div class="space-y-1">
-                <span
-                  class="text-atu-text-3 dark:text-[#6E7681] font-semibold uppercase tracking-wider block text-[10px]"
-                  >Perfil / Rol</span
-                >
-                <strong
-                  class="text-sm text-atu-text dark:text-[#E6EDF3] font-semibold block"
-                >
-                  {{ usuario?.perfilNombre }}
-                </strong>
+                <div class="space-y-1.5 group/field">
+                  <span
+                    class="text-atu-text-3 dark:text-[#6E7681] font-semibold uppercase tracking-wider block text-[10.5px]"
+                    >Razón Social</span
+                  >
+                  <strong
+                    class="text-[15px] text-atu-text dark:text-[#E6EDF3] font-semibold block group-hover/field:text-atu-primary transition-colors"
+                    >{{ perfilTrans?.datosEmpresa?.razonSocial || '—' }}</strong
+                  >
+                </div>
+                <div class="space-y-1.5 group/field">
+                  <span
+                    class="text-atu-text-3 dark:text-[#6E7681] font-semibold uppercase tracking-wider block text-[10.5px]"
+                    >RUC</span
+                  >
+                  <strong
+                    class="text-[15px] text-atu-text dark:text-[#E6EDF3] font-semibold block group-hover/field:text-atu-primary transition-colors font-mono"
+                    >{{ perfilTrans?.datosEmpresa?.ruc || '—' }}</strong
+                  >
+                </div>
+                <div class="space-y-1.5 group/field">
+                  <span
+                    class="text-atu-text-3 dark:text-[#6E7681] font-semibold uppercase tracking-wider block text-[10.5px]"
+                    >Estado y Condición</span
+                  >
+                  <strong
+                    class="text-[15px] text-atu-text dark:text-[#E6EDF3] font-semibold block group-hover/field:text-atu-primary transition-colors"
+                  >
+                    {{ perfilTrans?.datosEmpresa?.estadoCondicion || '—' }}
+                  </strong>
+                </div>
+                <div class="space-y-1.5 group/field">
+                  <span
+                    class="text-atu-text-3 dark:text-[#6E7681] font-semibold uppercase tracking-wider block text-[10.5px]"
+                    >Tipo de Entidad</span
+                  >
+                  <strong
+                    class="text-[15px] text-atu-text dark:text-[#E6EDF3] font-semibold block group-hover/field:text-atu-primary transition-colors"
+                  >
+                    {{ perfilTrans?.datosEmpresa?.tipoEntidad || '—' }}
+                  </strong>
+                </div>
+                <div class="space-y-1.5 group/field">
+                  <span
+                    class="text-atu-text-3 dark:text-[#6E7681] font-semibold uppercase tracking-wider block text-[10.5px]"
+                    >Autoridad que Autorizó</span
+                  >
+                  <strong
+                    class="text-[15px] text-atu-text dark:text-[#E6EDF3] font-semibold block group-hover/field:text-atu-primary transition-colors"
+                  >
+                    {{ perfilTrans?.datosEmpresa?.autoridad || '—' }}
+                  </strong>
+                </div>
+                <div class="space-y-1.5 group/field">
+                  <span
+                    class="text-atu-text-3 dark:text-[#6E7681] font-semibold uppercase tracking-wider block text-[10.5px]"
+                    >Autorización Vigente</span
+                  >
+                  <div class="pt-0.5">
+                    @if (perfilTrans?.datosEmpresa?.autorizacionVigente) {
+                      <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-green-50 dark:bg-[#102A1C] text-green-700 dark:text-[#3FC078] border border-green-200 dark:border-green-900/30">
+                        <i class="fa-solid fa-circle-check text-[10px]"></i> Vigente
+                      </span>
+                    } @else {
+                      <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-red-50 dark:bg-[#2C1816] text-red-700 dark:text-[#E27062] border border-red-200 dark:border-red-900/30">
+                        <i class="fa-solid fa-circle-xmark text-[10px]"></i> No Vigente
+                      </span>
+                    }
+                  </div>
+                </div>
               </div>
-            }
+            </div>
 
-            <!-- Razón Social (solo lectura) -->
-            @if (usuario?.razonSocial) {
-              <div class="space-y-1">
+            <!-- Representante Legal -->
+            <div
+              class="group bg-white dark:bg-[#0D1117] border border-atu-border dark:border-[#30363D] rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden relative"
+            >
+              <div class="absolute inset-0 bg-gradient-to-r from-atu-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
+              <div
+                class="flex items-center justify-between px-5 py-4 border-b border-atu-border/50 dark:border-[#30363D]/50 bg-gray-50/50 dark:bg-white/[0.02]"
+              >
+                <div class="flex items-center gap-3">
+                  <div class="w-8 h-8 rounded-full bg-purple-100 dark:bg-purple-500/20 text-purple-600 dark:text-purple-400 flex items-center justify-center">
+                    <i class="fa-solid fa-id-card text-sm"></i>
+                  </div>
+                  <span
+                    class="text-base font-extrabold text-atu-text dark:text-[#E6EDF3]"
+                    >Representante legal</span
+                  >
+                </div>
                 <span
-                  class="text-atu-text-3 dark:text-[#6E7681] font-semibold uppercase tracking-wider block text-[10px]"
-                  >Razón Social</span
+                  class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10.5px] font-bold bg-gray-100 dark:bg-[#21262D] text-gray-500 dark:text-[#8B949E] border border-gray-200 dark:border-[#30363D]"
                 >
-                <strong
-                  class="text-sm text-atu-text dark:text-[#E6EDF3] font-semibold block"
-                >
-                  {{ usuario?.razonSocial }}
-                </strong>
-              </div>
-            }
-
-            @if (usuario?.documentoCargo) {
-              <div class="space-y-1 sm:col-span-2">
-                <span
-                  class="text-atu-text-3 dark:text-[#6E7681] font-semibold uppercase tracking-wider block text-[10px]"
-                  >Documento de Sustentación de Cargo</span
-                >
-                <span
-                  class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-atu-surface-2 dark:bg-[#21262D] border border-atu-border dark:border-[#30363D] rounded-lg text-sm font-semibold text-atu-text-2 dark:text-[#8B949E]"
-                >
-                  <i
-                    class="fa-solid fa-paperclip text-atu-text-3 dark:text-[#6E7681]"
-                  ></i>
-                  {{ usuario?.documentoCargo }}
+                  <i class="fa-solid fa-lock text-[9px]"></i> No editable
                 </span>
               </div>
-            }
+              <div
+                class="p-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 gap-x-8 text-xs leading-normal"
+              >
+                <div class="space-y-1.5 group/field">
+                  <span
+                    class="text-atu-text-3 dark:text-[#6E7681] font-semibold uppercase tracking-wider block text-[10.5px]"
+                    >Nombres y apellidos</span
+                  >
+                  <strong
+                    class="text-[15px] text-atu-text dark:text-[#E6EDF3] font-semibold block group-hover/field:text-atu-primary transition-colors"
+                  >
+                    {{ perfilTrans?.representanteLegal?.nombresApellidos || '—' }}
+                  </strong>
+                </div>
+                <div class="space-y-1.5 group/field">
+                  <span
+                    class="text-atu-text-3 dark:text-[#6E7681] font-semibold uppercase tracking-wider block text-[10.5px]"
+                    >Documento</span
+                  >
+                  <strong
+                    class="inline-flex items-center gap-2 text-[15px] text-atu-text dark:text-[#E6EDF3] font-semibold bg-gray-50 dark:bg-white/[0.03] px-2 py-0.5 rounded-md border border-gray-100 dark:border-white/10 font-mono group-hover/field:border-atu-primary/30 transition-colors"
+                  >
+                    <span class="text-atu-text-3 dark:text-[#8B949E] text-[11px]">{{ perfilTrans?.representanteLegal?.tipoDocumento || 'DNI' }}</span>
+                    {{ perfilTrans?.representanteLegal?.numeroDocumento || '—' }}
+                  </strong>
+                </div>
+              </div>
+            </div>
+
+            <!-- Contacto -->
+            <div
+              class="group bg-white dark:bg-[#0D1117] border border-atu-border dark:border-[#30363D] rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden relative"
+              [class.ring-2]="editMode"
+              [class.ring-atu-primary]="editMode"
+            >
+              <div class="absolute inset-0 bg-gradient-to-r from-atu-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
+              <div
+                class="flex items-center justify-between gap-3 px-5 py-4 border-b border-atu-border/50 dark:border-[#30363D]/50 bg-gray-50/50 dark:bg-white/[0.02]"
+              >
+                <div class="flex items-center gap-3">
+                  <div class="w-8 h-8 rounded-full bg-teal-100 dark:bg-teal-500/20 text-teal-600 dark:text-teal-400 flex items-center justify-center">
+                    <i class="fa-solid fa-address-book text-sm"></i>
+                  </div>
+                  <div>
+                    <div
+                      class="text-base font-extrabold text-atu-text dark:text-[#E6EDF3]"
+                    >
+                      Datos de contacto
+                    </div>
+                    <div
+                      class="text-[12px] text-atu-text-3 dark:text-[#6E7681] mt-0.5"
+                    >
+                      Mantén tus datos actualizados
+                    </div>
+                  </div>
+                </div>
+                @if (editMode) {
+                  <span class="animate-pulse inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold bg-blue-100 dark:bg-blue-500/20 text-blue-700 dark:text-blue-400">
+                    <i class="fa-solid fa-pen text-[9px]"></i> Editando
+                  </span>
+                }
+              </div>
+              <div
+                class="p-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 gap-x-8 text-xs leading-normal"
+              >
+                <!-- Nombre del Contacto -->
+                <div class="space-y-1.5 sm:col-span-2 lg:col-span-2">
+                  <span
+                    class="text-atu-text-3 dark:text-[#6E7681] font-semibold uppercase tracking-wider block text-[10.5px]"
+                  >
+                    Nombre del Contacto
+                    @if (editMode) {
+                      <span class="text-red-600 dark:text-red-500 ml-0.5">*</span>
+                    }
+                  </span>
+                  @if (editMode) {
+                    <div class="relative">
+                      <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fa-solid fa-user text-gray-400 text-xs"></i>
+                      </div>
+                      <input
+                        type="text"
+                        [(ngModel)]="editContactoNombre"
+                        placeholder="Nombres y Apellidos"
+                        class="w-full pl-9 border-2 border-atu-border dark:border-[#30363D] rounded-xl bg-white dark:bg-[#0D1117] px-3 py-2.5 text-[14px] text-atu-text dark:text-[#E6EDF3] focus:outline-none focus:border-atu-primary dark:focus:border-[#00A3E0] focus:ring-4 focus:ring-atu-primary/10 transition-all shadow-sm"
+                      />
+                    </div>
+                  } @else {
+                    <strong
+                      class="text-[15px] text-atu-text dark:text-[#E6EDF3] font-semibold flex items-center gap-2"
+                    >
+                      <i class="fa-solid fa-user text-atu-text-3 dark:text-[#8B949E] text-xs"></i>
+                      {{ perfilTrans?.contacto?.nombresApellidos || '—' }}
+                    </strong>
+                  }
+                </div>
+
+                <!-- Teléfono -->
+                <div class="space-y-1.5">
+                  <span
+                    class="text-atu-text-3 dark:text-[#6E7681] font-semibold uppercase tracking-wider block text-[10.5px]"
+                  >
+                    Teléfono
+                    @if (editMode) {
+                      <span class="text-red-600 dark:text-red-500 ml-0.5">*</span>
+                    }
+                  </span>
+                  @if (editMode) {
+                    <div class="relative">
+                      <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fa-solid fa-phone text-gray-400 text-xs"></i>
+                      </div>
+                      <input
+                        type="tel"
+                        [(ngModel)]="editContactoTelefono"
+                        placeholder="Teléfono"
+                        class="w-full pl-9 border-2 border-atu-border dark:border-[#30363D] rounded-xl bg-white dark:bg-[#0D1117] px-3 py-2.5 text-[14px] text-atu-text dark:text-[#E6EDF3] focus:outline-none focus:border-atu-primary dark:focus:border-[#00A3E0] focus:ring-4 focus:ring-atu-primary/10 transition-all font-mono tracking-wide shadow-sm"
+                      />
+                    </div>
+                  } @else {
+                    <strong
+                      class="text-[15px] text-atu-text dark:text-[#E6EDF3] font-semibold flex items-center gap-2 font-mono tracking-wide"
+                    >
+                      <i class="fa-solid fa-phone text-atu-text-3 dark:text-[#8B949E] text-[11px]"></i>
+                      {{ perfilTrans?.contacto?.telefono || '—' }}
+                    </strong>
+                  }
+                </div>
+
+                <!-- Tipo de Documento -->
+                <div class="space-y-1.5">
+                  <span
+                    class="text-atu-text-3 dark:text-[#6E7681] font-semibold uppercase tracking-wider block text-[10.5px]"
+                  >
+                    Tipo de Documento (Contacto)
+                    @if (editMode) {
+                      <span class="text-red-600 dark:text-red-500 ml-0.5">*</span>
+                    }
+                  </span>
+                  @if (editMode) {
+                    <div class="relative">
+                      <select
+                        [(ngModel)]="editContactoTipoDoc"
+                        class="w-full border-2 border-atu-border dark:border-[#30363D] rounded-xl bg-white dark:bg-[#0D1117] px-3 py-2.5 text-[14px] text-atu-text dark:text-[#E6EDF3] focus:outline-none focus:border-atu-primary dark:focus:border-[#00A3E0] focus:ring-4 focus:ring-atu-primary/10 transition-all cursor-pointer shadow-sm"
+                      >
+                        <option value="DNI">DNI</option>
+                        <option value="CE">Carné de Extranjería</option>
+                        <option value="PASAPORTE">Pasaporte</option>
+                      </select>
+                    </div>
+                  } @else {
+                    <strong
+                      class="text-[15px] text-atu-text dark:text-[#E6EDF3] font-semibold block"
+                    >
+                      {{ perfilTrans?.contacto?.tipoDocumento || '—' }}
+                    </strong>
+                  }
+                </div>
+
+                <!-- Número de Documento -->
+                <div class="space-y-1.5">
+                  <span
+                    class="text-atu-text-3 dark:text-[#6E7681] font-semibold uppercase tracking-wider block text-[10.5px]"
+                  >
+                    Número de Documento (Contacto)
+                    @if (editMode) {
+                      <span class="text-red-600 dark:text-red-500 ml-0.5">*</span>
+                    }
+                  </span>
+                  @if (editMode) {
+                    <div class="relative">
+                      <input
+                        type="text"
+                        [(ngModel)]="editContactoNumDoc"
+                        placeholder="Número de documento"
+                        class="w-full border-2 border-atu-border dark:border-[#30363D] rounded-xl bg-white dark:bg-[#0D1117] px-3 py-2.5 text-[14px] text-atu-text dark:text-[#E6EDF3] focus:outline-none focus:border-atu-primary dark:focus:border-[#00A3E0] focus:ring-4 focus:ring-atu-primary/10 transition-all font-mono shadow-sm"
+                      />
+                    </div>
+                  } @else {
+                    <strong
+                      class="text-[15px] text-atu-text dark:text-[#E6EDF3] font-semibold block font-mono"
+                    >
+                      {{ perfilTrans?.contacto?.numeroDocumento || '—' }}
+                    </strong>
+                  }
+                </div>
+
+                <!-- Correo (NO EDITABLE) -->
+                <div class="space-y-1.5">
+                  <span
+                    class="text-atu-text-3 dark:text-[#6E7681] font-semibold uppercase tracking-wider block text-[10.5px]"
+                  >
+                    Correo Electrónico
+                  </span>
+                  <strong
+                    class="text-[15px] text-atu-text dark:text-[#E6EDF3] font-semibold flex items-center gap-2 break-all"
+                  >
+                    <i class="fa-regular fa-envelope text-atu-text-3 dark:text-[#8B949E]"></i>
+                    {{ perfilTrans?.contacto?.correoElectronico || '—' }}
+                  </strong>
+                </div>
+
+                <!-- Documento de Cargo (del usuario actual si existe) -->
+                @if (usuario?.documentoCargo; as docCargo) {
+                  <div class="space-y-1.5 sm:col-span-2 lg:col-span-3">
+                    <span
+                      class="text-atu-text-3 dark:text-[#6E7681] font-semibold uppercase tracking-wider block text-[10.5px]"
+                      >Documento de Sustentación de Cargo (Usuario)</span
+                    >
+                    <span
+                      class="inline-flex items-center gap-2 px-3.5 py-2 bg-gray-50 dark:bg-white/[0.02] border border-gray-200 dark:border-white/10 rounded-xl text-[13.5px] font-semibold text-atu-text-2 dark:text-[#C9D1D9] hover:bg-gray-100 dark:hover:bg-white/[0.04] transition-colors cursor-default"
+                    >
+                      <i
+                        class="fa-solid fa-file-pdf text-red-500 dark:text-red-400 text-base"
+                      ></i>
+                      {{ docCargo }}
+                    </span>
+                  </div>
+                }
+              </div>
+            </div>
+
+            <!-- Cuenta de Abono -->
+            <div
+              class="group bg-white dark:bg-[#0D1117] border border-atu-border dark:border-[#30363D] rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden relative"
+              [class.ring-2]="editMode"
+              [class.ring-atu-primary]="editMode"
+            >
+              <div class="absolute inset-0 bg-gradient-to-r from-atu-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
+              <div
+                class="flex items-center justify-between gap-3 px-5 py-4 border-b border-atu-border/50 dark:border-[#30363D]/50 bg-gray-50/50 dark:bg-white/[0.02]"
+              >
+                <div class="flex items-center gap-3">
+                  <div class="w-8 h-8 rounded-full bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
+                    <i class="fa-solid fa-piggy-bank text-sm"></i>
+                  </div>
+                  <div
+                    class="text-base font-extrabold text-atu-text dark:text-[#E6EDF3]"
+                  >
+                    Cuenta de abono
+                  </div>
+                </div>
+                <!-- Badge de estado -->
+                <span
+                  class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10.5px] font-bold bg-green-100 dark:bg-[#102A1C] text-green-700 dark:text-[#3FC078] border border-green-200 dark:border-green-900/30"
+                >
+                  <i class="fa-solid fa-check-circle text-[11px]"></i> Registrada
+                </span>
+              </div>
+
+              <div
+                class="p-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 gap-x-8 text-xs leading-normal"
+              >
+                <!-- Banco -->
+                <div class="space-y-1.5">
+                  <span
+                    class="text-atu-text-3 dark:text-[#6E7681] font-semibold uppercase tracking-wider block text-[10.5px]"
+                  >
+                    Banco
+                    @if (editMode) {
+                      <span class="text-red-600 dark:text-red-500 ml-0.5">*</span>
+                    }
+                  </span>
+                  @if (editMode) {
+                    <div class="relative">
+                      <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fa-solid fa-building-columns text-gray-400 text-xs"></i>
+                      </div>
+                      <select
+                        [(ngModel)]="editBanco"
+                        class="w-full pl-9 border-2 border-atu-border dark:border-[#30363D] rounded-xl bg-white dark:bg-[#0D1117] px-3 py-2.5 text-[14px] text-atu-text dark:text-[#E6EDF3] focus:outline-none focus:border-atu-primary dark:focus:border-[#00A3E0] focus:ring-4 focus:ring-atu-primary/10 transition-all cursor-pointer shadow-sm appearance-none"
+                      >
+                        <option value="">Selecciona un banco…</option>
+                        <option value="bcp">BCP</option>
+                        <option value="bbva">BBVA</option>
+                        <option value="interbank">Interbank</option>
+                        <option value="scotiabank">Scotiabank</option>
+                        <option value="bn">Banco de la Nación</option>
+                      </select>
+                      <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                        <i class="fa-solid fa-chevron-down text-gray-400 text-xs"></i>
+                      </div>
+                    </div>
+                  } @else {
+                    <strong
+                      class="text-[15px] text-atu-text dark:text-[#E6EDF3] font-semibold flex items-center gap-2"
+                    >
+                      <div class="w-6 h-6 rounded-md bg-gray-100 dark:bg-[#21262D] flex items-center justify-center shrink-0">
+                        <i class="fa-solid fa-building-columns text-gray-500 dark:text-[#8B949E] text-[10px]"></i>
+                      </div>
+                      {{ usuario?.banco || '—' }}
+                    </strong>
+                  }
+                </div>
+
+                <!-- CCI -->
+                <div class="space-y-1.5 sm:col-span-1 lg:col-span-2">
+                  <span
+                    class="text-atu-text-3 dark:text-[#6E7681] font-semibold uppercase tracking-wider block text-[10.5px]"
+                  >
+                    Código de Cuenta Interbancario (CCI)
+                    @if (editMode) {
+                      <span class="text-red-600 dark:text-red-500 ml-0.5">*</span>
+                    }
+                  </span>
+                  @if (editMode) {
+                    <div class="relative">
+                      <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fa-solid fa-money-check text-gray-400 text-xs"></i>
+                      </div>
+                      <input
+                        type="text"
+                        inputmode="numeric"
+                        maxlength="20"
+                        [(ngModel)]="editCci"
+                        placeholder="20 dígitos"
+                        class="w-full pl-9 border-2 border-atu-border dark:border-[#30363D] rounded-xl bg-white dark:bg-[#0D1117] px-3 py-2.5 text-[14px] text-atu-text dark:text-[#E6EDF3] focus:outline-none focus:border-atu-primary dark:focus:border-[#00A3E0] focus:ring-4 focus:ring-atu-primary/10 transition-all font-mono tracking-widest shadow-sm"
+                      />
+                    </div>
+                  } @else {
+                    <strong
+                      class="text-[15px] text-atu-text dark:text-[#E6EDF3] font-semibold flex items-center gap-3 font-mono tracking-[0.2em]"
+                    >
+                      <i class="fa-solid fa-money-check text-gray-400 dark:text-[#8B949E]"></i>
+                      {{ usuario?.cci || '—' }}
+                    </strong>
+                  }
+                </div>
+              </div>
+
+              <!-- Mensajes Informativos (Dependiendo del banco seleccionado) -->
+              @if (
+                usuario?.banco === 'Banco de la Nación' || editBanco === 'bn'
+              ) {
+                <div
+                  class="mx-5 mb-5 bg-red-50 dark:bg-red-950/20 border-l-4 border-red-500 rounded-r-xl p-4 transition-all"
+                >
+                  <div class="flex items-center gap-3 mb-2">
+                    <div
+                      class="w-7 h-7 rounded-full bg-red-100 dark:bg-red-900/50 text-red-600 dark:text-red-400 flex items-center justify-center shrink-0 shadow-sm"
+                    >
+                      <i class="fa-solid fa-triangle-exclamation text-xs"></i>
+                    </div>
+                    <span
+                      class="text-[15px] font-extrabold text-red-700 dark:text-red-400"
+                      >Atención: cuenta del Banco de la Nación</span
+                    >
+                  </div>
+                  <p
+                    class="m-0 pl-10 text-[14px] text-red-900/80 dark:text-red-300/80 leading-relaxed"
+                  >
+                    Si eliges una cuenta del <b>Banco de la Nación</b>, tu
+                    subsidio <b class="text-red-700 dark:text-red-400">pierde la protección de intangibilidad</b> y
+                    podría ser objeto de <b>retención o embargo</b>. En
+                    cualquier otro banco el monto está protegido. Te
+                    recomendamos usar una cuenta de otro banco.
+                  </p>
+                </div>
+              } @else if (
+                (usuario?.banco &&
+                  usuario?.banco !== 'Banco de la Nación' &&
+                  usuario?.banco !== '—') ||
+                (editBanco && editBanco !== 'bn' && editBanco !== '')
+              ) {
+                <div
+                  class="mx-5 mb-5 bg-green-50 dark:bg-green-950/20 border-l-4 border-green-500 rounded-r-xl p-4 transition-all"
+                >
+                  <div class="flex items-center gap-3 mb-1.5">
+                    <div
+                      class="w-7 h-7 rounded-full bg-green-100 dark:bg-green-900/50 text-green-600 dark:text-green-400 flex items-center justify-center shrink-0 shadow-sm"
+                    >
+                      <i class="fa-solid fa-shield-check text-xs"></i>
+                    </div>
+                    <span
+                      class="text-[15px] font-extrabold text-green-700 dark:text-green-400"
+                      >Cuenta protegida por intangibilidad</span
+                    >
+                  </div>
+                  <p
+                    class="m-0 pl-10 text-[13.5px] text-green-900/80 dark:text-green-300/80 leading-relaxed"
+                  >
+                    Al no ser del Banco de la Nación, tu subsidio no puede ser
+                    retenido ni embargado.
+                  </p>
+                </div>
+              }
+            </div>
           </div>
 
           <!-- Edit Alert -->
@@ -390,10 +722,11 @@ import { Usuario } from '../../core/models/models';
       </div>
     </div>
   `,
-    styles: []
+  styles: [],
 })
 export class PerfilInfoComponent implements OnInit {
   usuario: Usuario | null = null;
+  perfilTrans: PerfilTransportista | null = null;
 
   // Password change
   passActual = '';
@@ -408,20 +741,44 @@ export class PerfilInfoComponent implements OnInit {
   editEmail = '';
   editTelefono = '';
   editCargo = '';
+  editBanco = '';
+  editCci = '';
   editAlert: { message: string; type: 'error' | 'success' } | null = null;
+
+  // Edit profile contact (New API)
+  editContactoNombre = '';
+  editContactoTipoDoc = '';
+  editContactoNumDoc = '';
+  editContactoTelefono = '';
 
   private readonly authService = inject(AuthService);
   private readonly apiAuthService = inject(ApiAuthService);
   private readonly apiUsuarioService = inject(ApiUsuarioService);
+  private readonly apiComprobanteService = inject(ApiComprobanteService);
 
   ngOnInit(): void {
     this.usuario = this.resolveSession();
+    this.cargarPerfilComprobante();
   }
 
   private resolveSession(): Usuario | null {
     const local = this.authService.getSession();
     if (local) return local;
     return this.apiAuthService.getUserFromSession();
+  }
+
+  cargarPerfilComprobante(): void {
+    const ruc = this.usuario?.numDocumento || '20512345678';
+    this.apiComprobanteService.obtenerPerfil(ruc).subscribe({
+      next: (res) => {
+        if (res.data?.lista) {
+          this.perfilTrans = res.data.lista;
+        }
+      },
+      error: (err) => {
+        console.error('Error al cargar perfil del transportista:', err);
+      }
+    });
   }
 
   get avatarLetter(): string {
@@ -439,6 +796,15 @@ export class PerfilInfoComponent implements OnInit {
     this.editEmail = this.usuario?.email ?? '';
     this.editTelefono = this.usuario?.telefono ?? '';
     this.editCargo = this.usuario?.cargo ?? '';
+    this.editBanco = this.usuario?.banco ?? '';
+    this.editCci = this.usuario?.cci ?? '';
+
+    // Bind contact edit fields
+    this.editContactoNombre = this.perfilTrans?.contacto?.nombresApellidos ?? '';
+    this.editContactoTipoDoc = this.perfilTrans?.contacto?.tipoDocumento ?? 'DNI';
+    this.editContactoNumDoc = this.perfilTrans?.contacto?.numeroDocumento ?? '';
+    this.editContactoTelefono = this.perfilTrans?.contacto?.telefono ?? '';
+
     this.editAlert = null;
     this.editMode = true;
   }
@@ -452,17 +818,82 @@ export class PerfilInfoComponent implements OnInit {
     this.editAlert = null;
     if (!this.usuario) return;
 
-    // Clean inputs (convert to string first to handle numeric inputs safely)
+    // Clean inputs
     this.editEmail = String(this.editEmail ?? '').trim();
     this.editTelefono = String(this.editTelefono ?? '').trim();
     this.editCargo = String(this.editCargo ?? '').trim();
+    this.editBanco = String(this.editBanco ?? '').trim();
+    this.editCci = String(this.editCci ?? '').trim();
 
+    this.editContactoNombre = String(this.editContactoNombre ?? '').trim();
+    this.editContactoTipoDoc = String(this.editContactoTipoDoc ?? '').trim();
+    this.editContactoNumDoc = String(this.editContactoNumDoc ?? '').trim();
+    this.editContactoTelefono = String(this.editContactoTelefono ?? '').trim();
+
+    // Validation for new contact edit fields
+    if (this.editMode) {
+      if (!this.editContactoNombre) {
+        this.editAlert = { message: 'El nombre del contacto es obligatorio.', type: 'error' };
+        return;
+      }
+      if (!this.editContactoNumDoc) {
+        this.editAlert = { message: 'El número de documento del contacto es obligatorio.', type: 'error' };
+        return;
+      }
+      if (!this.editContactoTelefono) {
+        this.editAlert = { message: 'El teléfono del contacto es obligatorio.', type: 'error' };
+        return;
+      }
+    }
+
+    if (this.perfilTrans) {
+      this.isSaving = true;
+      const ruc = this.perfilTrans.datosEmpresa.ruc;
+
+      this.apiComprobanteService.actualizarContacto({
+        ruc,
+        nombresApellidos: this.editContactoNombre,
+        tipoDocumento: this.editContactoTipoDoc,
+        numeroDocumento: this.editContactoNumDoc,
+        telefono: this.editContactoTelefono
+      }).subscribe({
+        next: (res) => {
+          this.isSaving = false;
+          if (this.perfilTrans) {
+            this.perfilTrans.contacto.nombresApellidos = this.editContactoNombre;
+            this.perfilTrans.contacto.tipoDocumento = this.editContactoTipoDoc;
+            this.perfilTrans.contacto.numeroDocumento = this.editContactoNumDoc;
+            this.perfilTrans.contacto.telefono = this.editContactoTelefono;
+          }
+
+          // Simular el guardado de banco y cci localmente
+          this.usuario!.banco = this.editBanco;
+          this.usuario!.cci = this.editCci;
+
+          this.editMode = false;
+          this.editAlert = {
+            message: res.mensaje || 'Perfil de transportista actualizado correctamente.',
+            type: 'success',
+          };
+          setTimeout(() => (this.editAlert = null), 4000);
+        },
+        error: (err) => {
+          this.isSaving = false;
+          this.editAlert = {
+            message: err?.error?.mensaje || err?.message || 'Error al guardar los datos de contacto.',
+            type: 'error',
+          };
+        }
+      });
+      return;
+    }
+
+    // Fallback old flow... (if perfilTrans is not loaded, just save using user service)
     // Validate email format
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     if (!this.editEmail || !emailRegex.test(this.editEmail)) {
       this.editAlert = {
-        message:
-          'Por favor, ingrese un correo electrónico válido (ejemplo@entidad.gob.pe).',
+        message: 'Por favor, ingrese un correo electrónico válido.',
         type: 'error',
       };
       return;
@@ -472,23 +903,18 @@ export class PerfilInfoComponent implements OnInit {
     const phoneRegex = /^\d{9}$/;
     if (!this.editTelefono || !phoneRegex.test(this.editTelefono)) {
       this.editAlert = {
-        message:
-          'Por favor, ingrese un número de teléfono válido (debe tener exactamente 9 dígitos).',
+        message: 'Por favor, ingrese un número de teléfono válido (9 dígitos).',
         type: 'error',
       };
       return;
     }
 
-    // Verificar si estamos usando la sesión por API (JWT)
     const apiSession = this.apiAuthService.getSession();
-
     if (apiSession) {
       this.isSaving = true;
-
       this.apiUsuarioService
         .actualizarCorreoTelefono({
-          usuarioUuid:
-            this.usuario.usuarioUuid || '00000000-0000-0000-0000-000000000000',
+          usuarioUuid: this.usuario.usuarioUuid || '00000000-0000-0000-0000-000000000000',
           correo: this.editEmail,
           telefono: this.editTelefono,
           cargo: this.editCargo,
@@ -496,59 +922,33 @@ export class PerfilInfoComponent implements OnInit {
         .subscribe({
           next: (res) => {
             this.isSaving = false;
-            // Actualizamos visualmente el usuario ya que el API devuelve solo un string de confirmación
             if (this.usuario) {
               this.usuario.email = this.editEmail;
               this.usuario.telefono = this.editTelefono;
               this.usuario.cargo = this.editCargo;
             }
-            this.apiAuthService.updateSessionUser(
-              this.editEmail,
-              this.editTelefono,
-              this.editCargo,
-            );
+            this.apiAuthService.updateSessionUser(this.editEmail, this.editTelefono, this.editCargo);
             this.editMode = false;
-            const msg =
-              res.mensaje ||
-              res.message ||
-              res.data?.mensaje ||
-              'Perfil actualizado correctamente.';
-            this.editAlert = { message: msg, type: 'success' };
+            this.editAlert = { message: res.mensaje || 'Perfil actualizado correctamente.', type: 'success' };
             setTimeout(() => (this.editAlert = null), 4000);
           },
           error: (err) => {
             this.isSaving = false;
-            this.editAlert = {
-              message:
-                err?.error?.descripcion ||
-                err?.error?.data?.mensaje ||
-                err?.error?.message ||
-                err?.message ||
-                'Error al guardar en el API.',
-              type: 'error',
-            };
+            this.editAlert = { message: err?.error?.descripcion || 'Error al guardar.', type: 'error' };
           },
         });
     } else {
-      // Fallback para usuarios del modo Mock / LocalStorage antiguo
       const res = this.authService.updateProfile(this.usuario.email, {
         email: this.editEmail,
         telefono: this.editTelefono,
       });
-
       if (res.success) {
         this.usuario = this.resolveSession();
         this.editMode = false;
-        this.editAlert = {
-          message: 'Perfil actualizado correctamente.',
-          type: 'success',
-        };
+        this.editAlert = { message: 'Perfil actualizado correctamente.', type: 'success' };
         setTimeout(() => (this.editAlert = null), 4000);
       } else {
-        this.editAlert = {
-          message: res.error ?? 'Error al guardar.',
-          type: 'error',
-        };
+        this.editAlert = { message: res.error ?? 'Error al guardar.', type: 'error' };
       }
     }
   }

@@ -25,6 +25,8 @@ export interface Usuario {
   razonSocial?: string;
   entidadUuid?: string;
   usuarioUuid?: string;
+  banco?: string;
+  cci?: string;
 }
 
 export interface RegistroVehicular {
@@ -75,4 +77,41 @@ export interface RegistroRaw {
   fecha_inicio_aut: string;
   fecha_fin_aut: string;
   estado_aut: string;
+}
+
+export interface DatosEmpresa {
+  razonSocial: string;
+  ruc: string;
+  estadoCondicion: string;
+  tipoEntidad: string;
+  autoridad: string;
+  autorizacionVigente: boolean;
+}
+
+export interface RepresentanteLegal {
+  nombresApellidos: string;
+  tipoDocumento: string;
+  numeroDocumento: string;
+}
+
+export interface ContactoTransportista {
+  nombresApellidos: string;
+  tipoDocumento: string;
+  numeroDocumento: string;
+  correoElectronico: string;
+  telefono: string;
+}
+
+export interface PerfilTransportista {
+  datosEmpresa: DatosEmpresa;
+  representanteLegal: RepresentanteLegal;
+  contacto: ContactoTransportista;
+}
+
+export interface PerfilTransportistaResponse {
+  data: {
+    lista: PerfilTransportista;
+    respuesta: string;
+    mensaje: string;
+  };
 }

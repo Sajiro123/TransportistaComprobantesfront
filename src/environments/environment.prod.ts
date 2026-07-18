@@ -22,6 +22,11 @@ export const environment = {
     (window as any).__env?.API_VALIDACION_URL ||
     'https://apidev.atu.gob.pe/api_validacion',
 
+  /** URL base del API de Comprobantes. */
+  API_COMPROBANTE_URL:
+    (window as any).__env?.API_COMPROBANTE_URL ||
+    'https://apidev.atu.gob.pe/api_comprobante',
+
   /** Clave privada para descifrado de campos sensibles (IAM) */
   ENCRYPTION_PRIVATE_KEY:
     (window as any).__env?.ENCRYPTION_PRIVATE_KEY ||
