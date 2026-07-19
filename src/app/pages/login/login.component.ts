@@ -10,7 +10,7 @@ import {
 } from '../../core/services/auth.service';
 import { ApiAuthService } from '../../core/services/api-auth.service';
 import { SessionService } from '../../core/services/session.service';
-import { ApiErrorResponse } from '../../core/models/api.models';
+import { ApiErrorResponse, EnviarOtpRegistroRequest } from '../../core/models/api.models';
 import { ThemeService } from '../../core/services/theme.service';
 import Swal from 'sweetalert2';
 import { isValidRuc, isValidEmail, isValidPhone } from '../../core/utils/validators';
@@ -116,12 +116,13 @@ export class LoginComponent implements OnInit, OnDestroy {
     this.loginDocumentTouched = true;
   }
 
-  // ── Dummy registration flow (pendiente de servicios SUNAT/registro) ──
+  // ── Registration flow (conectado al backend real) ──
   registrationRuc = '';
   registrationRucTouched = false;
   registrationValidating = false;
   registrationRucValidated = false;
-  registrationCompanyName = 'Transportes Lima Sur S.A.C.';
+  registrationCompanyName = '';
+  registrationRazonSocial = '';
   registrationContactName = '';
   registrationEmail = '';
   registrationPhone = '';
@@ -131,6 +132,10 @@ export class LoginComponent implements OnInit, OnDestroy {
   registrationCode = '';
   registrationCodeError = '';
   registrationCodeResent = false;
+  registrationSendingOtp = false;
+  registrationVerifying = false;
+  registrationResendCooldown = 0;
+  private registrationCooldownInterval: ReturnType<typeof setInterval> | null = null;
   private registrationValidationTimeout: ReturnType<typeof setTimeout> | null = null;
 
   get registrationRucError(): string {
@@ -161,12 +166,14 @@ export class LoginComponent implements OnInit, OnDestroy {
       : 'Ingrese un celular peruano de 9 dígitos que comience con 9.';
   }
 
+  private readonly PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,128}$/;
+
   get registrationPasswordError(): string {
     if (!this.registrationSubmitted) return '';
     if (!this.registrationPassword) return 'Ingrese una clave.';
-    return this.registrationPassword.length >= 8
+    return this.PASSWORD_REGEX.test(this.registrationPassword)
       ? ''
-      : 'La clave debe tener al menos 8 caracteres.';
+      : 'Mínimo 8 caracteres: 1 mayúscula, 1 minúscula, 1 dígito y 1 carácter especial.';
   }
 
   onRegistrationRucInput(): void {
@@ -181,11 +188,39 @@ export class LoginComponent implements OnInit, OnDestroy {
     if (this.registrationRucError || this.registrationValidating) return;
 
     this.registrationValidating = true;
-    this.registrationValidationTimeout = setTimeout(() => {
-      this.registrationValidating = false;
-      this.registrationRucValidated = true;
-      this.registrationValidationTimeout = null;
-    }, 1400);
+
+    const doValidate = (recaptchaToken?: string) => {
+      this.apiAuthService.validarRuc(this.registrationRuc, recaptchaToken).subscribe({
+        next: (res) => {
+          this.ngZone.run(() => {
+            this.registrationValidating = false;
+            if (res.elegible) {
+              this.registrationRucValidated = true;
+              this.registrationCompanyName = res.razonSocial;
+              this.registrationRazonSocial = res.razonSocial;
+            } else {
+              this.showAlert(res.mensaje || 'El RUC no es elegible.', 'error');
+            }
+          });
+        },
+        error: (err: ApiErrorResponse) => {
+          this.ngZone.run(() => {
+            this.registrationValidating = false;
+            this.showAlert(err?.descripcion || err?.message || 'Error al validar el RUC.', 'error');
+          });
+        },
+      });
+    };
+
+    if (typeof grecaptcha !== 'undefined') {
+      grecaptcha.ready(() => {
+        grecaptcha.execute(this.recaptchaSiteKey, { action: 'register' })
+          .then((token: string) => doValidate(token))
+          .catch(() => doValidate());
+      });
+    } else {
+      doValidate();
+    }
   }
 
   changeRegistrationRuc(): void {
@@ -193,11 +228,14 @@ export class LoginComponent implements OnInit, OnDestroy {
       clearTimeout(this.registrationValidationTimeout);
       this.registrationValidationTimeout = null;
     }
+    this.stopResendCooldown();
     this.registrationValidating = false;
     this.registrationRucValidated = false;
     this.registrationRucTouched = false;
     this.registrationSubmitted = false;
     this.registrationRuc = '';
+    this.registrationCompanyName = '';
+    this.registrationRazonSocial = '';
     this.registrationContactName = '';
     this.registrationEmail = '';
     this.registrationPhone = '';
@@ -206,6 +244,8 @@ export class LoginComponent implements OnInit, OnDestroy {
     this.registrationCode = '';
     this.registrationCodeError = '';
     this.registrationCodeResent = false;
+    this.registrationSendingOtp = false;
+    this.registrationVerifying = false;
     this.clearAlert();
   }
 
@@ -226,10 +266,72 @@ export class LoginComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.registrationStage = 'confirmation';
-    this.registrationCode = '';
-    this.registrationCodeError = '';
-    this.registrationCodeResent = false;
+    this.sendOtpToBackend();
+  }
+
+  private sendOtpToBackend(recaptchaToken?: string): void {
+    if (this.registrationSendingOtp) return;
+    this.registrationSendingOtp = true;
+
+    const doSend = (token?: string) => {
+      const payload: EnviarOtpRegistroRequest = {
+        ruc: this.registrationRuc,
+        personaContacto: this.registrationContactName.trim(),
+        correo: this.registrationEmail.trim(),
+        telefono: this.registrationPhone,
+        clave: this.registrationPassword,
+        razonSocial: this.registrationRazonSocial || undefined,
+        recaptchaToken: token,
+      };
+
+      this.apiAuthService.enviarOtp(payload).subscribe({
+        next: (res) => {
+          this.ngZone.run(() => {
+            this.registrationSendingOtp = false;
+            this.registrationStage = 'confirmation';
+            this.registrationCode = '';
+            this.registrationCodeError = '';
+            this.registrationCodeResent = false;
+            this.startResendCooldown(60);
+          });
+        },
+        error: (err: ApiErrorResponse) => {
+          this.ngZone.run(() => {
+            this.registrationSendingOtp = false;
+            this.showAlert(err?.descripcion || err?.message || 'Error al enviar el código.', 'error');
+          });
+        },
+      });
+    };
+
+    if (typeof grecaptcha !== 'undefined') {
+      grecaptcha.ready(() => {
+        grecaptcha.execute(this.recaptchaSiteKey, { action: 'register' })
+          .then((token: string) => doSend(token))
+          .catch(() => doSend());
+      });
+    } else {
+      doSend(recaptchaToken);
+    }
+  }
+
+  private startResendCooldown(seconds: number): void {
+    this.stopResendCooldown();
+    this.registrationResendCooldown = seconds;
+    this.registrationCooldownInterval = setInterval(() => {
+      this.registrationResendCooldown--;
+      if (this.registrationResendCooldown <= 0) {
+        this.stopResendCooldown();
+      }
+    }, 1000);
+  }
+
+  private stopResendCooldown(): void {
+    if (this.registrationCooldownInterval) {
+      clearInterval(this.registrationCooldownInterval);
+      this.registrationCooldownInterval = null;
+    }
+    this.registrationResendCooldown = 0;
   }
 
   onRegistrationCodeInput(): void {
@@ -238,19 +340,94 @@ export class LoginComponent implements OnInit, OnDestroy {
   }
 
   verifyDummyRegistrationCode(): void {
-    if (this.registrationCode !== '123123') {
-      this.registrationCodeError = 'Código incorrecto. Revísalo e intenta de nuevo.';
+    if (!this.registrationCode || this.registrationCode.length !== 6) {
+      this.registrationCodeError = 'Ingresa el código de 6 dígitos.';
       return;
     }
-
+    if (this.registrationVerifying) return;
+    this.registrationVerifying = true;
     this.registrationCodeError = '';
-    this.registrationStage = 'success';
+
+    const doVerify = (token?: string) => {
+      this.apiAuthService.verificarOtp(
+        this.registrationEmail.trim(),
+        this.registrationCode,
+        token,
+      ).subscribe({
+        next: () => {
+          this.ngZone.run(() => {
+            this.registrationVerifying = false;
+            this.registrationCodeError = '';
+            this.registrationStage = 'success';
+            this.stopResendCooldown();
+          });
+        },
+        error: (err: ApiErrorResponse) => {
+          this.ngZone.run(() => {
+            this.registrationVerifying = false;
+            this.registrationCodeError =
+              err?.descripcion || err?.message || 'Código incorrecto. Revísalo e intenta de nuevo.';
+          });
+        },
+      });
+    };
+
+    if (typeof grecaptcha !== 'undefined') {
+      grecaptcha.ready(() => {
+        grecaptcha.execute(this.recaptchaSiteKey, { action: 'register' })
+          .then((token: string) => doVerify(token))
+          .catch(() => doVerify());
+      });
+    } else {
+      doVerify();
+    }
   }
 
   resendDummyRegistrationCode(): void {
+    if (this.registrationResendCooldown > 0 || this.registrationSendingOtp) return;
     this.registrationCode = '';
     this.registrationCodeError = '';
-    this.registrationCodeResent = true;
+    this.registrationCodeResent = false;
+
+    const doResend = (token?: string) => {
+      this.registrationSendingOtp = true;
+      const payload: EnviarOtpRegistroRequest = {
+        ruc: this.registrationRuc,
+        personaContacto: this.registrationContactName.trim(),
+        correo: this.registrationEmail.trim(),
+        telefono: this.registrationPhone,
+        clave: this.registrationPassword,
+        razonSocial: this.registrationRazonSocial || undefined,
+        recaptchaToken: token,
+      };
+
+      this.apiAuthService.enviarOtp(payload).subscribe({
+        next: () => {
+          this.ngZone.run(() => {
+            this.registrationSendingOtp = false;
+            this.registrationCodeResent = true;
+            this.startResendCooldown(60);
+          });
+        },
+        error: (err: ApiErrorResponse) => {
+          this.ngZone.run(() => {
+            this.registrationSendingOtp = false;
+            this.registrationCodeError =
+              err?.descripcion || err?.message || 'No se pudo reenviar el código.';
+          });
+        },
+      });
+    };
+
+    if (typeof grecaptcha !== 'undefined') {
+      grecaptcha.ready(() => {
+        grecaptcha.execute(this.recaptchaSiteKey, { action: 'register' })
+          .then((token: string) => doResend(token))
+          .catch(() => doResend());
+      });
+    } else {
+      doResend();
+    }
   }
 
   correctRegistrationData(): void {
@@ -258,6 +435,7 @@ export class LoginComponent implements OnInit, OnDestroy {
     this.registrationCode = '';
     this.registrationCodeError = '';
     this.registrationCodeResent = false;
+    this.stopResendCooldown();
     this.clearAlert();
   }
 
@@ -520,6 +698,7 @@ export class LoginComponent implements OnInit, OnDestroy {
     if (this.registrationValidationTimeout) {
       clearTimeout(this.registrationValidationTimeout);
     }
+    this.stopResendCooldown();
   }
 
   iniciarSlider(): void {

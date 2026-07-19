@@ -2,19 +2,19 @@
   window.__env = window.__env || {};
 
   // URL base del API REST (IAM)
-  window.__env.API_BASE_URL = 'https://apidev.atu.gob.pe/api-subsidio/api_iam';
-  // window.__env.API_BASE_URL = 'http://localhost:8080/api_iam';
+  // window.__env.API_BASE_URL = 'https://apidev.atu.gob.pe/api-subsidio/api_iam';
+  window.__env.API_BASE_URL = 'http://localhost:8080/api_iam';
   // URL base del API de Padrón (carga masiva)
-  window.__env.API_PADRON_URL = 'https://apidev.atu.gob.pe/api-subsidio/api_padron';
-  // window.__env.API_PADRON_URL = 'http://localhost:8081/api_padron';
+  // window.__env.API_PADRON_URL = 'https://apidev.atu.gob.pe/api-subsidio/api_padron';
+  window.__env.API_PADRON_URL = 'http://localhost:8081/api_padron';
 
   // URL base del API de Organización (entidades y ámbitos)
   // window.__env.API_ORG_URL = 'http://localhost:8081/api_org';
   window.__env.API_ORG_URL = 'https://apidev.atu.gob.pe/api-subsidio/api_org';
 
   // URL base del API de Validación
-  window.__env.API_VALIDACION_URL = 'https://apidev.atu.gob.pe/api-subsidio/api_validacion';
-  // window.__env.API_VALIDACION_URL = 'http://localhost:8081/api_validacion';
+  // window.__env.API_VALIDACION_URL = 'https://apidev.atu.gob.pe/api-subsidio/api_validacion';
+  window.__env.API_VALIDACION_URL = 'http://localhost:8081/api_validacion';
 
   // Google reCAPTCHA v3 Site Key
   window.__env.RECAPTCHA_SITE_KEY = '6Ldu6FUrAAAAADnOURKYc9E_uUbGBRC35_ntvznt';

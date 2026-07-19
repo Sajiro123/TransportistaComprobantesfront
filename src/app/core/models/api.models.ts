@@ -237,6 +237,52 @@ export interface EstadoValidacionResponse {
   };
 }
 
+// ── Registro público con OTP ─────────────────────────────
 
+/** Wrapper genérico del backend: { data: T } */
+export interface ApiResponseDto<T> {
+  data: T;
+}
 
+/** Paso 1 — Validar RUC */
+export interface ValidarRucRequest {
+  ruc: string;
+  recaptchaToken?: string;
+}
 
+export interface ValidarRucResponse {
+  ruc: string;
+  razonSocial: string;
+  estado: string;
+  condicion: string;
+  elegible: boolean;
+  mensaje: string;
+}
+
+/** Paso 2 — Enviar OTP */
+export interface EnviarOtpRegistroRequest {
+  ruc: string;
+  personaContacto: string;
+  correo: string;
+  telefono: string;
+  clave: string;
+  razonSocial?: string;
+  recaptchaToken?: string;
+}
+
+export interface EnviarOtpRegistroResponse {
+  mensaje: string;
+  expiraEnSegundos: number;
+}
+
+/** Paso 3 — Verificar OTP y registrar */
+export interface VerificarOtpRegistroRequest {
+  correo: string;
+  otp: string;
+  recaptchaToken?: string;
+}
+
+export interface VerificarOtpRegistroResponse {
+  usuarioUuid: string;
+  mensaje: string;
+}

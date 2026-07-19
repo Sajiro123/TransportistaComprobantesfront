@@ -9,6 +9,13 @@ import {
   LoginResponse,
   ApiErrorResponse,
   ApiSession,
+  ApiResponseDto,
+  ValidarRucRequest,
+  ValidarRucResponse,
+  EnviarOtpRegistroRequest,
+  EnviarOtpRegistroResponse,
+  VerificarOtpRegistroRequest,
+  VerificarOtpRegistroResponse,
 } from '../models/api.models';
 import { Usuario } from '../models/models';
 import { FieldDecryptionForgeService } from './field-decryption-forge.service';
@@ -30,27 +37,61 @@ export class ApiAuthService {
    * @param recaptchaToken Token de Google reCAPTCHA v2 (requerido en producción)
    */
   login(usuario: string, password: string, recaptchaToken?: string): Observable<LoginResponse> {
-    const mockResponse: LoginResponse = {
-      data: {
-        usuarioId: 1,
-        nombrePersona: "Usuario Demostración",
-        apellidoPaterno: "Transportista",
-        apellidoMaterno: "Comprobantes",
-        razonSocial: "EMPRESA DE TRANSPORTES DEMO S.A.",
-        nombreEntidad: "MUNICIPALIDAD PROVINCIAL DE LIMA",
-        cargo: "Administrador de Transportes",
-        correo: usuario,
-        entidadUuid: "demo-entidad-uuid-12345",
-        numeroDocumento: "20123456789",
-        perfilCodigo: "APP_02_ADM",
-        perfilNombre: "Administrador",
-        telefono: "987654321",
-        tipoDocumento: "RUC",
-        tipoEntidad: "municipal",
-        usuarioUuid: "demo-user-uuid-12345"
-      }
-    };
-    return of(mockResponse);
+    const body: LoginRequest = { usuario, password, recaptchaToken };
+    return this.http
+      .post<LoginResponse>(`${this.baseUrl}/auth/login`, body)
+      .pipe(
+        map(res => {
+          if (res && res.data) {
+            res.data = this.decryptor.decryptLoginData(res.data);
+          }
+          return res;
+        }),
+        catchError(this.handleError.bind(this)),
+      );
+  }
+
+  // ── Registro público con OTP ─────────────────────────────
+
+  /**
+   * Paso 1: Valida un RUC contra SUNAT.
+   * POST /api_iam/registro/validar-ruc
+   */
+  validarRuc(ruc: string, recaptchaToken?: string): Observable<ValidarRucResponse> {
+    const body: ValidarRucRequest = { ruc, recaptchaToken };
+    return this.http
+      .post<ApiResponseDto<ValidarRucResponse>>(`${this.baseUrl}/registro/validar-ruc`, body)
+      .pipe(
+        map(res => res.data),
+        catchError(this.handleError),
+      );
+  }
+
+  /**
+   * Paso 2: Envía OTP al correo del usuario.
+   * POST /api_iam/registro/otp/enviar
+   */
+  enviarOtp(payload: EnviarOtpRegistroRequest): Observable<EnviarOtpRegistroResponse> {
+    return this.http
+      .post<ApiResponseDto<EnviarOtpRegistroResponse>>(`${this.baseUrl}/registro/otp/enviar`, payload)
+      .pipe(
+        map(res => res.data),
+        catchError(this.handleError),
+      );
+  }
+
+  /**
+   * Paso 3: Verifica el OTP y crea la cuenta.
+   * POST /api_iam/registro/otp/verificar
+   */
+  verificarOtp(correo: string, otp: string, recaptchaToken?: string): Observable<VerificarOtpRegistroResponse> {
+    const body: VerificarOtpRegistroRequest = { correo, otp, recaptchaToken };
+    return this.http
+      .post<ApiResponseDto<VerificarOtpRegistroResponse>>(`${this.baseUrl}/registro/otp/verificar`, body)
+      .pipe(
+        map(res => res.data),
+        catchError(this.handleError),
+      );
   }
 
   // ── Sesión ──────────────────────────────────────────────
@@ -98,7 +139,11 @@ export class ApiAuthService {
   }
 
   logout(): Observable<void> {
-    return of(undefined);
+    return this.http
+      .post<void>(`${this.baseUrl}/auth/logout`, {}, { withCredentials: true })
+      .pipe(
+        catchError(this.handleError.bind(this))
+      );
   }
 
   isLoggedIn(): boolean {
@@ -126,7 +171,11 @@ export class ApiAuthService {
    * Refresca la sesión usando el refresh token HttpOnly en cookie.
    */
   refreshAccessToken(): Observable<void> {
-    return of(undefined);
+    return this.http
+      .post<void>(`${this.baseUrl}/auth/refresh`, {}, { withCredentials: true })
+      .pipe(
+        catchError(this.handleError.bind(this))
+      );
   }
 
   /**

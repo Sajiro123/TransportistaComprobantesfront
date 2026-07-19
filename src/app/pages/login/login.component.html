@@ -399,9 +399,10 @@
             </p>
           </div>
 
-          <button type="button" (click)="submitDummyRegistration()"
-            style="width:100%; border:none; border-radius:10px; padding:14px; font-size:15px; font-weight:700; box-shadow:0 8px 20px rgba(14,90,138,.28); background:var(--primary); color:var(--primary-contrast); cursor:pointer">
-            Enviar código al correo
+          <button type="button" (click)="submitDummyRegistration()" [disabled]="registrationSendingOtp"
+            style="width:100%; border:none; border-radius:10px; padding:14px; font-size:15px; font-weight:700; box-shadow:0 8px 20px rgba(14,90,138,.28); background:var(--primary); color:var(--primary-contrast); cursor:pointer"
+            [style.opacity]="registrationSendingOtp ? '0.7' : '1'">
+            {{ registrationSendingOtp ? 'Enviando...' : 'Enviar código al correo' }}
           </button>
         </div>
         }
@@ -443,15 +444,22 @@
 
           <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:20px">
             <span style="font-size:12.5px; color:var(--text-3)">¿No llegó?</span>
-            <button type="button" (click)="resendDummyRegistrationCode()"
+            @if (registrationResendCooldown > 0) {
+            <span style="font-size:13px; font-weight:600; color:var(--text-3)">
+              Reenviar en {{ registrationResendCooldown }}s
+            </span>
+            } @else {
+            <button type="button" (click)="resendDummyRegistrationCode()" [disabled]="registrationSendingOtp"
               style="padding:0; background:transparent; border:none; color:var(--primary); font-size:13px; font-weight:700; cursor:pointer">
-              Reenviar código
+              {{ registrationSendingOtp ? 'Enviando...' : 'Reenviar código' }}
             </button>
+            }
           </div>
 
-          <button type="button" (click)="verifyDummyRegistrationCode()"
-            style="width:100%; background:var(--primary); color:var(--primary-contrast); border:none; border-radius:10px; padding:14px; font-size:15px; font-weight:700; cursor:pointer; box-shadow:0 8px 20px rgba(14,90,138,.28)">
-            Verificar código
+          <button type="button" (click)="verifyDummyRegistrationCode()" [disabled]="registrationVerifying"
+            style="width:100%; background:var(--primary); color:var(--primary-contrast); border:none; border-radius:10px; padding:14px; font-size:15px; font-weight:700; cursor:pointer; box-shadow:0 8px 20px rgba(14,90,138,.28)"
+            [style.opacity]="registrationVerifying ? '0.7' : '1'">
+            {{ registrationVerifying ? 'Verificando...' : 'Verificar código' }}
           </button>
           <div style="text-align:center; margin-top:14px">
             <button type="button" (click)="correctRegistrationData()"
