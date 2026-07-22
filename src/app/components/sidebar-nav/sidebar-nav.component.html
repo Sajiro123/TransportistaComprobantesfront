@@ -1,7 +1,7 @@
 <nav class="flex flex-col gap-3 p-4" [class.sidebar-nav--collapsed]="collapsed">
 
   <!-- ── Etiqueta de sección ─────────────────────────────────── -->
-  <div class="px-2 mb-1 mt-2">
+  <div class="sidebar-section-label px-2 mb-1 mt-2">
     <div class="flex items-center gap-2">
       <div class="w-1.5 h-1.5 rounded-full bg-[#00A3E0] shadow-[0_0_8px_rgba(0,163,224,0.8)]"></div>
       <span class="text-[10px] font-bold tracking-[0.15em] uppercase text-white/50 select-none">
@@ -11,15 +11,15 @@
   </div>
 
   <!-- Validación -->
-  <div class="flex flex-col gap-1">
+  <div class="sidebar-menu-item flex flex-col gap-1">
     <button type="button"
       class="group relative flex w-full items-center gap-4 overflow-hidden rounded-2xl border border-transparent px-3 py-3 text-left text-white/70 transition-all duration-300 hover:border-white/[.06] hover:bg-white/[.03] hover:text-white"
       [attr.aria-expanded]="validacionOpen"
       aria-controls="validacion-submenu"
       title="Validación"
       (click)="toggleValidacion()">
-      <div class="relative z-10 flex h-11 w-11 flex-none items-center justify-center rounded-[14px] border border-white/[.08] bg-white/[.04] shadow-inner transition-all duration-300 group-hover:scale-110 group-hover:border-[#00A3E0]/30 group-hover:bg-[#00A3E0]/15">
-        <i class="fa-solid fa-clipboard-check text-[18px] text-white/80 transition-all duration-300 group-hover:text-white group-hover:drop-shadow-[0_0_8px_rgba(0,163,224,0.6)]"></i>
+      <div class="sidebar-menu-icon relative z-10 flex h-11 w-11 flex-none items-center justify-center rounded-[14px] border border-white/[.08] bg-white/[.04] shadow-inner transition-all duration-300 group-hover:scale-110 group-hover:border-[#00A3E0]/30 group-hover:bg-[#00A3E0]/15">
+        <i class="fa-solid fa-user-check text-[18px] text-white/80 transition-all duration-300 group-hover:text-white group-hover:drop-shadow-[0_0_8px_rgba(0,163,224,0.6)]"></i>
       </div>
 
       <div class="sidebar-menu-text z-10 flex flex-1 flex-col overflow-hidden">
@@ -60,7 +60,7 @@
   </div>
 
   <!-- Carga y cálculo -->
-  <div class="flex flex-col gap-1">
+  <div class="sidebar-menu-item flex flex-col gap-1">
     <button type="button"
       class="group relative flex w-full items-center gap-4 overflow-hidden rounded-2xl border border-transparent px-3 py-3 text-left text-white/70 transition-all duration-300 hover:border-white/[.06] hover:bg-white/[.03] hover:text-white"
       [attr.aria-expanded]="cargaOpen"
@@ -117,7 +117,7 @@
   </div>
 
   <!-- Envío -->
-  <div class="flex flex-col gap-1">
+  <div class="sidebar-menu-item flex flex-col gap-1">
     <button type="button"
       class="group relative flex w-full items-center gap-4 overflow-hidden rounded-2xl border border-transparent px-3 py-3 text-left text-white/70 transition-all duration-300 hover:border-white/[.06] hover:bg-white/[.03] hover:text-white"
       [attr.aria-expanded]="envioOpen"

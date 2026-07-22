@@ -41,7 +41,7 @@ export class ApiComprobanteService {
       tipoDocumento: 'DNI',
       numeroDocumento: '40218765',
       correoElectronico: 'contacto@translimasur.pe',
-      telefono: '+51 987 654 321',
+      telefono: '987654321',
     },
   };
 

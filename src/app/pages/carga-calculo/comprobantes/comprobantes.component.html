@@ -137,8 +137,10 @@
     <div class="flex flex-col gap-2.5">
       @for (item of acumulados; track item.placa) {
         <article class="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-3.5 shadow-[var(--shadow)]">
-          <div class="mb-1.5 flex justify-between gap-3 text-[13.5px] font-bold">
-            <span class="mono">{{ item.placa }}</span>
+          <div class="mb-2 flex flex-wrap items-center justify-between gap-2.5 text-[13.5px] font-bold">
+            <span class="mono inline-flex min-w-[94px] items-center justify-center rounded-lg border border-[var(--border-strong)] bg-[var(--surface-2)] px-3 py-1.5 text-[13px] font-extrabold uppercase tracking-[0.09em] text-[var(--text)] shadow-sm">
+              {{ item.placa }}
+            </span>
             <span class="mono text-[var(--text-2)]">{{ item.consumido | number:'1.2-2' }} / {{ item.tope | number:'1.2-2' }} gal</span>
           </div>
           <div class="h-2 overflow-hidden rounded-full bg-[var(--surface-3)]">

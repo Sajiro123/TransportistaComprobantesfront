@@ -60,19 +60,19 @@ export const authInterceptor: HttpInterceptorFn = (
           return apiAuthService.refreshAccessToken().pipe(
             switchMap(() => {
               isRefreshing = false;
-              
+
               sessionService.renewSession();
-              
+
               refreshTokenSubject.next('refreshed');
 
               return next(req.clone({ withCredentials: true }));
             }),
             catchError((refreshErr) => {
                 isRefreshing = false;
-                
+
                 sessionService.stopSession();
                 apiAuthService.clearSession();
-                
+
                 Swal.fire({
                   icon: 'warning',
                   title: 'Sesión finalizada',
@@ -97,27 +97,6 @@ export const authInterceptor: HttpInterceptorFn = (
           );
         }
       }
-      if (err.status === 403) {
-        const hasSession = !!sessionStorage.getItem('sigt_api_session_DU004') || !!localStorage.getItem('sigt_sesion_DU004');
-        const isLoginUrl = router.url.includes('/login');
-
-        if (hasSession && !isLoginUrl) {
-          sessionService.stopSession();
-          apiAuthService.clearSession();
-
-          Swal.fire({
-            icon: 'warning',
-            title: 'Sesión finalizada',
-            text: 'Su sesión ha caducado. Por favor, inicie sesión nuevamente.',
-            confirmButtonText: 'Aceptar',
-            confirmButtonColor: '#0059bb'
-          }).then(() => {
-            router.navigate(['/login']);
-          });
-          return EMPTY;
-        }
-      }
-      // Para 403 o errores normales solo propagamos
       return throwError(() => err);
     }),
   );

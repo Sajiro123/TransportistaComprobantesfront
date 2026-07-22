@@ -2,7 +2,7 @@
   gap: 0.5rem;
   padding: 0.75rem 0.625rem;
 
-  > div:first-child,
+  .sidebar-section-label,
   .sidebar-menu-text,
   .sidebar-menu-chevron,
   .sidebar-submenu,
@@ -20,5 +20,10 @@
     > i:last-child {
       display: none;
     }
+  }
+
+  .sidebar-menu-item,
+  .sidebar-menu-icon {
+    display: flex;
   }
 }
