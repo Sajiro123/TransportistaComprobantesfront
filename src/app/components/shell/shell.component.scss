@@ -4,6 +4,7 @@
 */
 
 $sidebar-w: 260px;
+$sidebar-collapsed-w: 76px;
 
 // ──────────────────────────────────────────────────────────────
 //  BACKDROP — overlay oscuro al abrir sidebar en móvil
@@ -39,7 +40,8 @@ $sidebar-w: 260px;
   flex-direction: column;
   z-index: 40;
   transform: translateX(0);
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: width 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+              transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: 4px 0 24px rgba(0, 30, 60, 0.15);
 
   // Botón cerrar: oculto en desktop, flex en móvil
@@ -47,9 +49,12 @@ $sidebar-w: 260px;
     display: none;
   }
 
-  // Cuando sidebarOpen = false: se oculta deslizando a la izquierda
-  &:not(.atu-sidebar--open) {
-    transform: translateX(-#{$sidebar-w});
+  &--collapsed {
+    width: $sidebar-collapsed-w;
+
+    .atu-sidebar__header {
+      display: none;
+    }
   }
 }
 
@@ -62,7 +67,7 @@ $sidebar-w: 260px;
   transition: margin-left 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 
   &--collapsed {
-    margin-left: 0;
+    margin-left: $sidebar-collapsed-w;
   }
 }
 
@@ -73,10 +78,19 @@ $sidebar-w: 260px;
 @media (max-width: 900px) {
   .atu-sidebar {
     transform: translateX(-#{$sidebar-w});
+    width: $sidebar-w;
 
     &--open {
       transform: translateX(0);
       box-shadow: 8px 0 40px rgba(0, 30, 60, 0.25);
+    }
+
+    &--collapsed {
+      transform: translateX(-#{$sidebar-w});
+
+      .atu-sidebar__header {
+        display: block;
+      }
     }
 
     &__close-btn {

@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, HostListener } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { TableModule } from 'primeng/table';
+import { isValidRuc } from '../../../core/utils/validators';
 
 type Forma = 'A' | 'B';
 type EstadoFiltro = 'todos' | 'val' | 'pend' | 'obs';
@@ -88,6 +89,9 @@ export class ComprobantesComponent {
   editor: ComprobanteEditor | null = null;
   editorModo: 'crear' | 'editar' = 'editar';
   editorError = '';
+  editorSubmitted = false;
+  comprobantePendienteEliminar: Comprobante | null = null;
+  readonly todayDate = this.formatLocalDate(new Date());
 
   comprobantes: Comprobante[] = [
     {
@@ -225,8 +229,19 @@ export class ComprobantesComponent {
     return Math.min((item.consumido / item.tope) * 100, 100);
   }
 
-  retirar(id: number): void {
+  abrirConfirmacionEliminar(comprobante: Comprobante): void {
+    this.comprobantePendienteEliminar = comprobante;
+  }
+
+  cerrarConfirmacionEliminar(): void {
+    this.comprobantePendienteEliminar = null;
+  }
+
+  confirmarEliminarComprobante(): void {
+    if (!this.comprobantePendienteEliminar) return;
+    const id = this.comprobantePendienteEliminar.id;
     this.comprobantes = this.comprobantes.filter(comprobante => comprobante.id !== id);
+    this.comprobantePendienteEliminar = null;
   }
 
   abrirEditor(comprobante: Comprobante): void {
@@ -243,8 +258,8 @@ export class ComprobantesComponent {
       licencia: comprobante.licencia || (comprobante.placa === 'B2W-458' ? 'Q45879621' : 'Q41258963'),
       serie,
       numero: numeroPartes.join('-'),
-      emision: comprobante.fecha,
-      mes: comprobante.mes || this.mesDesdeFecha(comprobante.fecha),
+      emision: this.fechaParaInput(comprobante.fecha),
+      mes: this.mesDesdeFecha(comprobante.fecha),
       rucGrifo: comprobante.rucGrifo || (comprobante.grifo === 'Grifo El Sol S.A.C.' ? '20598765432' : '20487654321'),
       razonSocial: comprobante.grifo,
       direccion: comprobante.direccion || (distrito === 'Ate' ? 'Av. Nicolás Ayllón 2840' : 'Av. Separadora Industrial 1450'),
@@ -256,6 +271,7 @@ export class ComprobantesComponent {
       galones: comprobante.galones,
     };
     this.editorError = '';
+    this.editorSubmitted = false;
   }
 
   abrirRegistro(): void {
@@ -270,7 +286,7 @@ export class ComprobantesComponent {
       serie: 'F001',
       numero: '',
       emision: '',
-      mes: 'Junio',
+      mes: '',
       rucGrifo: '',
       razonSocial: '',
       direccion: '',
@@ -282,25 +298,172 @@ export class ComprobantesComponent {
       galones: 0,
     };
     this.editorError = '';
+    this.editorSubmitted = false;
   }
 
   cerrarEditor(): void {
     this.editor = null;
     this.editorError = '';
+    this.editorSubmitted = false;
+  }
+
+  get editorDocumentoMaxLength(): number {
+    return this.editor?.tipoDocumento === 'DNI' ? 8 : 12;
+  }
+
+  get editorDocumentoInputMode(): 'numeric' | 'text' {
+    return this.editor?.tipoDocumento === 'DNI' ? 'numeric' : 'text';
+  }
+
+  get editorDocumentoHint(): string {
+    return this.editor?.tipoDocumento === 'DNI'
+      ? 'El DNI debe contener exactamente 8 dígitos.'
+      : 'El carné debe contener entre 9 y 12 letras o números.';
+  }
+
+  get isEditorDocumentoValid(): boolean {
+    if (!this.editor) return false;
+    const value = this.editor.numeroDocumento.trim();
+    return this.editor.tipoDocumento === 'DNI'
+      ? /^\d{8}$/.test(value)
+      : /^[A-Z0-9]{9,12}$/.test(value);
+  }
+
+  onEditorTipoDocumentoChange(): void {
+    if (!this.editor) return;
+    this.editor.numeroDocumento = '';
+  }
+
+  onEditorNumeroDocumentoInput(event: Event): void {
+    if (!this.editor) return;
+    const input = event.target as HTMLInputElement;
+    const value = this.editor.tipoDocumento === 'DNI'
+      ? input.value.replace(/\D/g, '').slice(0, 8)
+      : input.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 12);
+    input.value = value;
+    this.editor.numeroDocumento = value;
+  }
+
+  get isEditorLicenseValid(): boolean {
+    return !!this.editor && /^[A-Z]\d{8}$/.test(this.editor.licencia.trim());
+  }
+
+  get isEditorInvoiceSeriesValid(): boolean {
+    return !!this.editor && /^F\d{3}$/.test(this.editor.serie.trim());
+  }
+
+  get isEditorInvoiceNumberValid(): boolean {
+    return !!this.editor && /^\d{1,8}$/.test(this.editor.numero.trim());
+  }
+
+  get isEditorEmissionValid(): boolean {
+    if (!this.editor || !/^\d{4}-\d{2}-\d{2}$/.test(this.editor.emision)) return false;
+    const [year, month, day] = this.editor.emision.split('-').map(Number);
+    const selectedDate = new Date(`${this.editor.emision}T00:00:00`);
+    const isRealDate = !Number.isNaN(selectedDate.getTime()) &&
+      selectedDate.getFullYear() === year &&
+      selectedDate.getMonth() + 1 === month &&
+      selectedDate.getDate() === day;
+    return isRealDate && this.editor.emision <= this.todayDate;
+  }
+
+  get isEditorMonthValid(): boolean {
+    return !!this.editor && !!this.editor.mes && this.editor.mes === this.mesDesdeFecha(this.editor.emision);
+  }
+
+  get isEditorStationRucValid(): boolean {
+    return !!this.editor && isValidRuc(this.editor.rucGrifo.trim());
+  }
+
+  onEditorLicenseInput(event: Event): void {
+    if (!this.editor) return;
+    const input = event.target as HTMLInputElement;
+    const upperValue = input.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+    const firstCharacter = upperValue.charAt(0).replace(/[^A-Z]/g, '');
+    const value = `${firstCharacter}${upperValue.slice(1).replace(/\D/g, '').slice(0, 8)}`;
+    input.value = value;
+    this.editor.licencia = value;
+  }
+
+  onEditorInvoiceSeriesInput(event: Event): void {
+    if (!this.editor) return;
+    const input = event.target as HTMLInputElement;
+    const digits = input.value.toUpperCase().replace(/^F/, '').replace(/\D/g, '').slice(0, 3);
+    const value = input.value ? `F${digits}` : '';
+    input.value = value;
+    this.editor.serie = value;
+  }
+
+  onEditorInvoiceNumberInput(event: Event): void {
+    if (!this.editor) return;
+    const input = event.target as HTMLInputElement;
+    const value = input.value.replace(/\D/g, '').slice(0, 8);
+    input.value = value;
+    this.editor.numero = value;
+  }
+
+  onEditorEmissionChange(): void {
+    if (!this.editor) return;
+    if (this.editor.emision > this.todayDate) this.editor.emision = this.todayDate;
+    this.editor.mes = this.mesDesdeFecha(this.editor.emision);
+  }
+
+  onEditorStationRucInput(event: Event): void {
+    if (!this.editor) return;
+    const input = event.target as HTMLInputElement;
+    const value = input.value.replace(/\D/g, '').slice(0, 11);
+    input.value = value;
+    this.editor.rucGrifo = value;
   }
 
   guardarEditor(): void {
     if (!this.editor) return;
+    this.editorSubmitted = true;
 
     const modelo = this.editor;
-    if (!modelo.placa || !modelo.numero.trim() || !modelo.galones || modelo.galones <= 0) {
-      this.editorError = 'Completa la placa, el número de factura y una cantidad válida de galones.';
+    if (!modelo.placa || !modelo.galones || modelo.galones <= 0) {
+      this.editorError = 'Completa la placa y una cantidad válida de galones.';
+      return;
+    }
+
+    if (!this.isEditorDocumentoValid) {
+      this.editorError = this.editorDocumentoHint;
+      return;
+    }
+
+    if (!this.isEditorLicenseValid) {
+      this.editorError = 'La licencia debe contener una letra seguida de 8 dígitos.';
+      return;
+    }
+
+    if (!this.isEditorInvoiceSeriesValid) {
+      this.editorError = 'La serie de la factura debe tener el formato F001.';
+      return;
+    }
+
+    if (!this.isEditorInvoiceNumberValid) {
+      this.editorError = 'El número de factura debe contener entre 1 y 8 dígitos.';
+      return;
+    }
+
+    if (!this.isEditorEmissionValid) {
+      this.editorError = 'Selecciona una fecha de emisión válida que no sea posterior al día de hoy.';
+      return;
+    }
+
+    if (!this.isEditorMonthValid) {
+      this.editorError = 'El mes debe corresponder a la fecha de emisión seleccionada.';
+      return;
+    }
+
+    if (!this.isEditorStationRucValid) {
+      this.editorError = 'El RUC del grifo debe tener 11 dígitos y un prefijo válido.';
       return;
     }
 
     const datosComprobante = {
       numero: `${modelo.serie.trim() || 'F001'}-${modelo.numero.trim()}`,
-      fecha: modelo.emision,
+      fecha: this.fechaParaMostrar(modelo.emision),
       placa: modelo.placa,
       conductor: modelo.conductor.trim(),
       grifo: modelo.razonSocial.trim() || 'Estación pendiente de validación',
@@ -342,11 +505,36 @@ export class ComprobantesComponent {
 
   @HostListener('document:keydown.escape')
   cerrarConEscape(): void {
-    if (this.editor) this.cerrarEditor();
+    if (this.comprobantePendienteEliminar) {
+      this.cerrarConfirmacionEliminar();
+    } else if (this.editor) {
+      this.cerrarEditor();
+    }
   }
 
   private mesDesdeFecha(fecha: string): string {
-    const mes = fecha.split('/')[1];
-    return ({ '05': 'Mayo', '06': 'Junio', '07': 'Julio' } as Record<string, string>)[mes] || 'Junio';
+    const monthNames = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+    const monthValue = /^\d{4}-\d{2}-\d{2}$/.test(fecha)
+      ? Number(fecha.slice(5, 7))
+      : Number(fecha.split('/')[1]);
+    return monthNames[monthValue - 1] || '';
+  }
+
+  private fechaParaInput(fecha: string): string {
+    if (/^\d{4}-\d{2}-\d{2}$/.test(fecha)) return fecha;
+    const [day, month, year] = fecha.split('/');
+    return day && month && year ? `${year}-${month}-${day}` : '';
+  }
+
+  private fechaParaMostrar(fecha: string): string {
+    const [year, month, day] = fecha.split('-');
+    return year && month && day ? `${day}/${month}/${year}` : fecha;
+  }
+
+  private formatLocalDate(date: Date): string {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
   }
 }

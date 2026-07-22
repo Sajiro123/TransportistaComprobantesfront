@@ -1,60 +1,63 @@
-<nav class="flex flex-col gap-3 p-4">
+<nav class="flex flex-col gap-3 p-4" [class.sidebar-nav--collapsed]="collapsed">
 
   <!-- ── Etiqueta de sección ─────────────────────────────────── -->
   <div class="px-2 mb-1 mt-2">
     <div class="flex items-center gap-2">
       <div class="w-1.5 h-1.5 rounded-full bg-[#00A3E0] shadow-[0_0_8px_rgba(0,163,224,0.8)]"></div>
       <span class="text-[10px] font-bold tracking-[0.15em] uppercase text-white/50 select-none">
-        Navegación
+        TU TRÁMITE
       </span>
     </div>
   </div>
 
-  <!-- ══ Registro ══════════════════════════════════════════════ -->
-  <a routerLink="/registro/verificacion" 
-     routerLinkActive="active-nav-item"
-     [routerLinkActiveOptions]="{exact: false}" 
-     class="group relative flex items-center gap-4 px-3 py-3 rounded-2xl border border-transparent 
-            text-white/70 hover:text-white hover:bg-white/[.03] hover:border-white/[.06] hover:shadow-lg
-            transition-all duration-300 ease-out cursor-pointer overflow-hidden" 
-     (click)="onNavigate()">
+  <!-- Validación -->
+  <div class="flex flex-col gap-1">
+    <button type="button"
+      class="group relative flex w-full items-center gap-4 overflow-hidden rounded-2xl border border-transparent px-3 py-3 text-left text-white/70 transition-all duration-300 hover:border-white/[.06] hover:bg-white/[.03] hover:text-white"
+      [attr.aria-expanded]="validacionOpen"
+      aria-controls="validacion-submenu"
+      title="Validación"
+      (click)="toggleValidacion()">
+      <div class="relative z-10 flex h-11 w-11 flex-none items-center justify-center rounded-[14px] border border-white/[.08] bg-white/[.04] shadow-inner transition-all duration-300 group-hover:scale-110 group-hover:border-[#00A3E0]/30 group-hover:bg-[#00A3E0]/15">
+        <i class="fa-solid fa-clipboard-check text-[18px] text-white/80 transition-all duration-300 group-hover:text-white group-hover:drop-shadow-[0_0_8px_rgba(0,163,224,0.6)]"></i>
+      </div>
 
-    <!-- Fondo Activo Completo (Gradiente sutil) -->
-    <div class="absolute inset-0 bg-gradient-to-r from-[#00A3E0]/15 to-transparent opacity-0 group-[.active-nav-item]:opacity-100 pointer-events-none transition-opacity duration-500"></div>
+      <div class="sidebar-menu-text z-10 flex flex-1 flex-col overflow-hidden">
+        <span class="truncate text-[14px] font-semibold tracking-[0.2px] text-white/80 transition-all duration-300 group-hover:translate-x-1 group-hover:text-white">
+          Validación
+        </span>
+        <span class="mt-0.5 truncate text-[11px] font-medium text-white/40 transition-colors duration-300 group-hover:text-white/60">
+          Transportista y vehículos
+        </span>
+      </div>
 
-    <!-- Indicador Activo (Línea lateral) -->
-    <div class="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-0 bg-[#00A3E0] rounded-r-md transition-all duration-300 group-[.active-nav-item]:h-3/5 group-[.active-nav-item]:shadow-[0_0_12px_#00A3E0]"></div>
+      <i class="sidebar-menu-chevron fa-solid fa-chevron-down z-10 text-[10px] text-white/35 transition-transform duration-300"
+        [class.rotate-180]="validacionOpen"></i>
+    </button>
 
-    <!-- Contenedor del Icono -->
-    <div class="relative flex-none flex items-center justify-center w-11 h-11 rounded-[14px]
-                bg-white/[.04] border border-white/[.08] shadow-inner
-                group-hover:bg-[#00A3E0]/15 group-hover:border-[#00A3E0]/30 group-hover:scale-110
-                group-[.active-nav-item]:bg-[#00A3E0]/25 group-[.active-nav-item]:border-[#00A3E0]/50 group-[.active-nav-item]:text-white
-                transition-all duration-300 z-10">
-      
-      <!-- Glow effect en hover/active dentro del icono -->
-      <div class="absolute inset-0 bg-gradient-to-tr from-[#00A3E0]/0 to-[#00A3E0]/30 opacity-0 group-hover:opacity-100 group-[.active-nav-item]:opacity-100 transition-opacity duration-300 rounded-[14px]"></div>
-      
-      <i class="fa-solid fa-address-card text-[18px] z-10 transition-all duration-300 group-hover:drop-shadow-[0_0_8px_rgba(0,163,224,0.6)] group-[.active-nav-item]:drop-shadow-[0_0_10px_rgba(0,163,224,0.8)] group-[.active-nav-item]:text-white text-white/80"></i>
-    </div>
-
-    <!-- Contenedor de Texto -->
-    <div class="flex flex-col flex-1 overflow-hidden z-10">
-      <span class="text-[14px] font-semibold tracking-[0.2px] text-white/80
-                   group-hover:translate-x-1 group-[.active-nav-item]:translate-x-1 group-[.active-nav-item]:text-white transition-all duration-300 truncate">
-        Registro
-      </span>
-      <span class="text-[11px] font-medium text-white/40 group-hover:text-white/60 group-[.active-nav-item]:text-white/70 transition-colors duration-300 truncate mt-0.5">
-        Gestión de verificación
-      </span>
-    </div>
-    
-    <!-- Chevron a la derecha -->
-    <div class="flex-none flex items-center justify-center w-6 h-6 rounded-full bg-white/[.02] group-hover:bg-[#00A3E0]/20 group-[.active-nav-item]:bg-[#00A3E0]/20 transition-all duration-300 z-10 group-hover:translate-x-1 group-[.active-nav-item]:translate-x-1">
-      <i class="fa-solid fa-chevron-right text-[10px] text-white/30 group-hover:text-[#00A3E0] group-[.active-nav-item]:text-[#00A3E0] transition-colors duration-300"></i>
-    </div>
-
-  </a>
+    @if (validacionOpen) {
+      <div id="validacion-submenu" class="sidebar-submenu relative ml-[34px] border-l border-white/10 py-1 pl-5">
+        <a routerLink="/validacion/verificacion"
+          routerLinkActive="!border-[#00A3E0]/30 !bg-[#00A3E0]/15 !text-white"
+          #verificacionLink="routerLinkActive"
+          class="group flex items-center gap-3 rounded-xl border border-transparent px-3 py-2.5 text-[12.5px] font-semibold text-white/55 transition-all duration-200 hover:bg-white/[.04] hover:text-white"
+          (click)="onNavigate()">
+          <span class="inline-flex h-[22px] w-[22px] flex-none items-center justify-center rounded-full bg-white/10 text-[11.5px] font-extrabold text-white/65 transition-colors group-hover:bg-[#00A3E0]/25 group-hover:text-white" [style.background]="verificacionLink.isActive ? '#00A3E0' : null" [style.color]="verificacionLink.isActive ? '#fff' : null">1</span>
+          <span>Verificación</span>
+          <i class="fa-solid fa-chevron-right ml-auto text-[9px] opacity-40 transition-transform group-hover:translate-x-0.5"></i>
+        </a>
+        <a routerLink="/validacion/vehiculos"
+          routerLinkActive="!border-[#00A3E0]/30 !bg-[#00A3E0]/15 !text-white"
+          #vehiculosLink="routerLinkActive"
+          class="group mt-1 flex items-center gap-3 rounded-xl border border-transparent px-3 py-2.5 text-[12.5px] font-semibold text-white/55 transition-all duration-200 hover:bg-white/[.04] hover:text-white"
+          (click)="onNavigate()">
+          <span class="inline-flex h-[22px] w-[22px] flex-none items-center justify-center rounded-full bg-white/10 text-[11.5px] font-extrabold text-white/65 transition-colors group-hover:bg-[#00A3E0]/25 group-hover:text-white" [style.background]="vehiculosLink.isActive ? '#00A3E0' : null" [style.color]="vehiculosLink.isActive ? '#fff' : null">2</span>
+          <span>Vehículos</span>
+          <i class="fa-solid fa-chevron-right ml-auto text-[9px] opacity-40 transition-transform group-hover:translate-x-0.5"></i>
+        </a>
+      </div>
+    }
+  </div>
 
   <!-- Carga y cálculo -->
   <div class="flex flex-col gap-1">

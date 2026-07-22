@@ -6,6 +6,7 @@ import { ApiAuthService } from '../../core/services/api-auth.service';
 import { ApiUsuarioService } from '../../core/services/api-usuario.service';
 import { ApiComprobanteService } from '../../core/services/api-comprobante.service';
 import { CuentaAbono, Usuario, PerfilTransportista } from '../../core/models/models';
+import { isValidPhone } from '../../core/utils/validators';
 
 @Component({
   selector: 'app-perfil-info',
@@ -299,10 +300,18 @@ import { CuentaAbono, Usuario, PerfilTransportista } from '../../core/models/mod
                       <input
                         type="text"
                         [(ngModel)]="editContactoNombre"
+                        (input)="onContactoNombreInput($event)"
+                        maxlength="120"
+                        autocomplete="name"
+                        [attr.aria-invalid]="!!contactoNombreError"
                         placeholder="Nombres y Apellidos"
-                        class="w-full pl-9 border-2 border-atu-border dark:border-[#30363D] rounded-xl bg-white dark:bg-[#0D1117] px-3 py-2.5 text-[14px] text-atu-text dark:text-[#E6EDF3] focus:outline-none focus:border-atu-primary dark:focus:border-[#00A3E0] focus:ring-4 focus:ring-atu-primary/10 transition-all shadow-sm"
+                        class="w-full pl-9 border-2 rounded-xl bg-white dark:bg-[#0D1117] px-3 py-2.5 text-[14px] text-atu-text dark:text-[#E6EDF3] focus:outline-none focus:ring-4 focus:ring-atu-primary/10 transition-all shadow-sm"
+                        [ngClass]="contactoNombreError ? 'border-red-500 focus:border-red-500' : 'border-atu-border dark:border-[#30363D] focus:border-atu-primary dark:focus:border-[#00A3E0]'"
                       />
                     </div>
+                    @if (contactoNombreError) {
+                      <p class="mt-1.5 text-[11.5px] font-semibold text-red-600 dark:text-red-400">{{ contactoNombreError }}</p>
+                    }
                   } @else {
                     <strong
                       class="text-[15px] text-atu-text dark:text-[#E6EDF3] font-semibold flex items-center gap-2"
@@ -331,10 +340,21 @@ import { CuentaAbono, Usuario, PerfilTransportista } from '../../core/models/mod
                       <input
                         type="tel"
                         [(ngModel)]="editContactoTelefono"
-                        placeholder="Teléfono"
-                        class="w-full pl-9 border-2 border-atu-border dark:border-[#30363D] rounded-xl bg-white dark:bg-[#0D1117] px-3 py-2.5 text-[14px] text-atu-text dark:text-[#E6EDF3] focus:outline-none focus:border-atu-primary dark:focus:border-[#00A3E0] focus:ring-4 focus:ring-atu-primary/10 transition-all font-mono tracking-wide shadow-sm"
+                        (input)="onContactoTelefonoInput($event)"
+                        inputmode="numeric"
+                        maxlength="9"
+                        autocomplete="tel"
+                        [attr.aria-invalid]="!!contactoTelefonoError"
+                        placeholder="9 dígitos"
+                        class="w-full pl-9 border-2 rounded-xl bg-white dark:bg-[#0D1117] px-3 py-2.5 text-[14px] text-atu-text dark:text-[#E6EDF3] focus:outline-none focus:ring-4 focus:ring-atu-primary/10 transition-all font-mono tracking-wide shadow-sm"
+                        [ngClass]="contactoTelefonoError ? 'border-red-500 focus:border-red-500' : 'border-atu-border dark:border-[#30363D] focus:border-atu-primary dark:focus:border-[#00A3E0]'"
                       />
                     </div>
+                    @if (contactoTelefonoError) {
+                      <p class="mt-1.5 text-[11.5px] font-semibold text-red-600 dark:text-red-400">{{ contactoTelefonoError }}</p>
+                    } @else {
+                      <p class="mt-1.5 text-[11px] text-atu-text-3 dark:text-[#6E7681]">Debe comenzar con 9 y contener 9 dígitos.</p>
+                    }
                   } @else {
                     <strong
                       class="text-[15px] text-atu-text dark:text-[#E6EDF3] font-semibold flex items-center gap-2 font-mono tracking-wide"
@@ -359,6 +379,7 @@ import { CuentaAbono, Usuario, PerfilTransportista } from '../../core/models/mod
                     <div class="relative">
                       <select
                         [(ngModel)]="editContactoTipoDoc"
+                        (ngModelChange)="onContactoTipoDocumentoChange()"
                         class="w-full border-2 border-atu-border dark:border-[#30363D] rounded-xl bg-white dark:bg-[#0D1117] px-3 py-2.5 text-[14px] text-atu-text dark:text-[#E6EDF3] focus:outline-none focus:border-atu-primary dark:focus:border-[#00A3E0] focus:ring-4 focus:ring-atu-primary/10 transition-all cursor-pointer shadow-sm"
                       >
                         <option value="DNI">DNI</option>
@@ -390,10 +411,21 @@ import { CuentaAbono, Usuario, PerfilTransportista } from '../../core/models/mod
                       <input
                         type="text"
                         [(ngModel)]="editContactoNumDoc"
+                        (input)="onContactoDocumentoInput($event)"
+                        [attr.inputmode]="contactoDocumentoSoloNumeros ? 'numeric' : 'text'"
+                        [attr.maxlength]="contactoDocumentoMaxLength"
+                        [attr.aria-invalid]="!!contactoDocumentoError"
+                        autocomplete="off"
                         placeholder="Número de documento"
-                        class="w-full border-2 border-atu-border dark:border-[#30363D] rounded-xl bg-white dark:bg-[#0D1117] px-3 py-2.5 text-[14px] text-atu-text dark:text-[#E6EDF3] focus:outline-none focus:border-atu-primary dark:focus:border-[#00A3E0] focus:ring-4 focus:ring-atu-primary/10 transition-all font-mono shadow-sm"
+                        class="w-full border-2 rounded-xl bg-white dark:bg-[#0D1117] px-3 py-2.5 text-[14px] uppercase text-atu-text dark:text-[#E6EDF3] focus:outline-none focus:ring-4 focus:ring-atu-primary/10 transition-all font-mono shadow-sm"
+                        [ngClass]="contactoDocumentoError ? 'border-red-500 focus:border-red-500' : 'border-atu-border dark:border-[#30363D] focus:border-atu-primary dark:focus:border-[#00A3E0]'"
                       />
                     </div>
+                    @if (contactoDocumentoError) {
+                      <p class="mt-1.5 text-[11.5px] font-semibold text-red-600 dark:text-red-400">{{ contactoDocumentoError }}</p>
+                    } @else {
+                      <p class="mt-1.5 text-[11px] text-atu-text-3 dark:text-[#6E7681]">{{ contactoDocumentoHint }}</p>
+                    }
                   } @else {
                     <strong
                       class="text-[15px] text-atu-text dark:text-[#E6EDF3] font-semibold block font-mono"
@@ -810,6 +842,7 @@ export class PerfilInfoComponent implements OnInit {
   editContactoTipoDoc = '';
   editContactoNumDoc = '';
   editContactoTelefono = '';
+  editAttempted = false;
 
   private readonly authService = inject(AuthService);
   private readonly apiAuthService = inject(ApiAuthService);
@@ -889,12 +922,107 @@ export class PerfilInfoComponent implements OnInit {
     this.editContactoTelefono = this.perfilTrans?.contacto?.telefono ?? '';
 
     this.editAlert = null;
+    this.editAttempted = false;
     this.editMode = true;
   }
 
   cancelarEdicion(): void {
     this.editMode = false;
     this.editAlert = null;
+    this.editAttempted = false;
+  }
+
+  get contactoDocumentoMaxLength(): number {
+    return this.contactoDocumentoReglas.max;
+  }
+
+  get contactoDocumentoSoloNumeros(): boolean {
+    return this.editContactoTipoDoc === 'DNI';
+  }
+
+  get contactoDocumentoHint(): string {
+    switch (this.editContactoTipoDoc) {
+      case 'DNI':
+        return 'El DNI debe contener exactamente 8 dígitos.';
+      case 'CE':
+        return 'El carné debe contener entre 9 y 12 letras o números.';
+      case 'PASAPORTE':
+        return 'El pasaporte debe contener entre 6 y 12 letras o números.';
+      default:
+        return 'Seleccione el tipo de documento.';
+    }
+  }
+
+  get contactoNombreError(): string {
+    const value = this.editContactoNombre.trim();
+    if (!value) return this.editAttempted ? 'El nombre del contacto es obligatorio.' : '';
+    if (value.length < 3) return 'Ingrese al menos 3 caracteres.';
+    if (!/^[\p{L}]+(?:[ '\-][\p{L}]+)*$/u.test(value)) {
+      return 'Ingrese únicamente letras, espacios, apóstrofes o guiones.';
+    }
+    return '';
+  }
+
+  get contactoTelefonoError(): string {
+    const value = this.editContactoTelefono.trim();
+    if (!value) return this.editAttempted ? 'El teléfono del contacto es obligatorio.' : '';
+    return isValidPhone(value) ? '' : 'Ingrese un celular válido: 9 dígitos y debe comenzar con 9.';
+  }
+
+  get contactoDocumentoError(): string {
+    const value = this.editContactoNumDoc.trim();
+    if (!this.editContactoTipoDoc) {
+      return this.editAttempted ? 'Seleccione el tipo de documento.' : '';
+    }
+    if (!value) {
+      return this.editAttempted ? 'El número de documento del contacto es obligatorio.' : '';
+    }
+    return this.contactoDocumentoReglas.pattern.test(value) ? '' : this.contactoDocumentoHint;
+  }
+
+  onContactoNombreInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const value = input.value
+      .replace(/[^\p{L}\s'\-]/gu, '')
+      .replace(/\s{2,}/g, ' ')
+      .slice(0, 120);
+    input.value = value;
+    this.editContactoNombre = value;
+  }
+
+  onContactoTelefonoInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const value = input.value.replace(/\D/g, '').slice(0, 9);
+    input.value = value;
+    this.editContactoTelefono = value;
+  }
+
+  onContactoTipoDocumentoChange(): void {
+    this.editContactoNumDoc = '';
+  }
+
+  onContactoDocumentoInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const rules = this.contactoDocumentoReglas;
+    const rawValue = this.contactoDocumentoSoloNumeros
+      ? input.value.replace(/\D/g, '')
+      : input.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+    const value = rawValue.slice(0, rules.max);
+    input.value = value;
+    this.editContactoNumDoc = value;
+  }
+
+  private get contactoDocumentoReglas(): { max: number; pattern: RegExp } {
+    switch (this.editContactoTipoDoc) {
+      case 'DNI':
+        return { max: 8, pattern: /^\d{8}$/ };
+      case 'CE':
+        return { max: 12, pattern: /^[A-Z0-9]{9,12}$/ };
+      case 'PASAPORTE':
+        return { max: 12, pattern: /^[A-Z0-9]{6,12}$/ };
+      default:
+        return { max: 12, pattern: /$^/ };
+    }
   }
 
   onCciInput(event: Event): void {
@@ -988,28 +1116,22 @@ export class PerfilInfoComponent implements OnInit {
   guardarEdicion(): void {
     this.editAlert = null;
     if (!this.usuario) return;
+    this.editAttempted = true;
 
     // Clean inputs
     this.editEmail = String(this.editEmail ?? '').trim();
     this.editTelefono = String(this.editTelefono ?? '').trim();
     this.editCargo = String(this.editCargo ?? '').trim();
-    this.editContactoNombre = String(this.editContactoNombre ?? '').trim();
+    this.editContactoNombre = String(this.editContactoNombre ?? '').trim().replace(/\s+/g, ' ');
     this.editContactoTipoDoc = String(this.editContactoTipoDoc ?? '').trim();
     this.editContactoNumDoc = String(this.editContactoNumDoc ?? '').trim();
     this.editContactoTelefono = String(this.editContactoTelefono ?? '').trim();
 
-    // Validation for new contact edit fields
+    // Validación de los campos editables de contacto antes de invocar el API.
     if (this.editMode) {
-      if (!this.editContactoNombre) {
-        this.editAlert = { message: 'El nombre del contacto es obligatorio.', type: 'error' };
-        return;
-      }
-      if (!this.editContactoNumDoc) {
-        this.editAlert = { message: 'El número de documento del contacto es obligatorio.', type: 'error' };
-        return;
-      }
-      if (!this.editContactoTelefono) {
-        this.editAlert = { message: 'El teléfono del contacto es obligatorio.', type: 'error' };
+      const validationError = this.contactoNombreError || this.contactoDocumentoError || this.contactoTelefonoError;
+      if (validationError) {
+        this.editAlert = { message: validationError, type: 'error' };
         return;
       }
     }
@@ -1063,11 +1185,10 @@ export class PerfilInfoComponent implements OnInit {
       return;
     }
 
-    // Validate phone format (exactly 9 digits)
-    const phoneRegex = /^\d{9}$/;
-    if (!this.editTelefono || !phoneRegex.test(this.editTelefono)) {
+    // Mantiene la misma regla de celular peruano usada en Datos de contacto.
+    if (!isValidPhone(this.editTelefono)) {
       this.editAlert = {
-        message: 'Por favor, ingrese un número de teléfono válido (9 dígitos).',
+        message: 'Por favor, ingrese un celular válido (9 dígitos y debe comenzar con 9).',
         type: 'error',
       };
       return;

@@ -44,10 +44,15 @@
     </div>
 
     <div class="mb-3.5 flex flex-wrap items-center gap-2.5">
-      <label class="relative min-w-[220px] flex-1">
-        <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-sm text-[var(--text-3)]"></i>
-        <input [(ngModel)]="busqueda" type="search" placeholder="Buscar por placa, combustible, factura o grifo…" class="filter-control w-full pl-9" />
-      </label>
+      <div class="relative min-w-[220px] flex-1">
+        <span class="pointer-events-none absolute left-3 top-1/2 z-10 flex -translate-y-1/2 text-[var(--text-3)]">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <circle cx="11" cy="11" r="7"></circle>
+            <path d="M21 21l-4.3-4.3"></path>
+          </svg>
+        </span>
+        <input [(ngModel)]="busqueda" type="text" placeholder="Buscar por placa, combustible, factura o grifo…" class="filter-control search-control w-full !rounded-xl !py-2.5 !pl-9 !pr-3" />
+      </div>
       <select [(ngModel)]="estadoFiltro" class="filter-control cursor-pointer font-semibold">
         <option value="todos">Todos los estados</option>
         <option value="val">Conformes</option>
@@ -111,7 +116,7 @@
             <td>
               <div class="flex justify-end gap-1.5">
                 <button type="button" class="icon-button" title="Editar" aria-label="Editar comprobante" (click)="abrirEditor(item)"><i class="fa-solid fa-pen"></i></button>
-                <button type="button" class="icon-button icon-button--danger" title="Retirar" aria-label="Retirar comprobante" (click)="retirar(item.id)"><i class="fa-solid fa-trash"></i></button>
+                <button type="button" class="icon-button icon-button--danger" title="Eliminar" aria-label="Eliminar comprobante" (click)="abrirConfirmacionEliminar(item)"><i class="fa-solid fa-trash"></i></button>
               </div>
             </td>
           </tr>
@@ -265,51 +270,54 @@
 
         <div class="editor-grid editor-grid--document">
           <label class="editor-field">
-            <span>Documento</span>
-            <select [(ngModel)]="model.tipoDocumento">
+            <span>Tipo de documento *</span>
+            <select [(ngModel)]="model.tipoDocumento" (ngModelChange)="onEditorTipoDocumentoChange()">
               <option value="DNI">DNI</option>
               <option value="CE">CE</option>
             </select>
           </label>
           <label class="editor-field">
-            <span>N.° documento</span>
-            <input [(ngModel)]="model.numeroDocumento" class="mono" />
+            <span>Número de documento *</span>
+            <input [(ngModel)]="model.numeroDocumento" (input)="onEditorNumeroDocumentoInput($event)" [attr.inputmode]="editorDocumentoInputMode" [attr.maxlength]="editorDocumentoMaxLength" [placeholder]="model.tipoDocumento === 'DNI' ? '12345678' : 'ABC123456'" class="mono uppercase" [class.editor-field--invalid]="editorSubmitted && !isEditorDocumentoValid" />
+            <small [class.editor-field-error]="editorSubmitted && !isEditorDocumentoValid" [class.editor-field-hint]="!editorSubmitted || isEditorDocumentoValid">{{ editorDocumentoHint }}</small>
           </label>
           <label class="editor-field">
-            <span>Licencia de conducir</span>
-            <input [(ngModel)]="model.licencia" class="mono" placeholder="Q00000000" />
+            <span>Licencia de conducir *</span>
+            <input [(ngModel)]="model.licencia" (input)="onEditorLicenseInput($event)" maxlength="9" autocomplete="off" class="mono uppercase" placeholder="Q00000000" [class.editor-field--invalid]="editorSubmitted && !isEditorLicenseValid" />
+            <small [class.editor-field-error]="editorSubmitted && !isEditorLicenseValid" [class.editor-field-hint]="!editorSubmitted || isEditorLicenseValid">Una letra seguida de 8 dígitos.</small>
           </label>
         </div>
 
         <div class="editor-section-title">2 · Factura</div>
         <div class="editor-grid editor-grid--invoice">
           <label class="editor-field">
-            <span>Serie</span>
-            <input [(ngModel)]="model.serie" class="mono" placeholder="F001" />
+            <span>Serie *</span>
+            <input [(ngModel)]="model.serie" (input)="onEditorInvoiceSeriesInput($event)" maxlength="4" autocomplete="off" class="mono uppercase" placeholder="F001" [class.editor-field--invalid]="editorSubmitted && !isEditorInvoiceSeriesValid" />
+            <small [class.editor-field-error]="editorSubmitted && !isEditorInvoiceSeriesValid" [class.editor-field-hint]="!editorSubmitted || isEditorInvoiceSeriesValid">Formato obligatorio: F001.</small>
           </label>
           <label class="editor-field">
             <span>Número *</span>
-            <input [(ngModel)]="model.numero" class="mono" placeholder="0001234" />
+            <input [(ngModel)]="model.numero" (input)="onEditorInvoiceNumberInput($event)" inputmode="numeric" maxlength="8" autocomplete="off" class="mono" placeholder="0001234" [class.editor-field--invalid]="editorSubmitted && !isEditorInvoiceNumberValid" />
+            <small [class.editor-field-error]="editorSubmitted && !isEditorInvoiceNumberValid" [class.editor-field-hint]="!editorSubmitted || isEditorInvoiceNumberValid">Entre 1 y 8 dígitos.</small>
           </label>
           <label class="editor-field">
-            <span>Emisión</span>
-            <input [(ngModel)]="model.emision" class="mono" placeholder="dd/mm/aaaa" />
+            <span>Emisión *</span>
+            <input [(ngModel)]="model.emision" (ngModelChange)="onEditorEmissionChange()" type="date" [max]="todayDate" class="mono" [class.editor-field--invalid]="editorSubmitted && !isEditorEmissionValid" />
+            <small [class.editor-field-error]="editorSubmitted && !isEditorEmissionValid" [class.editor-field-hint]="!editorSubmitted || isEditorEmissionValid">No puede ser posterior a hoy.</small>
           </label>
           <label class="editor-field">
             <span>Mes</span>
-            <select [(ngModel)]="model.mes">
-              <option value="Mayo">Mayo</option>
-              <option value="Junio">Junio</option>
-              <option value="Julio">Julio</option>
-            </select>
+            <input [(ngModel)]="model.mes" readonly class="editor-readonly" placeholder="Se obtiene de la emisión" [class.editor-field--invalid]="editorSubmitted && !isEditorMonthValid" />
+            <small class="editor-field-hint">Se calcula automáticamente.</small>
           </label>
         </div>
 
         <div class="editor-section-title">3 · Grifo</div>
         <div class="editor-grid editor-grid--station">
           <label class="editor-field">
-            <span>RUC del grifo</span>
-            <input [(ngModel)]="model.rucGrifo" class="mono" placeholder="20xxxxxxxxx" />
+            <span>RUC del grifo *</span>
+            <input [(ngModel)]="model.rucGrifo" (input)="onEditorStationRucInput($event)" inputmode="numeric" maxlength="11" autocomplete="off" class="mono" placeholder="20512345678" [class.editor-field--invalid]="editorSubmitted && !isEditorStationRucValid" />
+            <small [class.editor-field-error]="editorSubmitted && !isEditorStationRucValid" [class.editor-field-hint]="!editorSubmitted || isEditorStationRucValid">11 dígitos; inicia con 10, 15, 17 o 20.</small>
           </label>
           <label class="editor-field">
             <span>Razón social</span>
@@ -390,6 +398,29 @@
         <button type="button" class="editor-cancel" (click)="cerrarEditor()">Cancelar</button>
         <button type="button" class="editor-save" (click)="guardarEditor()">
           {{ editorModo === 'crear' ? 'Validar y registrar' : 'Guardar cambios' }}
+        </button>
+      </footer>
+    </section>
+  </div>
+}
+
+@if (comprobantePendienteEliminar; as comprobante) {
+  <div class="atu-modal-overlay z-[110]" role="presentation" (click)="cerrarConfirmacionEliminar()">
+    <section class="delete-confirmation" role="alertdialog" aria-modal="true" aria-labelledby="delete-receipt-title" (click)="$event.stopPropagation()">
+      <div class="delete-confirmation__body">
+        <div class="delete-confirmation__icon"><i class="fa-solid fa-trash-can"></i></div>
+        <h2 id="delete-receipt-title">Eliminar comprobante</h2>
+        <p>
+          ¿Estás seguro de que deseas eliminar el comprobante
+          <strong class="mono">{{ comprobante.numero }}</strong> correspondiente al vehículo
+          <strong class="mono">{{ comprobante.placa }}</strong>?
+          Esta acción no se puede deshacer.
+        </p>
+      </div>
+      <footer class="delete-confirmation__footer">
+        <button type="button" class="editor-cancel" (click)="cerrarConfirmacionEliminar()">Cancelar</button>
+        <button type="button" class="delete-confirmation__submit" (click)="confirmarEliminarComprobante()">
+          <i class="fa-solid fa-trash-can"></i> Eliminar
         </button>
       </footer>
     </section>

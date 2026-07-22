@@ -66,6 +66,21 @@
   &:focus { border-color: var(--primary); box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 12%, transparent); }
 }
 
+.search-control {
+  border-color: var(--border-strong);
+  background: var(--surface);
+  color: var(--text);
+
+  &::placeholder {
+    color: var(--text-3);
+    opacity: .9;
+  }
+
+  &:hover {
+    border-color: color-mix(in srgb, var(--primary) 45%, var(--border-strong));
+  }
+}
+
 .table-card {
   overflow: hidden;
   border: 1px solid var(--border);
@@ -82,7 +97,7 @@
 
   .p-datatable-thead > tr > th {
     padding: 13px 18px;
-    border-bottom: 1px solid var(--border);
+    border-bottom: 1px solid var(--border-strong);
     background-color: var(--surface-2);
     color: var(--text-3);
     font-size: 11px;
@@ -113,11 +128,12 @@
   }
 
   .p-datatable-tbody > tr {
-    border-bottom: 1px solid var(--border);
+    border-bottom: 1px solid var(--border-strong);
 
     > td {
       padding: 13px 18px;
       border: none;
+      border-bottom: 1px solid var(--border-strong);
       color: var(--text);
       font-size: 12.5px;
       vertical-align: middle;
@@ -392,6 +408,73 @@
 .editor-cancel { border: 1px solid var(--border); background: var(--surface); color: var(--text-2); }
 .editor-save { border: 1px solid var(--primary); background: var(--primary); color: var(--primary-contrast); padding-inline: 20px; }
 
+.delete-confirmation {
+  width: min(430px, 100%);
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: var(--surface);
+  box-shadow: 0 20px 60px rgba(16, 36, 52, .24);
+  animation: editor-pop .25s ease both;
+}
+
+.delete-confirmation__body {
+  padding: 24px 24px 20px;
+  text-align: center;
+
+  h2 {
+    margin: 0;
+    color: var(--text);
+    font-size: 20px;
+    font-weight: 800;
+  }
+
+  p {
+    margin: 8px 0 0;
+    color: var(--text-3);
+    font-size: 13.5px;
+    line-height: 1.55;
+  }
+
+  strong { color: var(--text); }
+}
+
+.delete-confirmation__icon {
+  display: grid;
+  width: 56px;
+  height: 56px;
+  margin: 0 auto 16px;
+  place-items: center;
+  border: 1px solid var(--bad);
+  border-radius: 50%;
+  background: var(--bad-bg);
+  color: var(--bad);
+  font-size: 20px;
+}
+
+.delete-confirmation__footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 16px 20px;
+  border-top: 1px solid var(--border);
+  background: var(--surface-2);
+}
+
+.delete-confirmation__submit {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid var(--bad);
+  border-radius: 9px;
+  background: var(--bad);
+  padding: 11px 18px;
+  color: #fff;
+  font-size: 13.5px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
 @media (max-width: 640px) {
   .comprobantes-page { padding: 16px 10px 36px; }
   .tab-button { padding-inline: 8px; font-size: 11.5px; }
@@ -410,4 +493,60 @@
     margin: 0 0 4px;
     text-align: center;
   }
+}
+
+.editor-field--invalid {
+  border-color: var(--bad) !important;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--bad) 10%, transparent) !important;
+}
+
+.editor-field-hint,
+.editor-field-error {
+  display: block;
+  margin-top: 5px;
+  font-size: 10.5px;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.editor-field-hint { color: var(--text-3); }
+.editor-field-error { color: var(--bad); }
+
+.editor-field input[type='date'] {
+  padding-right: 10px;
+  color-scheme: light;
+
+  &::-webkit-calendar-picker-indicator {
+    width: 18px;
+    height: 18px;
+    margin-left: 8px;
+    padding: 3px;
+    border-radius: 6px;
+    background-color: var(--primary-soft);
+    cursor: pointer;
+    opacity: .82;
+    transition: background-color .15s ease, opacity .15s ease;
+  }
+
+  &:hover::-webkit-calendar-picker-indicator,
+  &:focus::-webkit-calendar-picker-indicator {
+    background-color: color-mix(in srgb, var(--primary) 18%, var(--surface));
+    opacity: 1;
+  }
+}
+
+:host-context(.dark) .editor-field input[type='date'] {
+  color-scheme: dark;
+
+  &::-webkit-calendar-picker-indicator {
+    background-color: color-mix(in srgb, #00A3E0 22%, var(--surface-2));
+    filter: none;
+    opacity: 1;
+  }
+}
+
+.editor-readonly {
+  cursor: default;
+  background: var(--surface-3) !important;
+  color: var(--text-2) !important;
 }

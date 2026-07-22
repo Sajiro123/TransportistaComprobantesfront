@@ -6,6 +6,7 @@ import { FormsModule } from '@angular/forms';
 import { ApiVehiculoService } from '../../../../core/services/api-vehiculo.service';
 import { ApiAuthService } from '../../../../core/services/api-auth.service';
 import { AuthService } from '../../../../core/services/auth.service';
+import { isValidRuc } from '../../../../core/utils/validators';
 import {
   EstadoValidacionVehiculo,
   RegistrarVehiculoRequest,
@@ -223,7 +224,7 @@ export class VehiculoCargaComponent implements OnInit, OnDestroy {
   openVedit(vehicle: Vehiculo): void {
     this.editingVehicleId = vehicle.id;
     this.newVehicle = {
-      placa: vehicle.placa,
+      placa: this.formatPlate(vehicle.placa),
       categoria: vehicle.categoria,
       topeGalones: Number(vehicle.topeFmt),
       numeroAutorizacion: vehicle.nHab,
@@ -245,13 +246,41 @@ export class VehiculoCargaComponent implements OnInit, OnDestroy {
   }
 
   onVehicleCodeInput(
-    field: 'placa' | 'numeroAutorizacion' | 'tuc',
+    field: 'numeroAutorizacion' | 'tuc',
     event: Event,
   ): void {
     const input = event.target as HTMLInputElement;
     const value = input.value.toUpperCase().replace(/[^A-Z0-9-]/g, '');
     input.value = value;
     this.newVehicle[field] = value;
+  }
+
+  onVehiclePlateInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const value = this.formatPlate(input.value);
+    input.value = value;
+    this.newVehicle.placa = value;
+  }
+
+  onVehiclePlateKeydown(event: KeyboardEvent): void {
+    const input = event.target as HTMLInputElement;
+    const cursorAtMask = input.selectionStart === 4 && input.selectionEnd === 4;
+    if (event.key !== 'Backspace' || !cursorAtMask || !/^[A-Z0-9]{3}-/.test(input.value)) return;
+
+    event.preventDefault();
+    const value = input.value.slice(0, 2);
+    input.value = value;
+    this.newVehicle.placa = value;
+  }
+
+  private formatPlate(value: string): string {
+    const rawValue = String(value ?? '')
+      .toUpperCase()
+      .replace(/[^A-Z0-9]/g, '')
+      .slice(0, 6);
+    return rawValue.length >= 3
+      ? `${rawValue.slice(0, 3)}-${rawValue.slice(3)}`
+      : rawValue;
   }
 
   onOwnerDocumentInput(event: Event): void {
@@ -264,6 +293,28 @@ export class VehiculoCargaComponent implements OnInit, OnDestroy {
     this.newVehicle.propietarioNumeroDocumento = value;
   }
 
+  get ownerDocumentMaxLength(): number {
+    if (this.newVehicle.propietarioTipoDocumento === 'DNI') return 8;
+    if (this.newVehicle.propietarioTipoDocumento === 'CE') return 12;
+    return 11;
+  }
+
+  get ownerDocumentInputMode(): 'numeric' | 'text' {
+    return this.newVehicle.propietarioTipoDocumento === 'CE' ? 'text' : 'numeric';
+  }
+
+  get ownerDocumentPlaceholder(): string {
+    if (this.newVehicle.propietarioTipoDocumento === 'DNI') return '12345678';
+    if (this.newVehicle.propietarioTipoDocumento === 'CE') return 'ABC123456';
+    return '20512345678';
+  }
+
+  get ownerDocumentHint(): string {
+    if (this.newVehicle.propietarioTipoDocumento === 'DNI') return 'El DNI debe contener exactamente 8 dígitos.';
+    if (this.newVehicle.propietarioTipoDocumento === 'CE') return 'El carné debe contener entre 9 y 12 letras o números.';
+    return 'El RUC debe contener 11 dígitos e iniciar con 10, 15, 17 o 20.';
+  }
+
   onOwnerDocumentTypeChange(): void {
     this.newVehicle.propietarioNumeroDocumento = '';
   }
@@ -274,7 +325,7 @@ export class VehiculoCargaComponent implements OnInit, OnDestroy {
     if (!this.isVehicleFormValid) return;
 
     const payload: RegistrarVehiculoRequest = {
-      placa: this.newVehicle.placa.trim().toUpperCase(),
+      placa: this.formatPlate(this.newVehicle.placa),
       categoria: this.newVehicle.categoria,
       topeGalones: Number(this.newVehicle.topeGalones),
       numeroAutorizacion: this.newVehicle.numeroAutorizacion.trim().toUpperCase(),
@@ -382,7 +433,7 @@ export class VehiculoCargaComponent implements OnInit, OnDestroy {
     const value = this.newVehicle.propietarioNumeroDocumento;
     if (this.newVehicle.propietarioTipoDocumento === 'DNI') return /^\d{8}$/.test(value);
     if (this.newVehicle.propietarioTipoDocumento === 'CE') return /^[A-Z0-9]{9,12}$/.test(value);
-    return /^\d{11}$/.test(value);
+    return isValidRuc(value);
   }
 
   private emptyVehicleForm(): VehicleFormModel {

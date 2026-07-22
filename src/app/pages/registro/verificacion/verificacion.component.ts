@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { finalize } from 'rxjs';
 import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
-import { VehiculoCargaComponent } from './vehiculo-carga/vehiculo-carga.component';
 import { ApiVerificacionService } from '../../../core/services/api-verificacion.service';
 import { ApiAuthService } from '../../../core/services/api-auth.service';
 import { AuthService } from '../../../core/services/auth.service';
@@ -33,16 +32,10 @@ export interface Condicion {
   why: string;
 }
 
-export interface StepItem {
-  label: string;
-  icon: string;
-  subtitle?: string;
-}
-
 @Component({
   selector: 'app-verificacion',
   standalone: true,
-  imports: [CommonModule, TableModule, TagModule, VehiculoCargaComponent],
+  imports: [CommonModule, TableModule, TagModule],
   templateUrl: './verificacion.component.html',
   styleUrl: './verificacion.component.scss',
 })
@@ -51,17 +44,14 @@ export class VerificacionComponent implements OnInit {
   private readonly apiAuth = inject(ApiAuthService);
   private readonly auth = inject(AuthService);
 
-  steps: StepItem[] = [
-    { label: 'Verificación', subtitle: 'Paso 1', icon: 'fa-solid fa-shield-check' },
-    { label: 'Vehículos',    subtitle: 'Paso 2', icon: 'fa-solid fa-truck' },
-  ];
-  activeIndex = 0;
-
   // ── Datos del transportista ─────────────────────────────────
   datosTransportista: DatoTransportista[] = [];
   cargandoDatos = false;
   errorDatos = '';
   rucConsulta = '';
+  actualizacionesDatosRestantes = 5;
+  actualizacionesAutorizacionesRestantes = 5;
+  actualizacionesVehiculosRestantes = 5;
   readonly usandoMocks = this.apiVerificacion.usandoMocks;
   private transportista: DatosTransportista | null = null;
 
@@ -151,34 +141,66 @@ export class VerificacionComponent implements OnInit {
     this.apiVerificacion.obtenerDatosTransportista(this.rucConsulta).pipe(
       finalize(() => this.cargandoDatos = false),
     ).subscribe({
-      next: datos => this.aplicarDatosTransportista(datos),
+      next: datos => {
+        this.aplicarDatosTransportista(datos);
+      },
       error: (error: VerificacionServiceError) => {
         this.errorDatos = error.descripcion || error.message;
       },
     });
   }
 
-  nextStep() {
-    if (this.activeIndex < this.steps.length - 1) {
-      this.activeIndex++;
+  actualizarSeccion(seccion: 'datos' | 'autorizaciones' | 'vehiculos'): void {
+    if (this.actualizacionesDisponibles(seccion) === 0 || this.cargandoDatos) return;
+
+    const usuarioSesion = this.apiAuth.getUserFromSession() ?? this.auth.getSession();
+    const rucSesion = usuarioSesion?.numDocumento || '';
+    this.rucConsulta = this.usandoMocks ? '20512345678' : rucSesion;
+
+    if (!this.rucConsulta) {
+      this.errorDatos = 'No se encontró el RUC del transportista en la sesión actual.';
+      return;
     }
+
+    this.cargandoDatos = true;
+    this.errorDatos = '';
+    this.apiVerificacion.obtenerDatosTransportista(this.rucConsulta).pipe(
+      finalize(() => this.cargandoDatos = false),
+    ).subscribe({
+      next: datos => {
+        this.aplicarDatosTransportista(datos);
+        this.descontarActualizacion(seccion);
+      },
+      error: (error: VerificacionServiceError) => {
+        this.errorDatos = error.descripcion || error.message;
+      },
+    });
   }
 
-  prevStep() {
-    if (this.activeIndex > 0) {
-      this.activeIndex--;
+  private actualizacionesDisponibles(seccion: 'datos' | 'autorizaciones' | 'vehiculos'): number {
+    if (seccion === 'datos') return this.actualizacionesDatosRestantes;
+    if (seccion === 'autorizaciones') return this.actualizacionesAutorizacionesRestantes;
+    return this.actualizacionesVehiculosRestantes;
+  }
+
+  private descontarActualizacion(seccion: 'datos' | 'autorizaciones' | 'vehiculos'): void {
+    if (seccion === 'datos') {
+      this.actualizacionesDatosRestantes = Math.max(0, this.actualizacionesDatosRestantes - 1);
+    } else if (seccion === 'autorizaciones') {
+      this.actualizacionesAutorizacionesRestantes = Math.max(0, this.actualizacionesAutorizacionesRestantes - 1);
+    } else {
+      this.actualizacionesVehiculosRestantes = Math.max(0, this.actualizacionesVehiculosRestantes - 1);
     }
   }
 
   private aplicarDatosTransportista(datos: DatosTransportista): void {
     this.transportista = datos;
     this.datosTransportista = [
-      { k: 'ID interno', v: String(datos.id) },
-      { k: 'RUC', v: datos.ruc },
       { k: 'Razón social', v: datos.razonSocial },
-      { k: 'Tipo de entidad', v: datos.tipoEntidad },
-      { k: 'Estado', v: datos.estado },
-      { k: 'Total de autorizaciones', v: String(datos.totalAutorizaciones) },
+      { k: 'RUC', v: datos.ruc },
+      { k: 'Tipo', v: datos.tipoEntidad },
+      { k: 'Estado del RUC', v: datos.estado },
+      { k: 'Estado de habilitación', v: datos.estado },
     ];
 
     const habilitado = datos.estado.trim().toLowerCase() === 'habilitado';
