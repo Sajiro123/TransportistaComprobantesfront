@@ -3,14 +3,14 @@ import { CommonModule } from '@angular/common';
 import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
 import { FormsModule } from '@angular/forms';
-import { ApiVehiculoService } from '../../../../core/services/api-vehiculo.service';
-import { ApiAuthService } from '../../../../core/services/api-auth.service';
-import { AuthService } from '../../../../core/services/auth.service';
+import { ApiVehiculoService } from '@core/services/api-vehiculo.service';
+import { ApiAuthService } from '@core/services/api-auth.service';
+import { AuthService } from '@core/services/auth.service';
 import {
   EstadoValidacionVehiculo,
   RegistrarVehiculoRequest,
   VehiculoTransportista,
-} from '../../../../core/models/models';
+} from '@core/models/models';
 
 export interface Vehiculo {
   id: number;

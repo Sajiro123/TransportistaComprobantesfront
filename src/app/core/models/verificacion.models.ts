@@ -32,3 +32,42 @@ export interface VerificacionErrorResponse {
 export interface VerificacionServiceError extends VerificacionErrorDetalle {
   status?: number;
 }
+
+// ── Autorizaciones del Transportista ───────────────────────
+export interface AutorizacionTransportista {
+  id: number;
+  tipoTransporte: string;
+  estado: string; // 'Vigente' | 'Vencida'
+  numeroResolucion: string;
+  autoridad: string;
+  ambito: string;
+  fechaInicioVigencia: string; // YYYY-MM-DD
+  fechaFinVigencia: string; // YYYY-MM-DD
+}
+
+export interface AutorizacionesResponse {
+  data: {
+    lista: AutorizacionTransportista[];
+    respuesta: 'OK';
+    mensaje: string;
+  };
+}
+
+// ── Semáforo de Condiciones ───────────────────────────────
+export interface SemaforoCondicion {
+  codigo: string;
+  nombre: string;
+  estado: 'CUMPLE' | 'REVISAR' | 'NO_CUMPLE';
+  descripcion: string;
+  icono: 'CHECK' | 'WARNING' | 'ERROR';
+  colorNombre: string;
+  colorHex: string;
+}
+
+export interface SemaforoResponse {
+  data: {
+    lista: SemaforoCondicion[];
+    respuesta: 'OK';
+    mensaje: string;
+  };
+}

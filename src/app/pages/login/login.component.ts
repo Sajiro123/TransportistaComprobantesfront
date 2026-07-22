@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy, inject, NgZone } from '@angular/core';
-import { environment } from '../../../environments/environment';
+import { environment } from '@env/environment';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -7,13 +7,14 @@ import {
   AuthService,
   REGIONALES,
   MUNICIPALES,
-} from '../../core/services/auth.service';
-import { ApiAuthService } from '../../core/services/api-auth.service';
-import { SessionService } from '../../core/services/session.service';
-import { ApiErrorResponse, EnviarOtpRegistroRequest, LoginResponse } from '../../core/models/api.models';
-import { ThemeService } from '../../core/services/theme.service';
+} from '@core/services/auth.service';
+import { ApiAuthService } from '@core/services/api-auth.service';
+import { SessionService } from '@core/services/session.service';
+import { ApiErrorResponse, EnviarOtpRegistroRequest, LoginResponse } from '@core/models/api.models';
+import { ApiRecuperacionService } from '@core/services/api-recuperacion.service';
+import { ThemeService } from '@core/services/theme.service';
 import Swal from 'sweetalert2';
-import { isValidRuc, isValidEmail, isValidPhone } from '../../core/utils/validators';
+import { isValidRuc, isValidEmail, isValidPhone } from '@core/utils/validators';
 
 // Declarar el objeto grecaptcha global (inyectado por el script de Google)
 declare const grecaptcha: any;
@@ -644,6 +645,12 @@ export class LoginComponent implements OnInit, OnDestroy {
   recoveryNewPassword = '';
   recoveryConfirmPassword = '';
   recoveryPasswordSubmitted = false;
+  recoverySendingOtp = false;
+  recoveryVerifying = false;
+  recoverySaving = false;
+  recoveryResendCooldown = 0;
+  recoveryCorreoEnmascarado: string | null = null;
+  private recoveryCooldownInterval: ReturnType<typeof setInterval> | null = null;
 
   get recoveryRucError(): string {
     if (!this.recRucTouched) return '';
@@ -660,6 +667,7 @@ export class LoginComponent implements OnInit, OnDestroy {
   }
 
   openRecovery(): void {
+    this.stopRecoveryResendCooldown();
     this.recoveryStage = 'ruc';
     this.recRuc = '';
     this.recRucTouched = false;
@@ -669,6 +677,10 @@ export class LoginComponent implements OnInit, OnDestroy {
     this.recoveryNewPassword = '';
     this.recoveryConfirmPassword = '';
     this.recoveryPasswordSubmitted = false;
+    this.recoverySendingOtp = false;
+    this.recoveryVerifying = false;
+    this.recoverySaving = false;
+    this.recoveryCorreoEnmascarado = null;
     this.showForm('recuperacion');
   }
 
@@ -677,6 +689,7 @@ export class LoginComponent implements OnInit, OnDestroy {
 
   private readonly authService = inject(AuthService);
   private readonly apiAuthService = inject(ApiAuthService);
+  private readonly apiRecuperacionService = inject(ApiRecuperacionService);
   private readonly sessionService = inject(SessionService);
   private readonly router = inject(Router);
   private readonly ngZone = inject(NgZone);
@@ -699,6 +712,7 @@ export class LoginComponent implements OnInit, OnDestroy {
       clearTimeout(this.registrationValidationTimeout);
     }
     this.stopResendCooldown();
+    this.stopRecoveryResendCooldown();
   }
 
   iniciarSlider(): void {
@@ -930,10 +944,40 @@ export class LoginComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.recoveryStage = 'code';
-    this.recoveryCode = '';
-    this.recoveryCodeError = '';
-    this.recoveryCodeResent = false;
+    if (this.recoverySendingOtp) return;
+    this.recoverySendingOtp = true;
+
+    const doSend = (token?: string) => {
+      this.apiRecuperacionService.enviarOtp({ ruc: this.recRuc, recaptchaToken: token }).subscribe({
+        next: (res) => {
+          this.ngZone.run(() => {
+            this.recoverySendingOtp = false;
+            this.recoveryStage = 'code';
+            this.recoveryCode = '';
+            this.recoveryCodeError = '';
+            this.recoveryCodeResent = false;
+            this.recoveryCorreoEnmascarado = res.data.correoEnmascarado;
+            this.startRecoveryResendCooldown(res.data.expiraEnSegundos || 180);
+          });
+        },
+        error: (err: ApiErrorResponse) => {
+          this.ngZone.run(() => {
+            this.recoverySendingOtp = false;
+            this.showAlert(err?.descripcion || err?.message || 'Error al enviar código de recuperación.', 'error');
+          });
+        }
+      });
+    };
+
+    if (typeof grecaptcha !== 'undefined') {
+      grecaptcha.ready(() => {
+        grecaptcha.execute(this.recaptchaSiteKey, { action: 'reset_password' })
+          .then((token: string) => doSend(token))
+          .catch(() => doSend());
+      });
+    } else {
+      doSend();
+    }
   }
 
   onRecoveryKeydown(e: KeyboardEvent): void {
@@ -946,33 +990,113 @@ export class LoginComponent implements OnInit, OnDestroy {
     this.clearAlert();
   }
 
-  verifyDummyRecoveryCode(): void {
+  verifyRecoveryCode(): void {
     this.clearAlert();
-    if (this.recoveryCode !== '123123') {
-      this.recoveryCodeError = 'Código incorrecto. Revísalo e intenta de nuevo.';
+    if (!this.recoveryCode || this.recoveryCode.length !== 6) {
+      this.recoveryCodeError = 'Ingresa el código de 6 dígitos.';
       return;
     }
 
-    this.recoveryCodeError = '';
-    this.recoveryStage = 'password';
-    this.recoveryNewPassword = '';
-    this.recoveryConfirmPassword = '';
-    this.recoveryPasswordSubmitted = false;
+    if (this.recoveryVerifying) return;
+    this.recoveryVerifying = true;
+
+    const doVerify = (token?: string) => {
+      this.apiRecuperacionService.verificarOtp({ ruc: this.recRuc, otp: this.recoveryCode, recaptchaToken: token }).subscribe({
+        next: () => {
+          this.ngZone.run(() => {
+            this.recoveryVerifying = false;
+            this.recoveryCodeError = '';
+            this.recoveryStage = 'password';
+            this.recoveryNewPassword = '';
+            this.recoveryConfirmPassword = '';
+            this.recoveryPasswordSubmitted = false;
+            this.stopRecoveryResendCooldown();
+          });
+        },
+        error: (err: ApiErrorResponse) => {
+          this.ngZone.run(() => {
+            this.recoveryVerifying = false;
+            this.recoveryCodeError = err?.descripcion || err?.message || 'Código incorrecto o expirado.';
+          });
+        }
+      });
+    };
+
+    if (typeof grecaptcha !== 'undefined') {
+      grecaptcha.ready(() => {
+        grecaptcha.execute(this.recaptchaSiteKey, { action: 'reset_password' })
+          .then((token: string) => doVerify(token))
+          .catch(() => doVerify());
+      });
+    } else {
+      doVerify();
+    }
   }
 
-  resendDummyRecoveryCode(): void {
+  resendRecoveryCode(): void {
+    if (this.recoveryResendCooldown > 0 || this.recoverySendingOtp) return;
+    
     this.recoveryCode = '';
     this.recoveryCodeError = '';
-    this.recoveryCodeResent = true;
+    this.recoveryCodeResent = false;
     this.clearAlert();
+    this.recoverySendingOtp = true;
+
+    const doResend = (token?: string) => {
+      this.apiRecuperacionService.enviarOtp({ ruc: this.recRuc, recaptchaToken: token }).subscribe({
+        next: (res) => {
+          this.ngZone.run(() => {
+            this.recoverySendingOtp = false;
+            this.recoveryCodeResent = true;
+            this.recoveryCorreoEnmascarado = res.data.correoEnmascarado;
+            this.startRecoveryResendCooldown(60); // Cooldown de 60s
+          });
+        },
+        error: (err: ApiErrorResponse) => {
+          this.ngZone.run(() => {
+            this.recoverySendingOtp = false;
+            this.recoveryCodeError = err?.descripcion || err?.message || 'Error al reenviar código.';
+          });
+        }
+      });
+    };
+
+    if (typeof grecaptcha !== 'undefined') {
+      grecaptcha.ready(() => {
+        grecaptcha.execute(this.recaptchaSiteKey, { action: 'reset_password' })
+          .then((token: string) => doResend(token))
+          .catch(() => doResend());
+      });
+    } else {
+      doResend();
+    }
+  }
+
+  private startRecoveryResendCooldown(seconds: number): void {
+    this.stopRecoveryResendCooldown();
+    this.recoveryResendCooldown = seconds;
+    this.recoveryCooldownInterval = setInterval(() => {
+      this.recoveryResendCooldown--;
+      if (this.recoveryResendCooldown <= 0) {
+        this.stopRecoveryResendCooldown();
+      }
+    }, 1000);
+  }
+
+  private stopRecoveryResendCooldown(): void {
+    if (this.recoveryCooldownInterval) {
+      clearInterval(this.recoveryCooldownInterval);
+      this.recoveryCooldownInterval = null;
+    }
+    this.recoveryResendCooldown = 0;
   }
 
   get recoveryNewPasswordError(): string {
     if (!this.recoveryPasswordSubmitted) return '';
     if (!this.recoveryNewPassword) return 'Ingrese la nueva clave.';
-    return this.recoveryNewPassword.length >= 8
+    return this.PASSWORD_REGEX.test(this.recoveryNewPassword)
       ? ''
-      : 'La nueva clave debe tener al menos 8 caracteres.';
+      : 'Mínimo 8 caracteres: 1 mayúscula, 1 minúscula, 1 dígito y 1 carácter especial.';
   }
 
   get recoveryConfirmPasswordError(): string {
@@ -983,12 +1107,49 @@ export class LoginComponent implements OnInit, OnDestroy {
       : 'Las claves no coinciden.';
   }
 
-  saveDummyRecoveryPassword(): void {
+  saveRecoveryPassword(): void {
     this.clearAlert();
     this.recoveryPasswordSubmitted = true;
     if (this.recoveryNewPasswordError || this.recoveryConfirmPasswordError) return;
 
-    this.recoveryStage = 'success';
+    if (this.recoverySaving) return;
+    this.recoverySaving = true;
+
+    const doSave = (token?: string) => {
+      this.apiRecuperacionService.actualizarClave({
+        nuevaClave: this.recoveryNewPassword,
+        confirmarClave: this.recoveryConfirmPassword,
+        recaptchaToken: token
+      }).subscribe({
+        next: (res) => {
+          this.ngZone.run(() => {
+            this.recoverySaving = false;
+            this.recoveryStage = 'success';
+          });
+        },
+        error: (err: ApiErrorResponse) => {
+          this.ngZone.run(() => {
+            this.recoverySaving = false;
+            this.showAlert(err?.descripcion || err?.message || 'Error al actualizar la contraseña.', 'error');
+            if (err?.code === 'REC_003') {
+              setTimeout(() => {
+                this.openRecovery();
+              }, 2000);
+            }
+          });
+        }
+      });
+    };
+
+    if (typeof grecaptcha !== 'undefined') {
+      grecaptcha.ready(() => {
+        grecaptcha.execute(this.recaptchaSiteKey, { action: 'reset_password' })
+          .then((token: string) => doSave(token))
+          .catch(() => doSave());
+      });
+    } else {
+      doSave();
+    }
   }
 
   goToLoginAfterRecovery(): void {

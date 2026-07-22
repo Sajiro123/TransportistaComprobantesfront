@@ -32,9 +32,9 @@
           {{ step.label }}
         </span>
         @if (step.subtitle) {
-          <span class="text-[9.5px] font-semibold uppercase tracking-wider text-[var(--text-3)] opacity-70 leading-none">
-            {{ step.subtitle }}
-          </span>
+        <span class="text-[9.5px] font-semibold uppercase tracking-wider text-[var(--text-3)] opacity-70 leading-none">
+          {{ step.subtitle }}
+        </span>
         }
       </div>
     </div>
@@ -75,32 +75,32 @@
         </div>
 
         @if (cargandoDatos) {
-          <div class="flex flex-col gap-3 p-[18px]" aria-label="Cargando datos del transportista">
-            @for (item of [1, 2, 3, 4, 5]; track item) {
-              <div class="h-5 animate-pulse rounded-md bg-[var(--surface-3)]"></div>
-            }
-          </div>
+        <div class="flex flex-col gap-3 p-[18px]" aria-label="Cargando datos del transportista">
+          @for (item of [1, 2, 3, 4, 5]; track item) {
+          <div class="h-5 animate-pulse rounded-md bg-[var(--surface-3)]"></div>
+          }
+        </div>
         } @else if (errorDatos) {
-          <div class="flex min-h-[220px] flex-col items-center justify-center gap-2 p-6 text-center">
-            <span class="grid h-9 w-9 place-items-center rounded-full bg-[var(--bad-bg)] text-[var(--bad)]">
-              <i class="fa-solid fa-triangle-exclamation"></i>
-            </span>
-            <strong class="text-sm text-[var(--text)]">No se pudieron obtener los datos</strong>
-            <span class="max-w-[360px] text-xs leading-relaxed text-[var(--text-3)]">{{ errorDatos }}</span>
-            <button type="button" class="btn-secondary !mt-1 !px-3 !py-2 !text-xs" (click)="cargarDatosTransportista()">
-              <i class="fa-solid fa-rotate-right"></i> Reintentar
-            </button>
-          </div>
+        <div class="flex min-h-[220px] flex-col items-center justify-center gap-2 p-6 text-center">
+          <span class="grid h-9 w-9 place-items-center rounded-full bg-[var(--bad-bg)] text-[var(--bad)]">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+          </span>
+          <strong class="text-sm text-[var(--text)]">No se pudieron obtener los datos</strong>
+          <span class="max-w-[360px] text-xs leading-relaxed text-[var(--text-3)]">{{ errorDatos }}</span>
+          <button type="button" class="btn-secondary !mt-1 !px-3 !py-2 !text-xs" (click)="cargarDatosTransportista()">
+            <i class="fa-solid fa-rotate-right"></i> Reintentar
+          </button>
+        </div>
         } @else {
-          <p-table [value]="datosTransportista" [showGridlines]="false" styleClass="datos-transportista-table"
-            [tableStyle]="{'min-width': '100%'}">
-            <ng-template pTemplate="body" let-row>
-              <tr class="datos-row">
-                <td class="datos-key">{{ row.k }}</td>
-                <td class="datos-val">{{ row.v }}</td>
-              </tr>
-            </ng-template>
-          </p-table>
+        <p-table [value]="datosTransportista" [showGridlines]="false" styleClass="datos-transportista-table"
+          [tableStyle]="{'min-width': '100%'}">
+          <ng-template pTemplate="body" let-row>
+            <tr class="datos-row">
+              <td class="datos-key">{{ row.k }}</td>
+              <td class="datos-val">{{ row.v }}</td>
+            </tr>
+          </ng-template>
+        </p-table>
         }
       </div>
 
@@ -181,10 +181,7 @@
     <!-- Botón Siguiente ─────────────────────────────────── -->
     @if (!sinAutVigente && !cargandoDatos && !errorDatos) {
     <div class="step-actions step-actions--end">
-      <button class="btn-primary" (click)="nextStep()">
-        Siguiente
-        <i class="fa-solid fa-arrow-right"></i>
-      </button>
+
     </div>
     }
 
@@ -197,10 +194,7 @@
     <app-vehiculo-carga />
 
     <div class="step-actions step-actions--start">
-      <button class="btn-secondary" (click)="prevStep()">
-        <i class="fa-solid fa-arrow-left"></i>
-        Anterior
-      </button>
+
     </div>
   </div>
   }

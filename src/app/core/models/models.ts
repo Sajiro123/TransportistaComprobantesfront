@@ -157,6 +157,52 @@ export interface GuardarCuentaAbonoResponse {
   };
 }
 
+// ── API Real Cuenta Bancaria y Catálogos ───────────────────
+
+export interface BancoItemResponse {
+  uuidBanco: string;
+  codigo: string;
+  nombre: string;
+  abreviatura: string;
+  permiteOpe: boolean;
+}
+
+export interface BancosResponse {
+  data: {
+    lista: BancoItemResponse[];
+    respuesta: string;
+    mensaje: string;
+  };
+}
+
+export interface CuentaBancariaTransportistaRequest {
+  bancoId: number;
+  tipoAbonoId: number; // 1 = CCI, 2 = OPE
+  cci?: string | null;
+  dniBeneficiario?: string | null;
+  nombreBeneficiario?: string | null;
+}
+
+export interface CuentaBancariaTransportistaResponseData {
+  uuidCuentaBancaria?: string;
+  transportistaId?: number;
+  uuidBanco?: string;
+  tipoAbono?: string;
+  cci?: string | null;
+  dniBeneficiario?: string | null;
+  nombreBeneficiario?: string | null;
+  estado?: boolean;
+}
+
+export interface CuentaBancariaTransportistaResponse {
+  data: {
+    lista: CuentaBancariaTransportistaResponseData | null;
+    respuesta: string;
+    mensaje: string;
+  };
+}
+
+
 export type EstadoValidacionVehiculo =
   | 'VALIDADO'
   | 'EN_REVISION'
@@ -249,6 +295,180 @@ export interface EliminarVehiculoResponse {
   data: {
     lista: null;
     respuesta: 'OK';
+    mensaje: string;
+  };
+}
+
+// ── API Comprobantes de Combustible ───────────────────────────
+
+export interface ComprobanteListResponse {
+  comprobanteUuid: string;
+  tipoComprobanteCodigo: string;
+  estadoComprobanteCodigo: string;
+  estadoComprobanteNombre: string;
+  colorSemaforo: string;
+  colorHex: string;
+  serie: string;
+  numero: string;
+  fechaEmision: string;
+  placa?: string;
+  nombreComercialDistribuidor: string;
+  distritoDistribuidor: string;
+  provinciaDistribuidor: string;
+  tipoCombustibleCodigo: string;
+  azufrePpm: number;
+  galones: number;
+  tieneNotaCreditoActiva: boolean;
+}
+
+export interface ComprobanteArchivoResponse {
+  archivoUuid: string;
+  nombreOriginal: string;
+  tipoContenidoMime: string;
+  tamanioBytes: number;
+  tipoArchivo: string;
+  principal: boolean;
+}
+
+export interface ComprobanteDetalleResponse {
+  comprobanteDetalleUuid: string;
+  placa: string;
+  categoriaCodigo: string;
+  esSubsidiable: boolean;
+  galonesAsignados: number;
+  observacion?: string;
+}
+
+export interface ComprobanteResponse extends ComprobanteListResponse {
+  tipoComprobanteNombre: string;
+  rucTransportista: string;
+  razonSocialTransportista: string;
+  mes: string;
+  anio: number;
+  rucDistribuidor: string;
+  razonSocialDistribuidor: string;
+  tipoCombustibleNombre: string;
+  categoriaVehiculo?: string;
+  validaSunat: boolean;
+  validaOsinergmin: boolean;
+  observacion?: string;
+  archivos: ComprobanteArchivoResponse[];
+  detalle: ComprobanteDetalleResponse[];
+}
+
+export interface ComprobantePlacaRequest {
+  vehiculoUuid: string;
+  galonesAsignados?: number;
+}
+
+export interface ComprobanteRequest {
+  serie: string;
+  numero: string;
+  fechaEmision: string;
+  mes: string;
+  anio: number;
+  rucDistribuidor: string;
+  distribuidorRazonSocial?: string;
+  distribuidorDireccion?: string;
+  distribuidorDepartamento?: string;
+  distribuidorProvincia?: string;
+  distribuidorDistrito?: string;
+  tipoCombustibleCodigo: string;
+  azufrePpm?: number;
+  galones: number;
+  costo: number;
+  placas: ComprobantePlacaRequest[];
+}
+
+export interface ComprobanteDetalleRequest {
+  vehiculoUuid: string;
+  galonesAsignados: number;
+  esSubsidiable?: boolean;
+}
+
+export interface ComprobanteBRequest {
+  serie: string;
+  numero: string;
+  fechaEmision: string;
+  mes: string;
+  anio: number;
+  rucDistribuidor: string;
+  distribuidorRazonSocial?: string;
+  distribuidorDireccion?: string;
+  distribuidorDepartamento?: string;
+  distribuidorProvincia?: string;
+  distribuidorDistrito?: string;
+  tipoCombustibleCodigo: string;
+  azufrePpm?: number;
+  galones: number;
+  costo: number;
+  detalle?: ComprobanteDetalleRequest[];
+}
+
+export interface ActualizarComprobanteRequest {
+  serie?: string;
+  numero?: string;
+  fechaEmision?: string;
+  mes?: string;
+  anio?: number;
+  rucDistribuidor?: string;
+  tipoCombustibleCodigo?: string;
+  azufrePpm?: number;
+  galones?: number;
+  costo?: number;
+  placas?: ComprobantePlacaRequest[];
+  detalle?: ComprobanteDetalleRequest[];
+}
+
+export interface NotaCreditoRequest {
+  comprobanteUuid: string;
+  serieNc: string;
+  numeroNc: string;
+  fechaEmisionNc: string;
+  motivo: string;
+  alcance: 'TOTAL' | 'PARCIAL' | string;
+  galonesAfectados?: number;
+  mes?: string;
+}
+
+export interface DistribuidorResponse {
+  distribuidorUuid: string;
+  ruc: string;
+  razonSocial: string;
+  nombreComercial: string;
+  direccion: string;
+  departamento: string;
+  provincia: string;
+  distrito: string;
+  inscritoOsinergmin: boolean;
+}
+
+export interface VehiculoAsociadoResponse {
+  vehiculoUuid: string;
+  placa: string;
+  categoriaCodigo: string;
+  categoriaNombre: string;
+  topeGalones: number;
+  esSubsidiable: boolean;
+  entidadNombre: string;
+}
+
+export interface TipoCombustibleResponse {
+  codigo: string;
+  nombre: string;
+  ppmMaximo: number;
+}
+
+export interface EstadoComprobanteResponse {
+  codigo: string;
+  nombre: string;
+}
+
+// Responses wrappers
+export interface ApiResponse<T> {
+  data: {
+    lista: T;
+    respuesta: string;
     mensaje: string;
   };
 }

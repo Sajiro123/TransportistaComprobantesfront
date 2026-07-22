@@ -1,11 +1,18 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { AuthService } from '../../core/services/auth.service';
-import { ApiAuthService } from '../../core/services/api-auth.service';
-import { ApiUsuarioService } from '../../core/services/api-usuario.service';
-import { ApiComprobanteService } from '../../core/services/api-comprobante.service';
-import { CuentaAbono, Usuario, PerfilTransportista } from '../../core/models/models';
+import { AuthService } from '@core/services/auth.service';
+import { ApiAuthService } from '@core/services/api-auth.service';
+import { ApiUsuarioService } from '@core/services/api-usuario.service';
+import { ApiComprobanteService } from '@core/services/api-comprobante.service';
+import {
+  CuentaAbono,
+  Usuario,
+  PerfilTransportista,
+  BancoItemResponse,
+  CuentaBancariaTransportistaResponseData,
+} from '@core/models/models';
+
 
 @Component({
   selector: 'app-perfil-info',
@@ -508,6 +515,25 @@ import { CuentaAbono, Usuario, PerfilTransportista } from '../../core/models/mod
               <div
                 class="p-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 gap-x-8 text-xs leading-normal"
               >
+                <!-- Tipo de Abono -->
+                @if (cuentaEditMode) {
+                  <div class="space-y-1.5 sm:col-span-2 lg:col-span-3 pb-2 border-b border-gray-100 dark:border-[#30363D]">
+                    <span class="text-atu-text-3 dark:text-[#6E7681] font-semibold uppercase tracking-wider block text-[10.5px]">
+                      Tipo de Abono <span class="text-red-600 dark:text-red-500 ml-0.5">*</span>
+                    </span>
+                    <div class="flex items-center gap-6 mt-1">
+                      <label class="inline-flex items-center gap-2 text-sm text-atu-text dark:text-[#E6EDF3] font-semibold cursor-pointer">
+                        <input type="radio" name="tipoAbono" [value]="1" [(ngModel)]="editTipoAbonoId" class="text-atu-primary focus:ring-atu-primary" />
+                        <span>CCI (Depósito Bancario)</span>
+                      </label>
+                      <label class="inline-flex items-center gap-2 text-sm text-atu-text dark:text-[#E6EDF3] font-semibold cursor-pointer">
+                        <input type="radio" name="tipoAbono" [value]="2" [(ngModel)]="editTipoAbonoId" class="text-atu-primary focus:ring-atu-primary" />
+                        <span>OPE (Orden de Pago en Ventanilla)</span>
+                      </label>
+                    </div>
+                  </div>
+                }
+
                 <!-- Banco -->
                 <div class="space-y-1.5">
                   <span
@@ -528,11 +554,17 @@ import { CuentaAbono, Usuario, PerfilTransportista } from '../../core/models/mod
                         class="w-full pl-9 border-2 border-atu-border dark:border-[#30363D] rounded-xl bg-white dark:bg-[#0D1117] px-3 py-2.5 text-[14px] text-atu-text dark:text-[#E6EDF3] focus:outline-none focus:border-atu-primary dark:focus:border-[#00A3E0] focus:ring-4 focus:ring-atu-primary/10 transition-all cursor-pointer shadow-sm appearance-none"
                       >
                         <option value="">Selecciona un banco…</option>
-                        <option value="Banco de Crédito del Perú">Banco de Crédito del Perú</option>
-                        <option value="BBVA Perú">BBVA Perú</option>
-                        <option value="Interbank">Interbank</option>
-                        <option value="Scotiabank Perú">Scotiabank Perú</option>
-                        <option value="Banco de la Nación">Banco de la Nación</option>
+                        @if (bancosList.length > 0) {
+                          @for (banco of bancosList; track banco.uuidBanco) {
+                            <option [value]="banco.nombre">{{ banco.nombre }} ({{ banco.abreviatura }})</option>
+                          }
+                        } @else {
+                          <option value="Banco de Crédito del Perú">Banco de Crédito del Perú</option>
+                          <option value="BBVA Perú">BBVA Perú</option>
+                          <option value="Interbank">Interbank</option>
+                          <option value="Scotiabank Perú">Scotiabank Perú</option>
+                          <option value="Banco de la Nación">Banco de la Nación</option>
+                        }
                       </select>
                       <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
                         <i class="fa-solid fa-chevron-down text-gray-400 text-xs"></i>
@@ -550,45 +582,82 @@ import { CuentaAbono, Usuario, PerfilTransportista } from '../../core/models/mod
                   }
                 </div>
 
-                <!-- CCI -->
-                <div class="space-y-1.5 sm:col-span-1 lg:col-span-2">
-                  <span
-                    class="text-atu-text-3 dark:text-[#6E7681] font-semibold uppercase tracking-wider block text-[10.5px]"
-                  >
-                    Código de Cuenta Interbancario (CCI)
-                    @if (cuentaEditMode) {
-                      <span class="text-red-600 dark:text-red-500 ml-0.5">*</span>
-                    }
-                  </span>
-                  @if (cuentaEditMode) {
-                    <div class="relative">
-                      <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <i class="fa-solid fa-money-check text-gray-400 text-xs"></i>
+                <!-- Datos de Abono: CCI vs OPE -->
+                @if (cuentaEditMode) {
+                  @if (editTipoAbonoId === 1) {
+                    <!-- CCI -->
+                    <div class="space-y-1.5 sm:col-span-1 lg:col-span-2">
+                      <span
+                        class="text-atu-text-3 dark:text-[#6E7681] font-semibold uppercase tracking-wider block text-[10.5px]"
+                      >
+                        Código de Cuenta Interbancario (CCI) <span class="text-red-600 dark:text-red-500 ml-0.5">*</span>
+                      </span>
+                      <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                          <i class="fa-solid fa-money-check text-gray-400 text-xs"></i>
+                        </div>
+                        <input
+                          type="text"
+                          inputmode="numeric"
+                          maxlength="20"
+                          [(ngModel)]="editCci"
+                          (input)="onCciInput($event)"
+                          placeholder="20 dígitos"
+                          class="w-full pl-9 border-2 border-atu-border dark:border-[#30363D] rounded-xl bg-white dark:bg-[#0D1117] px-3 py-2.5 text-[14px] text-atu-text dark:text-[#E6EDF3] focus:outline-none focus:border-atu-primary dark:focus:border-[#00A3E0] focus:ring-4 focus:ring-atu-primary/10 transition-all font-mono tracking-widest shadow-sm"
+                        />
                       </div>
+                      @if (editCci && editCci.length !== 20) {
+                        <p class="mt-1.5 text-[11.5px] font-semibold text-red-600 dark:text-red-400">
+                          El CCI debe contener exactamente 20 dígitos.
+                        </p>
+                      }
+                    </div>
+                  } @else {
+                    <!-- OPE -->
+                    <div class="space-y-1.5">
+                      <span class="text-atu-text-3 dark:text-[#6E7681] font-semibold uppercase tracking-wider block text-[10.5px]">
+                        DNI Beneficiario <span class="text-red-600 dark:text-red-500 ml-0.5">*</span>
+                      </span>
                       <input
                         type="text"
-                        inputmode="numeric"
-                        maxlength="20"
-                        [(ngModel)]="editCci"
-                        (input)="onCciInput($event)"
-                        placeholder="20 dígitos"
-                        class="w-full pl-9 border-2 border-atu-border dark:border-[#30363D] rounded-xl bg-white dark:bg-[#0D1117] px-3 py-2.5 text-[14px] text-atu-text dark:text-[#E6EDF3] focus:outline-none focus:border-atu-primary dark:focus:border-[#00A3E0] focus:ring-4 focus:ring-atu-primary/10 transition-all font-mono tracking-widest shadow-sm"
+                        maxlength="8"
+                        [(ngModel)]="editDniBeneficiario"
+                        placeholder="8 dígitos"
+                        class="w-full border-2 border-atu-border dark:border-[#30363D] rounded-xl bg-white dark:bg-[#0D1117] px-3 py-2.5 text-[14px] text-atu-text dark:text-[#E6EDF3] focus:outline-none focus:border-atu-primary font-mono shadow-sm"
                       />
                     </div>
-                    @if (editCci && editCci.length !== 20) {
-                      <p class="mt-1.5 text-[11.5px] font-semibold text-red-600 dark:text-red-400">
-                        El CCI debe contener exactamente 20 dígitos.
-                      </p>
-                    }
-                  } @else {
-                    <strong
-                      class="text-[15px] text-atu-text dark:text-[#E6EDF3] font-semibold flex items-center gap-3 font-mono tracking-[0.2em]"
-                    >
-                      <i class="fa-solid fa-money-check text-gray-400 dark:text-[#8B949E]"></i>
-                      {{ cuentaAbono?.codigoCuentaInterbancario || '—' }}
-                    </strong>
+                    <div class="space-y-1.5">
+                      <span class="text-atu-text-3 dark:text-[#6E7681] font-semibold uppercase tracking-wider block text-[10.5px]">
+                        Nombre Completo Beneficiario <span class="text-red-600 dark:text-red-500 ml-0.5">*</span>
+                      </span>
+                      <input
+                        type="text"
+                        [(ngModel)]="editNombreBeneficiario"
+                        placeholder="Nombres y Apellidos completado"
+                        class="w-full border-2 border-atu-border dark:border-[#30363D] rounded-xl bg-white dark:bg-[#0D1117] px-3 py-2.5 text-[14px] text-atu-text dark:text-[#E6EDF3] focus:outline-none focus:border-atu-primary shadow-sm"
+                      />
+                    </div>
                   }
-                </div>
+                } @else {
+                  <div class="space-y-1.5 sm:col-span-1 lg:col-span-2">
+                    <span
+                      class="text-atu-text-3 dark:text-[#6E7681] font-semibold uppercase tracking-wider block text-[10.5px]"
+                    >
+                      {{ cuentaBancariaReal?.tipoAbono === 'OPE' ? 'Beneficiario OPE' : 'Código de Cuenta Interbancario (CCI)' }}
+                    </span>
+                    <strong
+                      class="text-[15px] text-atu-text dark:text-[#E6EDF3] font-semibold flex items-center gap-3 font-mono tracking-[0.1em]"
+                    >
+                      <i class="fa-solid" [ngClass]="cuentaBancariaReal?.tipoAbono === 'OPE' ? 'fa-user-check' : 'fa-money-check'" class="text-gray-400 dark:text-[#8B949E]"></i>
+                      @if (cuentaBancariaReal?.tipoAbono === 'OPE') {
+                        {{ cuentaBancariaReal?.nombreBeneficiario }} (DNI: {{ cuentaBancariaReal?.dniBeneficiario }})
+                      } @else {
+                        {{ cuentaAbono?.codigoCuentaInterbancario || '—' }}
+                      }
+                    </strong>
+                  </div>
+                }
+
               </div>
 
               <!-- Mensajes Informativos (Dependiendo del banco seleccionado) -->
@@ -811,6 +880,12 @@ export class PerfilInfoComponent implements OnInit {
   editContactoNumDoc = '';
   editContactoTelefono = '';
 
+  bancosList: BancoItemResponse[] = [];
+  cuentaBancariaReal: CuentaBancariaTransportistaResponseData | null = null;
+  editTipoAbonoId = 1; // 1 = CCI, 2 = OPE
+  editDniBeneficiario = '';
+  editNombreBeneficiario = '';
+
   private readonly authService = inject(AuthService);
   private readonly apiAuthService = inject(ApiAuthService);
   private readonly apiUsuarioService = inject(ApiUsuarioService);
@@ -819,7 +894,19 @@ export class PerfilInfoComponent implements OnInit {
   ngOnInit(): void {
     this.usuario = this.resolveSession();
     this.cargarPerfilComprobante();
+    this.cargarBancos();
     this.cargarCuentaAbono();
+  }
+
+  cargarBancos(): void {
+    this.apiComprobanteService.obtenerBancos().subscribe({
+      next: (res) => {
+        if (res.data?.lista) {
+          this.bancosList = res.data.lista;
+        }
+      },
+      error: (err) => console.error('Error al cargar lista de bancos:', err),
+    });
   }
 
   private resolveSession(): Usuario | null {
@@ -846,23 +933,44 @@ export class PerfilInfoComponent implements OnInit {
     const ruc = this.usuario?.numDocumento || '20512345678';
     this.isLoadingCuentaAbono = true;
 
-    this.apiComprobanteService.obtenerCuentaAbono(ruc).subscribe({
+    // 1. Intentar cargar con la API real de transportista si hay ID numérico o fallback
+    const transportistaId = 1; // ID técnico por defecto o asignado al usuario
+    this.apiComprobanteService.obtenerCuentaBancariaTransportista(transportistaId).subscribe({
       next: (res) => {
-        this.cuentaAbono = res.data.lista;
-        this.isLoadingCuentaAbono = false;
-        this.cuentaAbonoLoaded = true;
-
-        if (this.usuario) {
-          this.usuario.banco = this.cuentaAbono?.banco ?? '';
-          this.usuario.cci = this.cuentaAbono?.codigoCuentaInterbancario ?? '';
+        if (res.data?.lista) {
+          this.cuentaBancariaReal = res.data.lista;
+          const bancoMatch = this.bancosList.find(b => b.uuidBanco === res.data.lista?.uuidBanco);
+          this.cuentaAbono = {
+            banco: bancoMatch?.nombre || res.data.lista.uuidBanco || 'Banco de Crédito del Perú',
+            codigoCuentaInterbancario: res.data.lista.cci || '',
+          };
+        } else {
+          this.cuentaAbono = null;
         }
-      },
-      error: (err) => {
         this.isLoadingCuentaAbono = false;
         this.cuentaAbonoLoaded = true;
-        this.cuentaAbono = null;
-        console.error('Error al cargar la cuenta de abono:', err);
       },
+      error: () => {
+        // Fallback al endpoint legado si falla
+        this.apiComprobanteService.obtenerCuentaAbono(ruc).subscribe({
+          next: (res) => {
+            this.cuentaAbono = res.data.lista;
+            this.isLoadingCuentaAbono = false;
+            this.cuentaAbonoLoaded = true;
+
+            if (this.usuario) {
+              this.usuario.banco = this.cuentaAbono?.banco ?? '';
+              this.usuario.cci = this.cuentaAbono?.codigoCuentaInterbancario ?? '';
+            }
+          },
+          error: (err) => {
+            this.isLoadingCuentaAbono = false;
+            this.cuentaAbonoLoaded = true;
+            this.cuentaAbono = null;
+            console.error('Error al cargar la cuenta de abono:', err);
+          },
+        });
+      }
     });
   }
 
@@ -911,6 +1019,9 @@ export class PerfilInfoComponent implements OnInit {
   iniciarEdicionCuenta(): void {
     this.editBanco = this.cuentaAbono?.banco ?? '';
     this.editCci = this.cuentaAbono?.codigoCuentaInterbancario ?? '';
+    this.editTipoAbonoId = this.cuentaBancariaReal?.tipoAbono === 'OPE' ? 2 : 1;
+    this.editDniBeneficiario = this.cuentaBancariaReal?.dniBeneficiario ?? '';
+    this.editNombreBeneficiario = this.cuentaBancariaReal?.nombreBeneficiario ?? '';
     this.cuentaAlert = null;
     this.cuentaEditMode = true;
   }
@@ -920,12 +1031,16 @@ export class PerfilInfoComponent implements OnInit {
     this.cuentaEditMode = false;
     this.editBanco = '';
     this.editCci = '';
+    this.editDniBeneficiario = '';
+    this.editNombreBeneficiario = '';
     this.cuentaAlert = null;
   }
 
   guardarEdicionCuenta(): void {
     this.editBanco = String(this.editBanco ?? '').trim();
     this.editCci = String(this.editCci ?? '').trim();
+    this.editDniBeneficiario = String(this.editDniBeneficiario ?? '').trim();
+    this.editNombreBeneficiario = String(this.editNombreBeneficiario ?? '').trim();
     this.cuentaAlert = null;
 
     if (!this.editBanco) {
@@ -936,37 +1051,61 @@ export class PerfilInfoComponent implements OnInit {
       return;
     }
 
-    if (!/^\d{20}$/.test(this.editCci)) {
-      this.cuentaAlert = {
-        message: 'El CCI debe contener exactamente 20 dígitos.',
-        type: 'error',
-      };
-      return;
+    if (this.editTipoAbonoId === 1) {
+      if (!/^\d{20}$/.test(this.editCci)) {
+        this.cuentaAlert = {
+          message: 'El CCI debe contener exactamente 20 dígitos.',
+          type: 'error',
+        };
+        return;
+      }
+    } else {
+      if (!/^\d{8}$/.test(this.editDniBeneficiario)) {
+        this.cuentaAlert = {
+          message: 'El DNI del beneficiario debe contener 8 dígitos.',
+          type: 'error',
+        };
+        return;
+      }
+      if (!this.editNombreBeneficiario) {
+        this.cuentaAlert = {
+          message: 'Ingrese el nombre completo del beneficiario.',
+          type: 'error',
+        };
+        return;
+      }
     }
 
-    const ruc =
-      this.perfilTrans?.datosEmpresa.ruc ||
-      this.usuario?.numDocumento ||
-      '20512345678';
+    const transportistaId = 1;
+    const bancoSeleccionado = this.bancosList.find(b => b.nombre === this.editBanco || b.uuidBanco === this.editBanco);
+    const bancoIdTecnico = bancoSeleccionado ? 1 : 1; // Default técnico 1
 
     this.isSavingCuenta = true;
-    this.apiComprobanteService.guardarCuentaAbono(ruc, {
-      banco: this.editBanco,
-      codigoCuentaInterbancario: this.editCci,
-    }).subscribe({
+    const payload = {
+      bancoId: bancoIdTecnico,
+      tipoAbonoId: this.editTipoAbonoId,
+      cci: this.editTipoAbonoId === 1 ? this.editCci : null,
+      dniBeneficiario: this.editTipoAbonoId === 2 ? this.editDniBeneficiario : null,
+      nombreBeneficiario: this.editTipoAbonoId === 2 ? this.editNombreBeneficiario : null,
+    };
+
+    const action$ = this.cuentaBancariaReal
+      ? this.apiComprobanteService.actualizarCuentaBancariaTransportista(transportistaId, payload)
+      : this.apiComprobanteService.registrarCuentaBancariaTransportista(transportistaId, payload);
+
+    action$.subscribe({
       next: (response) => {
         this.isSavingCuenta = false;
-        this.cuentaAbono = response.data.lista;
+        this.cuentaBancariaReal = response.data.lista;
+        this.cuentaAbono = {
+          banco: this.editBanco,
+          codigoCuentaInterbancario: this.editTipoAbonoId === 1 ? this.editCci : 'OPE - Orden de Pago',
+        };
         this.cuentaAbonoLoaded = true;
         this.cuentaEditMode = false;
 
-        if (this.usuario) {
-          this.usuario.banco = response.data.lista.banco;
-          this.usuario.cci = response.data.lista.codigoCuentaInterbancario;
-        }
-
         this.cuentaAlert = {
-          message: response.data.mensaje || 'Cuenta de abono guardada correctamente.',
+          message: response.data.mensaje || 'Cuenta bancaria guardada correctamente.',
           type: 'success',
         };
         setTimeout(() => (this.cuentaAlert = null), 4000);
@@ -984,6 +1123,7 @@ export class PerfilInfoComponent implements OnInit {
       },
     });
   }
+
 
   guardarEdicion(): void {
     this.editAlert = null;

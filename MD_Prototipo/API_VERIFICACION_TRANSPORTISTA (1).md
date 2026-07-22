@@ -18,7 +18,7 @@ Obtiene la información general del transportista a partir de su RUC.
 
 | Parámetro | Tipo   | Requerido | Descripción           | Ejemplo       |
 | --------- | ------ | --------- | --------------------- | ------------- |
-| `ruc`     | String | Sí        | RUC del transportista | `20512345678` |
+| `ruc`     | String | Sí        | RUC del transportista | `20412345670` |
 
 **Response 200 OK:**
 
@@ -28,7 +28,7 @@ Obtiene la información general del transportista a partir de su RUC.
     "lista": {
       "id": 1,
       "razonSocial": "Transportes Lima Sur S.A.C.",
-      "ruc": "20512345678",
+      "ruc": "20412345670",
       "tipoEntidad": "Persona jurídica",
       "estado": "Habilitado",
       "totalAutorizaciones": 3
@@ -45,7 +45,7 @@ Obtiene la información general del transportista a partir de su RUC.
 | --------------------- | ------- | -------------------------------- | ----------------------------- |
 | `id`                  | Integer | ID interno del transportista     | `1`                           |
 | `razonSocial`         | String  | Razón social                     | `Transportes Lima Sur S.A.C.` |
-| `ruc`                 | String  | RUC                              | `20512345678`                 |
+| `ruc`                 | String  | RUC                              | `20412345670`                 |
 | `tipoEntidad`         | String  | Tipo de entidad                  | `Persona jurídica`            |
 | `estado`              | String  | Estado del transportista         | `Habilitado`                  |
 | `totalAutorizaciones` | Integer | Cantidad total de autorizaciones | `3`                           |
@@ -78,7 +78,7 @@ Lista todas las autorizaciones de transporte asociadas al transportista.
 
 | Parámetro | Tipo   | Requerido | Descripción           | Ejemplo       |
 | --------- | ------ | --------- | --------------------- | ------------- |
-| `ruc`     | String | Sí        | RUC del transportista | `20512345678` |
+| `ruc`     | String | Sí        | RUC del transportista | `20412345670` |
 
 **Response 200 OK:**
 
@@ -164,7 +164,7 @@ Obtiene el estado de las condiciones de elegibilidad del transportista para el s
 
 | Parámetro | Tipo   | Requerido | Descripción           | Ejemplo       |
 | --------- | ------ | --------- | --------------------- | ------------- |
-| `ruc`     | String | Sí        | RUC del transportista | `20512345678` |
+| `ruc`     | String | Sí        | RUC del transportista | `20412345670` |
 
 **Response 200 OK:**
 
@@ -177,21 +177,27 @@ Obtiene el estado de las condiciones de elegibilidad del transportista para el s
         "nombre": "RUC activo y habido",
         "estado": "CUMPLE",
         "descripcion": "Tu RUC figura en estado ACTIVO y con condición de domicilio HABIDO en SUNAT.",
-        "icono": "CHECK"
+        "icono": "CHECK",
+        "colorNombre": "verde",
+        "colorHex": "#16A34A"
       },
       {
         "codigo": "AUTORIZACION_VIGENTE",
         "nombre": "Autorización de transporte vigente",
         "estado": "CUMPLE",
         "descripcion": "La ATU registra tu autorización como vigente a la fecha de la solicitud.",
-        "icono": "CHECK"
+        "icono": "CHECK",
+        "colorNombre": "verde",
+        "colorHex": "#16A34A"
       },
       {
         "codigo": "VEHICULOS_HABILITADOS",
         "nombre": "Vehículos habilitados",
         "estado": "REVISAR",
-        "descripcion": "Tienes vehículos habilitados, pero la placa C4T-119 está observada. Puedes continuar; sus comprobantes no serán reconocidos hasta regularizarla.",
-        "icono": "WARNING"
+        "descripcion": "Tienes 2 vehículo(s) observado(s): C4T-119, C4T-220.",
+        "icono": "WARNING",
+        "colorNombre": "amarillo",
+        "colorHex": "#EAB308"
       }
     ],
     "respuesta": "OK",
@@ -209,6 +215,14 @@ Obtiene el estado de las condiciones de elegibilidad del transportista para el s
 | `estado`      | String | Estado de la condición               | `CUMPLE`, `REVISAR`, `NO_CUMPLE`                              | `CUMPLE`                            |
 | `descripcion` | String | Descripción contextual del resultado | -                                                             | `Tu RUC figura en estado ACTIVO...` |
 | `icono`       | String | Icono a renderizar en frontend       | `CHECK`, `WARNING`, `ERROR`                                   | `CHECK`                             |
+| `colorNombre` | String | Nombre del color del semáforo        | `verde`, `amarillo`, `rojo`, `gris`                           | `verde`                             |
+| `colorHex`    | String | Color hexadecimal                    | -                                                             | `#16A34A`                           |
+
+**Notas para VEHICULOS_HABILITADOS:**
+
+- `estado=CUMPLE`: Todos los vehículos tienen TUC vigente
+- `estado=REVISAR`: Al menos un vehículo tiene TUC observado (no vigente). La descripción incluye las placas observadas
+- `estado=NO_CUMPLE`: No se encontraron vehículos habilitados
 
 **Response 500 Error:**
 
@@ -242,4 +256,11 @@ Obtiene el estado de las condiciones de elegibilidad del transportista para el s
    - `REVISAR` → condición con observación, puede continuar pero con restricciones
    - `NO_CUMPLE` → condición no satisfecha, bloqueante
 
-4. **Cuando no existe transportista con el RUC**: El endpoint `/datos` retorna `lista: null`.
+4. **Colores del semáforo** (viene de `te_nivel_semaforo`):
+   - `E001` → verde (`#16A34A`) - CONFORME
+   - `E002` → gris (`#9CA3AF`) - NO_ENCONTRADO
+   - `E004` → rojo (`#DC2626`) - NO_CONFORME
+   - `E005` → azul (`#2563EB`) - EN_PROCESO
+   - Los colores se pueden usar directamente en el frontend con `colorHex` para estilos CSS
+
+5. **Cuando no existe transportista con el RUC**: El endpoint `/datos` retorna `lista: null`.

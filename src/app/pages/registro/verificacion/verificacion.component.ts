@@ -1,13 +1,18 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { finalize } from 'rxjs';
+import { finalize, forkJoin } from 'rxjs';
 import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
 import { VehiculoCargaComponent } from './vehiculo-carga/vehiculo-carga.component';
-import { ApiVerificacionService } from '../../../core/services/api-verificacion.service';
-import { ApiAuthService } from '../../../core/services/api-auth.service';
-import { AuthService } from '../../../core/services/auth.service';
-import { DatosTransportista, VerificacionServiceError } from '../../../core/models/verificacion.models';
+import { ApiVerificacionService } from '@core/services/api-verificacion.service';
+import { ApiAuthService } from '@core/services/api-auth.service';
+import { AuthService } from '@core/services/auth.service';
+import {
+  DatosTransportista,
+  VerificacionServiceError,
+  AutorizacionTransportista,
+  SemaforoCondicion,
+} from '@core/models/verificacion.models';
 
 export interface DatoTransportista {
   k: string;
@@ -52,8 +57,12 @@ export class VerificacionComponent implements OnInit {
   private readonly auth = inject(AuthService);
 
   steps: StepItem[] = [
-    { label: 'Verificación', subtitle: 'Paso 1', icon: 'fa-solid fa-shield-check' },
-    { label: 'Vehículos',    subtitle: 'Paso 2', icon: 'fa-solid fa-truck' },
+    {
+      label: 'Verificación',
+      subtitle: 'Paso 1',
+      icon: 'fa-solid fa-shield-check',
+    },
+    { label: 'Vehículos', subtitle: 'Paso 2', icon: 'fa-solid fa-truck' },
   ];
   activeIndex = 0;
 
@@ -66,108 +75,56 @@ export class VerificacionComponent implements OnInit {
   private transportista: DatosTransportista | null = null;
 
   // ── Autorizaciones ──────────────────────────────────────────
-  autorizaciones: Autorizacion[] = [
-    {
-      servicio: 'Transporte Urbano Regular – Lima Metropolitana',
-      estado: 'Vigente',
-      badgeSeverity: 'success',
-      resolucion: 'RD-2023-0412-ATU',
-      autoridad: 'ATU',
-      ambito: 'Lima Metropolitana',
-      vigencia: '01/03/2023 – 28/02/2026',
-    },
-    {
-      servicio: 'Transporte Especial – Servicio Escolar',
-      estado: 'Vencida',
-      badgeSeverity: 'danger',
-      resolucion: 'RD-2021-0089-ATU',
-      autoridad: 'ATU',
-      ambito: 'Lima Metropolitana',
-      vigencia: '15/01/2021 – 14/01/2024',
-    },
-    {
-      servicio: 'Transporte Especial – Servicio de trabajadores',
-      estado: 'Vigente',
-      badgeSeverity: 'success',
-      resolucion: 'RD-2024-0178-ATU',
-      autoridad: 'ATU',
-      ambito: 'Lima Metropolitana',
-      vigencia: '10/05/2024 – 09/05/2027',
-    },
-  ];
+  autorizaciones: Autorizacion[] = [];
 
   get autCount(): number {
-    return this.transportista?.totalAutorizaciones ?? this.autorizaciones.length;
+    return (
+      this.transportista?.totalAutorizaciones ?? this.autorizaciones.length
+    );
   }
 
   // ── Semáforo de condiciones ─────────────────────────────────
-  condiciones: Condicion[] = [
-    {
-      glyph: '✓',
-      label: 'RUC activo y habido',
-      estado: 'OK',
-      estadoColor: 'success',
-      barColor: 'var(--ok)',
-      why: 'Tu empresa aparece como ACTIVO / HABIDO en SUNAT. Estás apto para continuar.',
-    },
-    {
-      glyph: '✓',
-      label: 'Autorización de transporte vigente',
-      estado: 'OK',
-      estadoColor: 'success',
-      barColor: 'var(--ok)',
-      why: 'Tienes al menos una autorización vigente ante la ATU. El subsidio aplica a los vehículos habilitados bajo esa autorización.',
-    },
-    {
-      glyph: '!',
-      label: 'Vehículos habilitados',
-      estado: 'PENDIENTE',
-      estadoColor: 'warn',
-      barColor: 'var(--warn)',
-      why: 'En el siguiente paso deberás confirmar los vehículos habilitados bajo tu autorización vigente.',
-    },
-  ];
+  condiciones: Condicion[] = [];
 
   sinAutVigente = false; // true mostraría el banner de error
 
   ngOnInit() {
-    this.sinAutVigente = !this.autorizaciones.some(a => a.badgeSeverity === 'success');
     this.cargarDatosTransportista();
   }
 
   cargarDatosTransportista(): void {
-    const usuarioSesion = this.apiAuth.getUserFromSession() ?? this.auth.getSession();
+    const usuarioSesion =
+      this.apiAuth.getUserFromSession() ?? this.auth.getSession();
     const rucSesion = usuarioSesion?.numDocumento || '';
     this.rucConsulta = this.usandoMocks ? '20512345678' : rucSesion;
 
     if (!this.rucConsulta) {
-      this.errorDatos = 'No se encontró el RUC del transportista en la sesión actual.';
+      this.errorDatos =
+        'No se encontró el RUC del transportista en la sesión actual.';
       return;
     }
 
     this.cargandoDatos = true;
     this.errorDatos = '';
 
-    this.apiVerificacion.obtenerDatosTransportista(this.rucConsulta).pipe(
-      finalize(() => this.cargandoDatos = false),
-    ).subscribe({
-      next: datos => this.aplicarDatosTransportista(datos),
-      error: (error: VerificacionServiceError) => {
-        this.errorDatos = error.descripcion || error.message;
-      },
-    });
-  }
-
-  nextStep() {
-    if (this.activeIndex < this.steps.length - 1) {
-      this.activeIndex++;
-    }
-  }
-
-  prevStep() {
-    if (this.activeIndex > 0) {
-      this.activeIndex--;
-    }
+    forkJoin({
+      datos: this.apiVerificacion.obtenerDatosTransportista(this.rucConsulta),
+      autorizaciones: this.apiVerificacion.obtenerAutorizaciones(
+        this.rucConsulta,
+      ),
+      semaforo: this.apiVerificacion.obtenerSemaforo(this.rucConsulta),
+    })
+      .pipe(finalize(() => (this.cargandoDatos = false)))
+      .subscribe({
+        next: ({ datos, autorizaciones, semaforo }) => {
+          this.aplicarDatosTransportista(datos);
+          this.aplicarAutorizaciones(autorizaciones);
+          this.aplicarSemaforo(semaforo);
+        },
+        error: (error: VerificacionServiceError) => {
+          this.errorDatos = error.descripcion || error.message;
+        },
+      });
   }
 
   private aplicarDatosTransportista(datos: DatosTransportista): void {
@@ -180,20 +137,73 @@ export class VerificacionComponent implements OnInit {
       { k: 'Estado', v: datos.estado },
       { k: 'Total de autorizaciones', v: String(datos.totalAutorizaciones) },
     ];
+  }
 
-    const habilitado = datos.estado.trim().toLowerCase() === 'habilitado';
-    this.condiciones = this.condiciones.map((condicion, index) => index === 0
-      ? {
-          ...condicion,
-          glyph: habilitado ? '✓' : '!',
-          label: 'Estado del transportista',
-          estado: datos.estado.toUpperCase(),
-          estadoColor: habilitado ? 'success' : 'danger',
-          barColor: habilitado ? 'var(--ok)' : 'var(--bad)',
-          why: habilitado
-            ? 'El transportista figura como habilitado en el registro consultado. Está apto para continuar.'
-            : 'El transportista no figura como habilitado. Revisa su situación antes de continuar.',
+  private aplicarAutorizaciones(lista: AutorizacionTransportista[]): void {
+    this.autorizaciones = lista.map((item) => {
+      let severity: 'success' | 'warn' | 'danger' | 'secondary' = 'secondary';
+      const est = item.estado.toLowerCase().trim();
+      if (est === 'vigente') {
+        severity = 'success';
+      } else if (est === 'vencida') {
+        severity = 'danger';
+      }
+
+      // Formato fecha: YYYY-MM-DD -> DD/MM/YYYY
+      const fmtFecha = (f: string) => {
+        if (!f) return '';
+        const parts = f.split('-');
+        if (parts.length === 3) {
+          return `${parts[2]}/${parts[1]}/${parts[0]}`;
         }
-      : condicion);
+        return f;
+      };
+
+      const vigenciaFmt =
+        item.fechaInicioVigencia && item.fechaFinVigencia
+          ? `${fmtFecha(item.fechaInicioVigencia)} – ${fmtFecha(item.fechaFinVigencia)}`
+          : '';
+
+      return {
+        servicio: item.tipoTransporte,
+        estado: item.estado,
+        badgeSeverity: severity,
+        resolucion: item.numeroResolucion,
+        autoridad: item.autoridad,
+        ambito: item.ambito,
+        vigencia: vigenciaFmt,
+      };
+    });
+
+    this.sinAutVigente = !this.autorizaciones.some(
+      (a) => a.badgeSeverity === 'success',
+    );
+  }
+
+  private aplicarSemaforo(lista: SemaforoCondicion[]): void {
+    this.condiciones = lista.map((item) => {
+      let glyph = '✓';
+      if (item.icono === 'WARNING') {
+        glyph = '!';
+      } else if (item.icono === 'ERROR') {
+        glyph = '✗';
+      }
+
+      let color: 'success' | 'warn' | 'danger' = 'success';
+      if (item.estado === 'REVISAR') {
+        color = 'warn';
+      } else if (item.estado === 'NO_CUMPLE') {
+        color = 'danger';
+      }
+
+      return {
+        glyph,
+        label: item.nombre,
+        estado: item.estado,
+        estadoColor: color,
+        barColor: item.colorHex || 'var(--secondary)',
+        why: item.descripcion,
+      };
+    });
   }
 }
