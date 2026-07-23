@@ -3,33 +3,42 @@
     <div class="flex items-center gap-2.5 rounded-xl border border-[var(--warn)] bg-[var(--warn-bg)] px-3.5 py-2.5">
       <i class="fa-regular fa-clock text-[var(--warn)]"></i>
       <span class="text-[13px] font-semibold text-[var(--warn)]">Plazo de compra: 29/05/2026 – 28/07/2026</span>
-      <span class="ml-auto whitespace-nowrap rounded-full bg-[var(--warn)] px-2.5 py-0.5 text-xs font-bold text-white">9 días</span>
+      <span class="ml-auto whitespace-nowrap rounded-full bg-[var(--warn)] px-2.5 py-0.5 text-xs font-bold text-white">9
+        días</span>
     </div>
-    <div class="flex items-center gap-2.5 rounded-xl border border-[var(--primary)] bg-[var(--primary-soft)] px-3.5 py-2.5">
+    <div
+      class="flex items-center gap-2.5 rounded-xl border border-[var(--primary)] bg-[var(--primary-soft)] px-3.5 py-2.5">
       <i class="fa-solid fa-circle-info text-[var(--primary)]"></i>
-      <span class="text-[12.5px] font-medium leading-snug text-[var(--primary)]">El beneficiario es el <b>transportista titular de la autorización</b>, no el dueño del vehículo.</span>
+      <span class="text-[12.5px] font-medium leading-snug text-[var(--primary)]">El beneficiario es el <b>transportista
+          titular de la autorización</b>, no el dueño del vehículo.</span>
     </div>
   </div>
 
   <section class="animate-entry">
     <header class="mb-3.5">
       <div class="flex flex-wrap items-center gap-2">
-        <span class="rounded-md bg-[var(--primary)] px-2.5 py-[3px] text-[10.5px] font-extrabold uppercase tracking-wide text-[var(--primary-contrast)]">Sección 2 · Carga y cálculo</span>
+        <span
+          class="rounded-md bg-[var(--primary)] px-2.5 py-[3px] text-[10.5px] font-extrabold uppercase tracking-wide text-[var(--primary-contrast)]">Sección
+          2 · Carga y cálculo</span>
         <span class="text-[10.5px] font-bold uppercase tracking-wide text-[var(--text-3)]">Hoja 1 de 3</span>
       </div>
       <h1 class="mt-1 text-2xl font-extrabold text-[var(--text)]">Comprobantes</h1>
-      <p class="mt-1.5 text-[13.5px] text-[var(--text-3)]">Regístralos en la forma que corresponda — puedes cargar varios en cada una.</p>
+      <p class="mt-1.5 text-[13.5px] text-[var(--text-3)]">Regístralos en la forma que corresponda — puedes cargar
+        varios en cada una.</p>
     </header>
 
     <div class="mb-4 flex gap-1.5 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] p-1">
-      <button type="button" class="tab-button" [class.tab-button--active]="forma === 'A'" (click)="forma = 'A'">Forma A · Surtido directo</button>
-      <button type="button" class="tab-button" [class.tab-button--active]="forma === 'B'" (click)="forma = 'B'">Forma B · Consumidor directo</button>
+      <button type="button" class="tab-button" [class.tab-button--active]="forma === 'A'" (click)="forma = 'A'">Forma A
+        · Surtido directo</button>
+      <button type="button" class="tab-button" [class.tab-button--active]="forma === 'B'" (click)="forma = 'B'">Forma B
+        · Consumidor directo</button>
     </div>
 
     @if (forma === 'A') {
     <div class="mb-3.5 flex flex-wrap items-end justify-between gap-3.5">
       <p class="min-w-[240px] flex-1 max-w-[620px] text-[13.5px] leading-relaxed text-[var(--text-2)]">
-        Registra tus facturas de compra <b>con placa</b> — una por una o varias por Excel. Cada comprobante se valida en SUNAT y Osinergmin. Si una factura tiene una nota de crédito activa, queda <b>inhabilitada</b>.
+        Registra tus facturas de compra <b>con placa</b> — una por una o varias por Excel. Cada comprobante se valida en
+        SUNAT y Osinergmin. Si una factura tiene una nota de crédito activa, queda <b>inhabilitada</b>.
       </p>
       <div class="flex flex-wrap gap-2.5">
         <button type="button" class="action-button action-button--primary" (click)="abrirRegistro()">
@@ -40,36 +49,36 @@
 
     <div class="mb-3 flex items-center gap-2 px-0.5">
       <span class="text-[11.5px] font-bold uppercase tracking-wide text-[var(--text-3)]">Comprobantes registrados</span>
-      <span class="rounded-full bg-[var(--surface-3)] px-2.5 py-0.5 text-xs font-extrabold text-[var(--text-2)]">{{ comprobantes.length }}</span>
+      <span class="rounded-full bg-[var(--surface-3)] px-2.5 py-0.5 text-xs font-extrabold text-[var(--text-2)]">{{
+        comprobantes.length }}</span>
     </div>
 
     <div class="mb-3.5 flex flex-wrap items-center gap-2.5">
-      <label class="relative min-w-[220px] flex-1">
-        <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-sm text-[var(--text-3)]"></i>
-        <input [(ngModel)]="busqueda" (ngModelChange)="listarComprobantes()" type="search" placeholder="Buscar por placa, combustible, factura o grifo…" class="filter-control w-full pl-9" />
-      </label>
-      <select [(ngModel)]="estadoFiltro" (ngModelChange)="listarComprobantes()" class="filter-control cursor-pointer font-semibold">
+      <div class="relative min-w-[220px] flex-1">
+        <span class="pointer-events-none absolute left-3 top-1/2 z-10 flex -translate-y-1/2 text-[var(--text-3)]">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            aria-hidden="true">
+            <circle cx="11" cy="11" r="7"></circle>
+            <path d="M21 21l-4.3-4.3"></path>
+          </svg>
+        </span>
+        <input [(ngModel)]="busqueda" (ngModelChange)="listarComprobantes()" type="search"
+          placeholder="Buscar por placa, combustible, factura o grifo…" class="filter-control w-full pl-9" />
+      </div>
+      <select [(ngModel)]="estadoFiltro" (ngModelChange)="listarComprobantes()"
+        class="filter-control cursor-pointer font-semibold">
         <option value="todos">Todos los estados</option>
         @for(estado of estados; track estado.codigo) {
-          <option [value]="estado.codigo">{{ estado.nombre }}</option>
+        <option [value]="estado.codigo">{{ estado.nombre }}</option>
         }
       </select>
     </div>
 
     <div class="table-card">
-      <p-table
-        [value]="comprobantesFiltrados"
-        dataKey="comprobanteUuid"
-        styleClass="comprobantes-table p-datatable-sm"
-        [paginator]="true"
-        [rows]="5"
-        [rowsPerPageOptions]="[5, 10, 25]"
-        [showCurrentPageReport]="true"
+      <p-table [value]="comprobantesFiltrados" dataKey="comprobanteUuid" styleClass="comprobantes-table p-datatable-sm"
+        [paginator]="true" [rows]="5" [rowsPerPageOptions]="[5, 10, 25]" [showCurrentPageReport]="true"
         currentPageReportTemplate="Mostrando {first}–{last} de {totalRecords} registros"
-        paginatorDropdownAppendTo="body"
-        [alwaysShowPaginator]="true"
-        [scrollable]="true"
-        scrollHeight="480px"
+        paginatorDropdownAppendTo="body" [alwaysShowPaginator]="true" [scrollable]="true" scrollHeight="480px"
         [tableStyle]="{'min-width': '1040px'}">
 
         <ng-template pTemplate="header">
@@ -100,28 +109,29 @@
           <tr>
             <td><b class="mono">{{ item.serie }}-{{ item.numero }}</b><small>{{ item.fechaEmision }}</small></td>
             <td><b class="mono text-[13.5px]">{{ item.placa || 'GRANEL' }}</b></td>
-            <td><b>{{ item.nombreComercialDistribuidor }}</b><small>{{ item.distritoDistribuidor }}, {{ item.provinciaDistribuidor }}</small></td>
-            <td><span class="fuel-badge">{{ item.tipoCombustibleCodigo }}</span> <small class="mono inline">{{ item.azufrePpm }} ppm</small></td>
+            <td><b>{{ item.nombreComercialDistribuidor }}</b><small>{{ item.distritoDistribuidor }}, {{
+                item.provinciaDistribuidor }}</small></td>
+            <td><span class="fuel-badge">{{ item.tipoCombustibleCodigo }}</span> <small class="mono inline">{{
+                item.azufrePpm }} ppm</small></td>
             <td class="mono">{{ item.galones | number:'1.2-2' }}</td>
             <td>
-              <span class="status-badge" 
-                    [style.backgroundColor]="item.colorHex + '20'" 
-                    [style.color]="item.colorHex"
-                    [class.status-badge--ok]="item.estadoComprobanteCodigo === 'CONFORME'" 
-                    [class.status-badge--pending]="item.estadoComprobanteCodigo === 'PENDIENTE'" 
-                    [class.status-badge--bad]="item.estadoComprobanteCodigo === 'OBSERVADO' || item.estadoComprobanteCodigo === 'INHABILITADO'">
-                <i class="fa-solid" 
-                   [class.fa-check]="item.estadoComprobanteCodigo === 'CONFORME'"
-                   [class.fa-clock]="item.estadoComprobanteCodigo === 'PENDIENTE'"
-                   [class.fa-ban]="item.estadoComprobanteCodigo === 'INHABILITADO'"
-                   [class.fa-exclamation]="item.estadoComprobanteCodigo === 'OBSERVADO'"></i>
+              <span class="status-badge" [style.backgroundColor]="item.colorHex + '20'" [style.color]="item.colorHex"
+                [class.status-badge--ok]="item.estadoComprobanteCodigo === 'CONFORME'"
+                [class.status-badge--pending]="item.estadoComprobanteCodigo === 'PENDIENTE'"
+                [class.status-badge--bad]="item.estadoComprobanteCodigo === 'OBSERVADO' || item.estadoComprobanteCodigo === 'INHABILITADO'">
+                <i class="fa-solid" [class.fa-check]="item.estadoComprobanteCodigo === 'CONFORME'"
+                  [class.fa-clock]="item.estadoComprobanteCodigo === 'PENDIENTE'"
+                  [class.fa-ban]="item.estadoComprobanteCodigo === 'INHABILITADO'"
+                  [class.fa-exclamation]="item.estadoComprobanteCodigo === 'OBSERVADO'"></i>
                 {{ item.estadoComprobanteNombre }}
               </span>
             </td>
             <td>
               <div class="flex justify-end gap-1.5">
-                <button type="button" class="icon-button" title="Editar" aria-label="Editar comprobante" (click)="abrirEditor(item)"><i class="fa-solid fa-pen"></i></button>
-                <button type="button" class="icon-button icon-button--danger" title="Retirar" aria-label="Retirar comprobante" (click)="retirar(item.comprobanteUuid)"><i class="fa-solid fa-trash"></i></button>
+                <button type="button" class="icon-button" title="Editar" aria-label="Editar comprobante"
+                  (click)="abrirEditor(item)"><i class="fa-solid fa-pen"></i></button>
+                <button type="button" class="icon-button icon-button--danger" title="Retirar"
+                  aria-label="Retirar comprobante" (click)="retirar(item.comprobanteUuid)"><i class="fa-solid fa-trash"></i></button>
               </div>
             </td>
           </tr>
@@ -138,82 +148,91 @@
       </p-table>
     </div>
 
-    <div class="mb-2.5 mt-5 px-0.5 text-[11.5px] font-bold uppercase tracking-wide text-[var(--text-3)]">Acumulado por vehículo</div>
+    <div class="mb-2.5 mt-5 px-0.5 text-[11.5px] font-bold uppercase tracking-wide text-[var(--text-3)]">Acumulado por
+      vehículo</div>
     <div class="flex flex-col gap-2.5">
       @for (item of acumulados; track item.placa) {
-        <article class="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-3.5 shadow-[var(--shadow)]">
-          <div class="mb-1.5 flex justify-between gap-3 text-[13.5px] font-bold">
-            <span class="mono">{{ item.placa }}</span>
-            <span class="mono text-[var(--text-2)]">{{ item.consumido | number:'1.2-2' }} / {{ item.tope | number:'1.2-2' }} gal</span>
-          </div>
-          <div class="h-2 overflow-hidden rounded-full bg-[var(--surface-3)]">
-            <div class="h-full rounded-full bg-[var(--ok)] transition-all duration-500" [style.width.%]="porcentaje(item)"></div>
-          </div>
-        </article>
+      <article class="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-3.5 shadow-[var(--shadow)]">
+        <div class="mb-1.5 flex justify-between gap-3 text-[13.5px] font-bold">
+          <span class="mono">{{ item.placa }}</span>
+          <span class="mono text-[var(--text-2)]">{{ item.consumido | number:'1.2-2' }} / {{ item.tope | number:'1.2-2'
+            }} gal</span>
+        </div>
+        <div class="h-2 overflow-hidden rounded-full bg-[var(--surface-3)]">
+          <div class="h-full rounded-full bg-[var(--ok)] transition-all duration-500"
+            [style.width.%]="porcentaje(item)"></div>
+        </div>
+      </article>
       }
     </div>
     } @else {
     <div class="forma-b-content">
       <p class="mb-3.5 text-sm leading-relaxed text-[var(--text-2)]">
-        Tú, el transportista, registras tus compras al mayorista (sin placa) y, por separado, qué vehículos abastece ese combustible. <b>El proveedor nunca registra por ti.</b>
+        Tú, el transportista, registras tus compras al mayorista (sin placa) y, por separado, qué vehículos abastece ese
+        combustible. <b>El proveedor nunca registra por ti.</b>
       </p>
 
       <div class="section-label">(i) Compras al distribuidor mayorista</div>
       <div class="flex flex-col gap-3">
         @for (compra of comprasMayorista; track compra.id) {
-          <article class="rounded-[14px] border border-[var(--border)] bg-[var(--surface)] p-[15px] shadow-[var(--shadow)]">
-            <div class="flex flex-wrap items-start justify-between gap-2.5">
-              <div>
-                <div class="text-[15px] font-extrabold text-[var(--text)]">Factura <span class="mono">{{ compra.numero }}</span></div>
-                <div class="mt-0.5 text-[12.5px] text-[var(--text-3)]">{{ compra.distribuidor }} · RUC <span class="mono">{{ compra.ruc }}</span></div>
-              </div>
-              <span class="status-badge status-badge--ok !px-[11px] !py-[5px] !text-xs">
-                <i class="fa-solid fa-check"></i> Conforme
-              </span>
+        <article
+          class="rounded-[14px] border border-[var(--border)] bg-[var(--surface)] p-[15px] shadow-[var(--shadow)]">
+          <div class="flex flex-wrap items-start justify-between gap-2.5">
+            <div>
+              <div class="text-[15px] font-extrabold text-[var(--text)]">Factura <span class="mono">{{ compra.numero
+                  }}</span></div>
+              <div class="mt-0.5 text-[12.5px] text-[var(--text-3)]">{{ compra.distribuidor }} · RUC <span
+                  class="mono">{{ compra.ruc }}</span></div>
             </div>
+            <span class="status-badge status-badge--ok !px-[11px] !py-[5px] !text-xs">
+              <i class="fa-solid fa-check"></i> Conforme
+            </span>
+          </div>
 
-            <div class="mt-3 flex flex-wrap gap-x-6 gap-y-3">
-              <div>
-                <div class="meta-label">Sin placa</div>
-                <div class="meta-value text-[var(--text-3)]">— (a granel)</div>
-              </div>
-              <div>
-                <div class="meta-label">Combustible</div>
-                <div class="meta-value">{{ compra.combustible }} · {{ compra.ppm }} ppm</div>
-              </div>
-              <div>
-                <div class="meta-label">Galones</div>
-                <div class="meta-value mono">{{ compra.galones | number:'1.2-2' }}</div>
-              </div>
+          <div class="mt-3 flex flex-wrap gap-x-6 gap-y-3">
+            <div>
+              <div class="meta-label">Sin placa</div>
+              <div class="meta-value text-[var(--text-3)]">— (a granel)</div>
             </div>
-          </article>
+            <div>
+              <div class="meta-label">Combustible</div>
+              <div class="meta-value">{{ compra.combustible }} · {{ compra.ppm }} ppm</div>
+            </div>
+            <div>
+              <div class="meta-label">Galones</div>
+              <div class="meta-value mono">{{ compra.galones | number:'1.2-2' }}</div>
+            </div>
+          </div>
+        </article>
         }
       </div>
 
-      <button type="button" (click)="abrirRegistro()" class="mt-3 w-full rounded-[10px] border border-dashed border-[var(--primary)] bg-[var(--surface)] p-[13px] text-sm font-bold text-[var(--primary)] transition-colors hover:bg-[var(--primary-soft)]">
+      <button type="button" (click)="abrirRegistro()"
+        class="mt-3 w-full rounded-[10px] border border-dashed border-[var(--primary)] bg-[var(--surface)] p-[13px] text-sm font-bold text-[var(--primary)] transition-colors hover:bg-[var(--primary-soft)]">
         <i class="fa-solid fa-plus mr-1"></i> Registrar compra a granel
       </button>
 
       <div class="section-label !mt-[22px]">(ii) Vehículos que abastece este combustible</div>
-      <div class="overflow-hidden rounded-[14px] border border-[var(--border)] bg-[var(--surface)] shadow-[var(--shadow)]">
+      <div
+        class="overflow-hidden rounded-[14px] border border-[var(--border)] bg-[var(--surface)] shadow-[var(--shadow)]">
         @for (vehiculo of vehiculosAbastecidos; track vehiculo.placa; let last = $last) {
-          <div class="flex items-center gap-2.5 px-[15px] py-3" [class.border-b]="!last" [class.border-[var(--border)]]="!last">
-            <span class="mono text-sm font-bold text-[var(--text)]">{{ vehiculo.placa }}</span>
-            <span class="ml-auto rounded-full px-[11px] py-1 text-xs font-bold"
-              [class.bg-[var(--ok-bg)]]="vehiculo.subsidiable"
-              [class.text-[var(--ok)]]="vehiculo.subsidiable"
-              [class.bg-[var(--surface-3)]]="!vehiculo.subsidiable"
-              [class.text-[var(--text-3)]]="!vehiculo.subsidiable">
-              {{ vehiculo.subsidiable ? 'Subsidiable' : 'No subsidiable' }}
-            </span>
-          </div>
+        <div class="flex items-center gap-2.5 px-[15px] py-3" [class.border-b]="!last"
+          [class.border-[var(--border)]]="!last">
+          <span class="mono text-sm font-bold text-[var(--text)]">{{ vehiculo.placa }}</span>
+          <span class="ml-auto rounded-full px-[11px] py-1 text-xs font-bold"
+            [class.bg-[var(--ok-bg)]]="vehiculo.subsidiable" [class.text-[var(--ok)]]="vehiculo.subsidiable"
+            [class.bg-[var(--surface-3)]]="!vehiculo.subsidiable" [class.text-[var(--text-3)]]="!vehiculo.subsidiable">
+            {{ vehiculo.subsidiable ? 'Subsidiable' : 'No subsidiable' }}
+          </span>
+        </div>
         }
       </div>
 
       <article class="mt-4 rounded-[14px] border border-[var(--primary)] bg-[var(--primary-soft)] p-4">
         <h2 class="mb-2 text-[15px] font-extrabold text-[var(--primary)]">Factor de prorrateo Qa / Ta</h2>
         <p class="mb-2.5 text-[13.5px] leading-relaxed text-[var(--text-2)]">
-          El combustible a granel se reparte entre tus vehículos. El subsidio solo cubre la parte de los <b>subsidiables</b> (Qa) sobre el <b>total</b> que usa ese combustible (Ta).
+          El combustible a granel se reparte entre tus vehículos. El subsidio solo cubre la parte de los
+          <b>subsidiables</b> (Qa) sobre el <b>total</b> que usa ese combustible (Ta).
         </p>
 
         <div class="flex flex-wrap items-center gap-3.5 rounded-[10px] bg-[var(--surface)] p-3.5">
@@ -234,7 +253,8 @@
         </div>
 
         <div class="mt-[11px] text-[13px] leading-relaxed text-[var(--text-2)]">
-          De los <b>{{ totalGalonesMayorista | number:'1.2-2' }} gal</b> comprados se reconoce el {{ factorProrrateo | percent:'1.0-0' }} → <b>{{ galonesSubsidiados | number:'1.2-2' }} gal</b> subsidiados = <b>S/ 6,000.00</b>.
+          De los <b>{{ totalGalonesMayorista | number:'1.2-2' }} gal</b> comprados se reconoce el {{ factorProrrateo |
+          percent:'1.0-0' }} → <b>{{ galonesSubsidiados | number:'1.2-2' }} gal</b> subsidiados = <b>S/ 6,000.00</b>.
         </div>
       </article>
     </div>
@@ -243,119 +263,175 @@
 </div>
 
 @if (editor; as model) {
-  <div class="atu-modal-overlay z-[100]" role="presentation" (click)="cerrarEditor()">
-    <section class="editor-modal" role="dialog" aria-modal="true" aria-labelledby="editor-title" (click)="$event.stopPropagation()">
-      <header class="editor-modal__header">
-        <div>
-          <h2 id="editor-title">{{ editorModo === 'crear' ? 'Registrar comprobante' : 'Editar comprobante' }}</h2>
-          <p>Se valida en SUNAT (que exista) y Osinergmin (grifo inscrito)</p>
-        </div>
-        <button type="button" class="editor-modal__close" aria-label="Cerrar modal" (click)="cerrarEditor()">
-          <i class="fa-solid fa-xmark"></i>
-        </button>
-      </header>
+<div class="atu-modal-overlay z-[100]" role="presentation" (click)="cerrarEditor()">
+  <section class="editor-modal" role="dialog" aria-modal="true" aria-labelledby="editor-title"
+    (click)="$event.stopPropagation()">
+    <header class="editor-modal__header">
+      <div>
+        <h2 id="editor-title">{{ editorModo === 'crear' ? 'Registrar comprobante' : 'Editar comprobante' }}</h2>
+        <p>Se valida en SUNAT (que exista) y Osinergmin (grifo inscrito)</p>
+      </div>
+      <button type="button" class="editor-modal__close" aria-label="Cerrar modal" (click)="cerrarEditor()">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </header>
 
-      <div class="editor-modal__body">
-        
-        @if (editorModo === 'crear') {
-          <div class="editor-section-title">0 · Archivo adjunto</div>
-          <div class="editor-grid">
-            <label class="editor-field editor-field--full">
-              <span>PDF o Imagen del Comprobante *</span>
-              <input type="file" (change)="onFileSelected($event)" accept="application/pdf,image/jpeg,image/png" class="file-input" />
-            </label>
-          </div>
-        }
+    <div class="editor-modal__body">
 
-        @if (forma === 'A') {
-        <div class="editor-section-title">1 · Vehículo y conductor</div>
-        <div class="editor-grid editor-grid--two">
-          <label class="editor-field">
-            <span>Placa *</span>
-            <select [(ngModel)]="model.placa" class="mono">
-              <option value="">Selecciona una placa…</option>
-              @for (v of vehiculos; track v.placa) {
-                <option [value]="v.placa">{{ v.placa }}</option>
-              }
-            </select>
-          </label>
-        </div>
-        }
+      @if (editorModo === 'crear') {
+      <div class="editor-section-title">0 · Archivo adjunto</div>
+      <div class="editor-grid">
+        <label class="editor-field editor-field--full">
+          <span>PDF o Imagen del Comprobante *</span>
+          <input type="file" (change)="onFileSelected($event)" accept="application/pdf,image/jpeg,image/png"
+            class="file-input" />
+        </label>
+      </div>
+      }
 
-        <div class="editor-section-title">2 · Factura</div>
-        <div class="editor-grid editor-grid--invoice">
-          <label class="editor-field">
-            <span>Serie</span>
-            <input [(ngModel)]="model.serie" class="mono" placeholder="F001" />
-          </label>
-          <label class="editor-field">
-            <span>Número *</span>
-            <input [(ngModel)]="model.numero" class="mono" placeholder="0001234" />
-          </label>
-          <label class="editor-field">
-            <span>Emisión</span>
-            <input [(ngModel)]="model.emision" class="mono" type="date" />
-          </label>
-          <label class="editor-field">
-            <span>Mes</span>
-            <select [(ngModel)]="model.mes">
-              <option value="Mayo">Mayo</option>
-              <option value="Junio">Junio</option>
-              <option value="Julio">Julio</option>
-            </select>
-          </label>
-        </div>
-
-        <div class="editor-section-title">3 · Grifo o Distribuidor</div>
-        <div class="editor-grid editor-grid--station">
-          <label class="editor-field">
-            <span>RUC del grifo</span>
-            <input [(ngModel)]="model.rucGrifo" class="mono" placeholder="20xxxxxxxxx" />
-          </label>
-          <label class="editor-field">
-            <span>Razón social</span>
-            <input [(ngModel)]="model.razonSocial" placeholder="Opcional" />
-          </label>
-        </div>
-
-        <div class="editor-section-title">4 · Combustible</div>
-        <div class="editor-grid editor-grid--fuel">
-          <label class="editor-field">
-            <span>Tipo</span>
-            <select [(ngModel)]="model.combustible">
-              @for (t of tiposCombustible; track t.codigo) {
-                <option [value]="t.codigo">{{ t.nombre }}</option>
-              }
-            </select>
-          </label>
-          <label class="editor-field">
-            <span>Azufre (ppm)</span>
-            <input [(ngModel)]="model.ppm" type="number" min="0" class="mono" placeholder="45" />
-          </label>
-          <label class="editor-field">
-            <span>Galones *</span>
-            <input [(ngModel)]="model.galones" type="number" min="0.01" step="0.01" class="mono" placeholder="0.00" />
-          </label>
-        </div>
-        
-        <div class="editor-grid editor-grid--fuel mt-3">
-          <label class="editor-field">
-            <span>Costo Total (S/)</span>
-            <input [(ngModel)]="model.costo" type="number" min="0.01" step="0.01" class="mono" placeholder="0.00" />
-          </label>
-        </div>
-
-        @if (editorError) {
-          <div class="editor-error mt-4" role="alert"><i class="fa-solid fa-circle-exclamation"></i>{{ editorError }}</div>
-        }
+      @if (forma === 'A') {
+      <div class="editor-section-title">1 · Vehículo y conductor</div>
+      <div class="editor-grid editor-grid--two">
+        <label class="editor-field">
+          <span>Placa *</span>
+          <select [(ngModel)]="model.placa" class="mono">
+            <option value="">Selecciona una placa…</option>
+            @for (v of vehiculos; track v.placa) {
+            <option [value]="v.placa">{{ v.placa }}</option>
+            }
+          </select>
+        </label>
       </div>
 
-      <footer class="editor-modal__footer">
-        <button type="button" class="editor-cancel" (click)="cerrarEditor()">Cancelar</button>
-        <button type="button" class="editor-save" (click)="guardarEditor()">
-          {{ editorModo === 'crear' ? 'Validar y registrar' : 'Guardar cambios' }}
-        </button>
-      </footer>
-    </section>
-  </div>
+      <div class="editor-grid editor-grid--document">
+        <label class="editor-field">
+          <span>Documento</span>
+          <select [(ngModel)]="model.tipoDocumento">
+            <option value="DNI">DNI</option>
+            <option value="CE">CE</option>
+          </select>
+        </label>
+        <label class="editor-field">
+          <span>N.° documento</span>
+          <input [(ngModel)]="model.numeroDocumento" class="mono" />
+        </label>
+        <label class="editor-field">
+          <span>Licencia de conducir</span>
+          <input [(ngModel)]="model.licencia" class="mono" placeholder="Q00000000" />
+        </label>
+      </div>
+      }
+
+      <div class="editor-section-title">2 · Factura</div>
+      <div class="editor-grid editor-grid--invoice">
+        <label class="editor-field">
+          <span>Serie *</span>
+          <input [(ngModel)]="model.serie" (input)="onEditorInvoiceSeriesInput($event)" maxlength="4" autocomplete="off"
+            class="mono uppercase" placeholder="F001"
+            [class.editor-field--invalid]="editorSubmitted && !isEditorInvoiceSeriesValid" />
+          <small [class.editor-field-error]="editorSubmitted && !isEditorInvoiceSeriesValid"
+            [class.editor-field-hint]="!editorSubmitted || isEditorInvoiceSeriesValid">Formato obligatorio:
+            F001.</small>
+        </label>
+        <label class="editor-field">
+          <span>Número *</span>
+          <input [(ngModel)]="model.numero" (input)="onEditorInvoiceNumberInput($event)" inputmode="numeric"
+            maxlength="8" autocomplete="off" class="mono" placeholder="0001234"
+            [class.editor-field--invalid]="editorSubmitted && !isEditorInvoiceNumberValid" />
+          <small [class.editor-field-error]="editorSubmitted && !isEditorInvoiceNumberValid"
+            [class.editor-field-hint]="!editorSubmitted || isEditorInvoiceNumberValid">Entre 1 y 8 dígitos.</small>
+        </label>
+        <label class="editor-field">
+          <span>Emisión</span>
+          <input [(ngModel)]="model.emision" class="mono" placeholder="dd/mm/aaaa" />
+        </label>
+        <label class="editor-field">
+          <span>Mes</span>
+          <input [(ngModel)]="model.mes" readonly class="editor-readonly" placeholder="Se obtiene de la emisión"
+            [class.editor-field--invalid]="editorSubmitted && !isEditorMonthValid" />
+          <small class="editor-field-hint">Se calcula automáticamente.</small>
+        </label>
+      </div>
+
+      <div class="editor-section-title">3 · Grifo o Distribuidor</div>
+      <div class="editor-grid editor-grid--station">
+        <label class="editor-field">
+          <span>RUC del grifo *</span>
+          <input [(ngModel)]="model.rucGrifo" (input)="onEditorStationRucInput($event)" inputmode="numeric"
+            maxlength="11" autocomplete="off" class="mono" placeholder="20512345678"
+            [class.editor-field--invalid]="editorSubmitted && !isEditorStationRucValid" />
+          <small [class.editor-field-error]="editorSubmitted && !isEditorStationRucValid"
+            [class.editor-field-hint]="!editorSubmitted || isEditorStationRucValid">11 dígitos; inicia con 10, 15, 17 o
+            20.</small>
+        </label>
+        <label class="editor-field">
+          <span>Razón social</span>
+          <input [(ngModel)]="model.razonSocial" placeholder="Opcional" />
+        </label>
+      </div>
+
+      <div class="editor-section-title">4 · Combustible</div>
+      <div class="editor-grid editor-grid--fuel">
+        <label class="editor-field">
+          <span>Tipo</span>
+          <select [(ngModel)]="model.combustible">
+            @for (t of tiposCombustible; track t.codigo) {
+            <option [value]="t.codigo">{{ t.nombre }}</option>
+            }
+          </select>
+        </label>
+        <label class="editor-field">
+          <span>Azufre (ppm)</span>
+          <input [(ngModel)]="model.ppm" type="number" min="0" class="mono" placeholder="45" />
+        </label>
+        <label class="editor-field">
+          <span>Galones *</span>
+          <input [(ngModel)]="model.galones" type="number" min="0.01" step="0.01" class="mono" placeholder="0.00" />
+        </label>
+      </div>
+
+      <div class="editor-grid editor-grid--fuel mt-3">
+        <label class="editor-field">
+          <span>Costo Total (S/)</span>
+          <input [(ngModel)]="model.costo" type="number" min="0.01" step="0.01" class="mono" placeholder="0.00" />
+        </label>
+      </div>
+
+      @if (editorError) {
+      <div class="editor-error mt-4" role="alert"><i class="fa-solid fa-circle-exclamation"></i>{{ editorError }}</div>
+      }
+    </div>
+
+    <footer class="editor-modal__footer">
+      <button type="button" class="editor-cancel" (click)="cerrarEditor()">Cancelar</button>
+      <button type="button" class="editor-save" (click)="guardarEditor()">
+        {{ editorModo === 'crear' ? 'Validar y registrar' : 'Guardar cambios' }}
+      </button>
+    </footer>
+  </section>
+</div>
+}
+
+@if (comprobantePendienteEliminar; as comprobante) {
+<div class="atu-modal-overlay z-[110]" role="presentation" (click)="cerrarConfirmacionEliminar()">
+  <section class="delete-confirmation" role="alertdialog" aria-modal="true" aria-labelledby="delete-receipt-title"
+    (click)="$event.stopPropagation()">
+    <div class="delete-confirmation__body">
+      <div class="delete-confirmation__icon"><i class="fa-solid fa-trash-can"></i></div>
+      <h2 id="delete-receipt-title">Eliminar comprobante</h2>
+      <p>
+        ¿Estás seguro de que deseas eliminar el comprobante
+        <strong class="mono">{{ comprobante.numero }}</strong> correspondiente al vehículo
+        <strong class="mono">{{ comprobante.placa }}</strong>?
+        Esta acción no se puede deshacer.
+      </p>
+    </div>
+    <footer class="delete-confirmation__footer">
+      <button type="button" class="editor-cancel" (click)="cerrarConfirmacionEliminar()">Cancelar</button>
+      <button type="button" class="delete-confirmation__submit" (click)="confirmarEliminarComprobante()">
+        <i class="fa-solid fa-trash-can"></i> Eliminar
+      </button>
+    </footer>
+  </section>
+</div>
 }

@@ -1,6 +1,7 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { isValidPhone } from '../../core/utils/validators';
 import { AuthService } from '@core/services/auth.service';
 import { ApiAuthService } from '@core/services/api-auth.service';
 import { ApiUsuarioService } from '@core/services/api-usuario.service';
@@ -12,7 +13,6 @@ import {
   BancoItemResponse,
   CuentaBancariaTransportistaResponseData,
 } from '@core/models/models';
-
 
 @Component({
   selector: 'app-perfil-info',
@@ -105,12 +105,16 @@ import {
             <div
               class="group bg-white dark:bg-[#0D1117] border border-atu-border dark:border-[#30363D] rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden relative"
             >
-              <div class="absolute inset-0 bg-gradient-to-r from-atu-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
+              <div
+                class="absolute inset-0 bg-gradient-to-r from-atu-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+              ></div>
               <div
                 class="flex items-center justify-between px-5 py-4 border-b border-atu-border/50 dark:border-[#30363D]/50 bg-gray-50/50 dark:bg-white/[0.02]"
               >
                 <div class="flex items-center gap-3">
-                  <div class="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 flex items-center justify-center">
+                  <div
+                    class="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 flex items-center justify-center"
+                  >
                     <i class="fa-solid fa-building text-sm"></i>
                   </div>
                   <span
@@ -187,12 +191,18 @@ import {
                   >
                   <div class="pt-0.5">
                     @if (perfilTrans?.datosEmpresa?.autorizacionVigente) {
-                      <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-green-50 dark:bg-[#102A1C] text-green-700 dark:text-[#3FC078] border border-green-200 dark:border-green-900/30">
-                        <i class="fa-solid fa-circle-check text-[10px]"></i> Vigente
+                      <span
+                        class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-green-50 dark:bg-[#102A1C] text-green-700 dark:text-[#3FC078] border border-green-200 dark:border-green-900/30"
+                      >
+                        <i class="fa-solid fa-circle-check text-[10px]"></i>
+                        Vigente
                       </span>
                     } @else {
-                      <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-red-50 dark:bg-[#2C1816] text-red-700 dark:text-[#E27062] border border-red-200 dark:border-red-900/30">
-                        <i class="fa-solid fa-circle-xmark text-[10px]"></i> No Vigente
+                      <span
+                        class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-red-50 dark:bg-[#2C1816] text-red-700 dark:text-[#E27062] border border-red-200 dark:border-red-900/30"
+                      >
+                        <i class="fa-solid fa-circle-xmark text-[10px]"></i> No
+                        Vigente
                       </span>
                     }
                   </div>
@@ -204,12 +214,16 @@ import {
             <div
               class="group bg-white dark:bg-[#0D1117] border border-atu-border dark:border-[#30363D] rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden relative"
             >
-              <div class="absolute inset-0 bg-gradient-to-r from-atu-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
+              <div
+                class="absolute inset-0 bg-gradient-to-r from-atu-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+              ></div>
               <div
                 class="flex items-center justify-between px-5 py-4 border-b border-atu-border/50 dark:border-[#30363D]/50 bg-gray-50/50 dark:bg-white/[0.02]"
               >
                 <div class="flex items-center gap-3">
-                  <div class="w-8 h-8 rounded-full bg-purple-100 dark:bg-purple-500/20 text-purple-600 dark:text-purple-400 flex items-center justify-center">
+                  <div
+                    class="w-8 h-8 rounded-full bg-purple-100 dark:bg-purple-500/20 text-purple-600 dark:text-purple-400 flex items-center justify-center"
+                  >
                     <i class="fa-solid fa-id-card text-sm"></i>
                   </div>
                   <span
@@ -234,7 +248,9 @@ import {
                   <strong
                     class="text-[15px] text-atu-text dark:text-[#E6EDF3] font-semibold block group-hover/field:text-atu-primary transition-colors"
                   >
-                    {{ perfilTrans?.representanteLegal?.nombresApellidos || '—' }}
+                    {{
+                      perfilTrans?.representanteLegal?.nombresApellidos || '—'
+                    }}
                   </strong>
                 </div>
                 <div class="space-y-1.5 group/field">
@@ -245,8 +261,15 @@ import {
                   <strong
                     class="inline-flex items-center gap-2 text-[15px] text-atu-text dark:text-[#E6EDF3] font-semibold bg-gray-50 dark:bg-white/[0.03] px-2 py-0.5 rounded-md border border-gray-100 dark:border-white/10 font-mono group-hover/field:border-atu-primary/30 transition-colors"
                   >
-                    <span class="text-atu-text-3 dark:text-[#8B949E] text-[11px]">{{ perfilTrans?.representanteLegal?.tipoDocumento || 'DNI' }}</span>
-                    {{ perfilTrans?.representanteLegal?.numeroDocumento || '—' }}
+                    <span
+                      class="text-atu-text-3 dark:text-[#8B949E] text-[11px]"
+                      >{{
+                        perfilTrans?.representanteLegal?.tipoDocumento || 'DNI'
+                      }}</span
+                    >
+                    {{
+                      perfilTrans?.representanteLegal?.numeroDocumento || '—'
+                    }}
                   </strong>
                 </div>
               </div>
@@ -258,12 +281,16 @@ import {
               [class.ring-2]="editMode"
               [class.ring-atu-primary]="editMode"
             >
-              <div class="absolute inset-0 bg-gradient-to-r from-atu-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
+              <div
+                class="absolute inset-0 bg-gradient-to-r from-atu-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+              ></div>
               <div
                 class="flex items-center justify-between gap-3 px-5 py-4 border-b border-atu-border/50 dark:border-[#30363D]/50 bg-gray-50/50 dark:bg-white/[0.02]"
               >
                 <div class="flex items-center gap-3">
-                  <div class="w-8 h-8 rounded-full bg-teal-100 dark:bg-teal-500/20 text-teal-600 dark:text-teal-400 flex items-center justify-center">
+                  <div
+                    class="w-8 h-8 rounded-full bg-teal-100 dark:bg-teal-500/20 text-teal-600 dark:text-teal-400 flex items-center justify-center"
+                  >
                     <i class="fa-solid fa-address-book text-sm"></i>
                   </div>
                   <div>
@@ -280,7 +307,9 @@ import {
                   </div>
                 </div>
                 @if (editMode) {
-                  <span class="animate-pulse inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold bg-blue-100 dark:bg-blue-500/20 text-blue-700 dark:text-blue-400">
+                  <span
+                    class="animate-pulse inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold bg-blue-100 dark:bg-blue-500/20 text-blue-700 dark:text-blue-400"
+                  >
                     <i class="fa-solid fa-pen text-[9px]"></i> Editando
                   </span>
                 }
@@ -295,26 +324,48 @@ import {
                   >
                     Nombre del Contacto
                     @if (editMode) {
-                      <span class="text-red-600 dark:text-red-500 ml-0.5">*</span>
+                      <span class="text-red-600 dark:text-red-500 ml-0.5"
+                        >*</span
+                      >
                     }
                   </span>
                   @if (editMode) {
                     <div class="relative">
-                      <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <div
+                        class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+                      >
                         <i class="fa-solid fa-user text-gray-400 text-xs"></i>
                       </div>
                       <input
                         type="text"
                         [(ngModel)]="editContactoNombre"
+                        (input)="onContactoNombreInput($event)"
+                        maxlength="120"
+                        autocomplete="name"
+                        [attr.aria-invalid]="!!contactoNombreError"
                         placeholder="Nombres y Apellidos"
-                        class="w-full pl-9 border-2 border-atu-border dark:border-[#30363D] rounded-xl bg-white dark:bg-[#0D1117] px-3 py-2.5 text-[14px] text-atu-text dark:text-[#E6EDF3] focus:outline-none focus:border-atu-primary dark:focus:border-[#00A3E0] focus:ring-4 focus:ring-atu-primary/10 transition-all shadow-sm"
+                        class="w-full pl-9 border-2 rounded-xl bg-white dark:bg-[#0D1117] px-3 py-2.5 text-[14px] text-atu-text dark:text-[#E6EDF3] focus:outline-none focus:ring-4 focus:ring-atu-primary/10 transition-all shadow-sm"
+                        [ngClass]="
+                          contactoNombreError
+                            ? 'border-red-500 focus:border-red-500'
+                            : 'border-atu-border dark:border-[#30363D] focus:border-atu-primary dark:focus:border-[#00A3E0]'
+                        "
                       />
                     </div>
+                    @if (contactoNombreError) {
+                      <p
+                        class="mt-1.5 text-[11.5px] font-semibold text-red-600 dark:text-red-400"
+                      >
+                        {{ contactoNombreError }}
+                      </p>
+                    }
                   } @else {
                     <strong
                       class="text-[15px] text-atu-text dark:text-[#E6EDF3] font-semibold flex items-center gap-2"
                     >
-                      <i class="fa-solid fa-user text-atu-text-3 dark:text-[#8B949E] text-xs"></i>
+                      <i
+                        class="fa-solid fa-user text-atu-text-3 dark:text-[#8B949E] text-xs"
+                      ></i>
                       {{ perfilTrans?.contacto?.nombresApellidos || '—' }}
                     </strong>
                   }
@@ -327,26 +378,55 @@ import {
                   >
                     Teléfono
                     @if (editMode) {
-                      <span class="text-red-600 dark:text-red-500 ml-0.5">*</span>
+                      <span class="text-red-600 dark:text-red-500 ml-0.5"
+                        >*</span
+                      >
                     }
                   </span>
                   @if (editMode) {
                     <div class="relative">
-                      <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <div
+                        class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+                      >
                         <i class="fa-solid fa-phone text-gray-400 text-xs"></i>
                       </div>
                       <input
                         type="tel"
                         [(ngModel)]="editContactoTelefono"
-                        placeholder="Teléfono"
-                        class="w-full pl-9 border-2 border-atu-border dark:border-[#30363D] rounded-xl bg-white dark:bg-[#0D1117] px-3 py-2.5 text-[14px] text-atu-text dark:text-[#E6EDF3] focus:outline-none focus:border-atu-primary dark:focus:border-[#00A3E0] focus:ring-4 focus:ring-atu-primary/10 transition-all font-mono tracking-wide shadow-sm"
+                        (input)="onContactoTelefonoInput($event)"
+                        inputmode="numeric"
+                        maxlength="9"
+                        autocomplete="tel"
+                        [attr.aria-invalid]="!!contactoTelefonoError"
+                        placeholder="9 dígitos"
+                        class="w-full pl-9 border-2 rounded-xl bg-white dark:bg-[#0D1117] px-3 py-2.5 text-[14px] text-atu-text dark:text-[#E6EDF3] focus:outline-none focus:ring-4 focus:ring-atu-primary/10 transition-all font-mono tracking-wide shadow-sm"
+                        [ngClass]="
+                          contactoTelefonoError
+                            ? 'border-red-500 focus:border-red-500'
+                            : 'border-atu-border dark:border-[#30363D] focus:border-atu-primary dark:focus:border-[#00A3E0]'
+                        "
                       />
                     </div>
+                    @if (contactoTelefonoError) {
+                      <p
+                        class="mt-1.5 text-[11.5px] font-semibold text-red-600 dark:text-red-400"
+                      >
+                        {{ contactoTelefonoError }}
+                      </p>
+                    } @else {
+                      <p
+                        class="mt-1.5 text-[11px] text-atu-text-3 dark:text-[#6E7681]"
+                      >
+                        Debe comenzar con 9 y contener 9 dígitos.
+                      </p>
+                    }
                   } @else {
                     <strong
                       class="text-[15px] text-atu-text dark:text-[#E6EDF3] font-semibold flex items-center gap-2 font-mono tracking-wide"
                     >
-                      <i class="fa-solid fa-phone text-atu-text-3 dark:text-[#8B949E] text-[11px]"></i>
+                      <i
+                        class="fa-solid fa-phone text-atu-text-3 dark:text-[#8B949E] text-[11px]"
+                      ></i>
                       {{ perfilTrans?.contacto?.telefono || '—' }}
                     </strong>
                   }
@@ -359,13 +439,16 @@ import {
                   >
                     Tipo de Documento (Contacto)
                     @if (editMode) {
-                      <span class="text-red-600 dark:text-red-500 ml-0.5">*</span>
+                      <span class="text-red-600 dark:text-red-500 ml-0.5"
+                        >*</span
+                      >
                     }
                   </span>
                   @if (editMode) {
                     <div class="relative">
                       <select
                         [(ngModel)]="editContactoTipoDoc"
+                        (ngModelChange)="onContactoTipoDocumentoChange()"
                         class="w-full border-2 border-atu-border dark:border-[#30363D] rounded-xl bg-white dark:bg-[#0D1117] px-3 py-2.5 text-[14px] text-atu-text dark:text-[#E6EDF3] focus:outline-none focus:border-atu-primary dark:focus:border-[#00A3E0] focus:ring-4 focus:ring-atu-primary/10 transition-all cursor-pointer shadow-sm"
                       >
                         <option value="DNI">DNI</option>
@@ -389,7 +472,9 @@ import {
                   >
                     Número de Documento (Contacto)
                     @if (editMode) {
-                      <span class="text-red-600 dark:text-red-500 ml-0.5">*</span>
+                      <span class="text-red-600 dark:text-red-500 ml-0.5"
+                        >*</span
+                      >
                     }
                   </span>
                   @if (editMode) {
@@ -397,10 +482,35 @@ import {
                       <input
                         type="text"
                         [(ngModel)]="editContactoNumDoc"
+                        (input)="onContactoDocumentoInput($event)"
+                        [attr.inputmode]="
+                          contactoDocumentoSoloNumeros ? 'numeric' : 'text'
+                        "
+                        [attr.maxlength]="contactoDocumentoMaxLength"
+                        [attr.aria-invalid]="!!contactoDocumentoError"
+                        autocomplete="off"
                         placeholder="Número de documento"
-                        class="w-full border-2 border-atu-border dark:border-[#30363D] rounded-xl bg-white dark:bg-[#0D1117] px-3 py-2.5 text-[14px] text-atu-text dark:text-[#E6EDF3] focus:outline-none focus:border-atu-primary dark:focus:border-[#00A3E0] focus:ring-4 focus:ring-atu-primary/10 transition-all font-mono shadow-sm"
+                        class="w-full border-2 rounded-xl bg-white dark:bg-[#0D1117] px-3 py-2.5 text-[14px] uppercase text-atu-text dark:text-[#E6EDF3] focus:outline-none focus:ring-4 focus:ring-atu-primary/10 transition-all font-mono shadow-sm"
+                        [ngClass]="
+                          contactoDocumentoError
+                            ? 'border-red-500 focus:border-red-500'
+                            : 'border-atu-border dark:border-[#30363D] focus:border-atu-primary dark:focus:border-[#00A3E0]'
+                        "
                       />
                     </div>
+                    @if (contactoDocumentoError) {
+                      <p
+                        class="mt-1.5 text-[11.5px] font-semibold text-red-600 dark:text-red-400"
+                      >
+                        {{ contactoDocumentoError }}
+                      </p>
+                    } @else {
+                      <p
+                        class="mt-1.5 text-[11px] text-atu-text-3 dark:text-[#6E7681]"
+                      >
+                        {{ contactoDocumentoHint }}
+                      </p>
+                    }
                   } @else {
                     <strong
                       class="text-[15px] text-atu-text dark:text-[#E6EDF3] font-semibold block font-mono"
@@ -420,7 +530,9 @@ import {
                   <strong
                     class="text-[15px] text-atu-text dark:text-[#E6EDF3] font-semibold flex items-center gap-2 break-all"
                   >
-                    <i class="fa-regular fa-envelope text-atu-text-3 dark:text-[#8B949E]"></i>
+                    <i
+                      class="fa-regular fa-envelope text-atu-text-3 dark:text-[#8B949E]"
+                    ></i>
                     {{ perfilTrans?.contacto?.correoElectronico || '—' }}
                   </strong>
                 </div>
@@ -451,12 +563,16 @@ import {
               [class.ring-2]="cuentaEditMode"
               [class.ring-atu-primary]="cuentaEditMode"
             >
-              <div class="absolute inset-0 bg-gradient-to-r from-atu-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
+              <div
+                class="absolute inset-0 bg-gradient-to-r from-atu-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+              ></div>
               <div
                 class="flex items-center justify-between gap-3 px-5 py-4 border-b border-atu-border/50 dark:border-[#30363D]/50 bg-gray-50/50 dark:bg-white/[0.02]"
               >
                 <div class="flex items-center gap-3">
-                  <div class="w-8 h-8 rounded-full bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
+                  <div
+                    class="w-8 h-8 rounded-full bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center"
+                  >
                     <i class="fa-solid fa-piggy-bank text-sm"></i>
                   </div>
                   <div
@@ -467,16 +583,25 @@ import {
                 </div>
                 <div class="flex items-center justify-end gap-2 flex-wrap">
                   @if (isLoadingCuentaAbono) {
-                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10.5px] font-bold bg-blue-100 dark:bg-blue-500/20 text-blue-700 dark:text-blue-400 border border-blue-200 dark:border-blue-900/30">
-                      <i class="fa-solid fa-spinner fa-spin text-[11px]"></i> Consultando
+                    <span
+                      class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10.5px] font-bold bg-blue-100 dark:bg-blue-500/20 text-blue-700 dark:text-blue-400 border border-blue-200 dark:border-blue-900/30"
+                    >
+                      <i class="fa-solid fa-spinner fa-spin text-[11px]"></i>
+                      Consultando
                     </span>
                   } @else if (cuentaAbono) {
-                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10.5px] font-bold bg-green-100 dark:bg-[#102A1C] text-green-700 dark:text-[#3FC078] border border-green-200 dark:border-green-900/30">
-                      <i class="fa-solid fa-check-circle text-[11px]"></i> Registrada
+                    <span
+                      class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10.5px] font-bold bg-green-100 dark:bg-[#102A1C] text-green-700 dark:text-[#3FC078] border border-green-200 dark:border-green-900/30"
+                    >
+                      <i class="fa-solid fa-check-circle text-[11px]"></i>
+                      Registrada
                     </span>
                   } @else if (cuentaAbonoLoaded) {
-                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10.5px] font-bold bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-900/30">
-                      <i class="fa-solid fa-circle-exclamation text-[11px]"></i> No registrada
+                    <span
+                      class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10.5px] font-bold bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-900/30"
+                    >
+                      <i class="fa-solid fa-circle-exclamation text-[11px]"></i>
+                      No registrada
                     </span>
                   }
 
@@ -497,7 +622,14 @@ import {
                       [disabled]="isSavingCuenta"
                       class="inline-flex items-center gap-2 bg-atu-primary text-white border border-atu-primary rounded-[9px] px-3 py-2 text-[12.5px] font-bold cursor-pointer disabled:opacity-60"
                     >
-                      <i class="fa-solid" [ngClass]="isSavingCuenta ? 'fa-spinner fa-spin' : 'fa-floppy-disk'"></i>
+                      <i
+                        class="fa-solid"
+                        [ngClass]="
+                          isSavingCuenta
+                            ? 'fa-spinner fa-spin'
+                            : 'fa-floppy-disk'
+                        "
+                      ></i>
                       {{ isSavingCuenta ? 'Guardando...' : 'Guardar cuenta' }}
                     </button>
                     <button
@@ -517,17 +649,40 @@ import {
               >
                 <!-- Tipo de Abono -->
                 @if (cuentaEditMode) {
-                  <div class="space-y-1.5 sm:col-span-2 lg:col-span-3 pb-2 border-b border-gray-100 dark:border-[#30363D]">
-                    <span class="text-atu-text-3 dark:text-[#6E7681] font-semibold uppercase tracking-wider block text-[10.5px]">
-                      Tipo de Abono <span class="text-red-600 dark:text-red-500 ml-0.5">*</span>
+                  <div
+                    class="space-y-1.5 sm:col-span-2 lg:col-span-3 pb-2 border-b border-gray-100 dark:border-[#30363D]"
+                  >
+                    <span
+                      class="text-atu-text-3 dark:text-[#6E7681] font-semibold uppercase tracking-wider block text-[10.5px]"
+                    >
+                      Tipo de Abono
+                      <span class="text-red-600 dark:text-red-500 ml-0.5"
+                        >*</span
+                      >
                     </span>
                     <div class="flex items-center gap-6 mt-1">
-                      <label class="inline-flex items-center gap-2 text-sm text-atu-text dark:text-[#E6EDF3] font-semibold cursor-pointer">
-                        <input type="radio" name="tipoAbono" [value]="1" [(ngModel)]="editTipoAbonoId" class="text-atu-primary focus:ring-atu-primary" />
+                      <label
+                        class="inline-flex items-center gap-2 text-sm text-atu-text dark:text-[#E6EDF3] font-semibold cursor-pointer"
+                      >
+                        <input
+                          type="radio"
+                          name="tipoAbono"
+                          [value]="1"
+                          [(ngModel)]="editTipoAbonoId"
+                          class="text-atu-primary focus:ring-atu-primary"
+                        />
                         <span>CCI (Depósito Bancario)</span>
                       </label>
-                      <label class="inline-flex items-center gap-2 text-sm text-atu-text dark:text-[#E6EDF3] font-semibold cursor-pointer">
-                        <input type="radio" name="tipoAbono" [value]="2" [(ngModel)]="editTipoAbonoId" class="text-atu-primary focus:ring-atu-primary" />
+                      <label
+                        class="inline-flex items-center gap-2 text-sm text-atu-text dark:text-[#E6EDF3] font-semibold cursor-pointer"
+                      >
+                        <input
+                          type="radio"
+                          name="tipoAbono"
+                          [value]="2"
+                          [(ngModel)]="editTipoAbonoId"
+                          class="text-atu-primary focus:ring-atu-primary"
+                        />
                         <span>OPE (Orden de Pago en Ventanilla)</span>
                       </label>
                     </div>
@@ -541,13 +696,19 @@ import {
                   >
                     Banco
                     @if (cuentaEditMode) {
-                      <span class="text-red-600 dark:text-red-500 ml-0.5">*</span>
+                      <span class="text-red-600 dark:text-red-500 ml-0.5"
+                        >*</span
+                      >
                     }
                   </span>
                   @if (cuentaEditMode) {
                     <div class="relative">
-                      <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <i class="fa-solid fa-building-columns text-gray-400 text-xs"></i>
+                      <div
+                        class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+                      >
+                        <i
+                          class="fa-solid fa-building-columns text-gray-400 text-xs"
+                        ></i>
                       </div>
                       <select
                         [(ngModel)]="editBanco"
@@ -556,26 +717,42 @@ import {
                         <option value="">Selecciona un banco…</option>
                         @if (bancosList.length > 0) {
                           @for (banco of bancosList; track banco.uuidBanco) {
-                            <option [value]="banco.nombre">{{ banco.nombre }} ({{ banco.abreviatura }})</option>
+                            <option [value]="banco.nombre">
+                              {{ banco.nombre }} ({{ banco.abreviatura }})
+                            </option>
                           }
                         } @else {
-                          <option value="Banco de Crédito del Perú">Banco de Crédito del Perú</option>
+                          <option value="Banco de Crédito del Perú">
+                            Banco de Crédito del Perú
+                          </option>
                           <option value="BBVA Perú">BBVA Perú</option>
                           <option value="Interbank">Interbank</option>
-                          <option value="Scotiabank Perú">Scotiabank Perú</option>
-                          <option value="Banco de la Nación">Banco de la Nación</option>
+                          <option value="Scotiabank Perú">
+                            Scotiabank Perú
+                          </option>
+                          <option value="Banco de la Nación">
+                            Banco de la Nación
+                          </option>
                         }
                       </select>
-                      <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                        <i class="fa-solid fa-chevron-down text-gray-400 text-xs"></i>
+                      <div
+                        class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none"
+                      >
+                        <i
+                          class="fa-solid fa-chevron-down text-gray-400 text-xs"
+                        ></i>
                       </div>
                     </div>
                   } @else {
                     <strong
                       class="text-[15px] text-atu-text dark:text-[#E6EDF3] font-semibold flex items-center gap-2"
                     >
-                      <div class="w-6 h-6 rounded-md bg-gray-100 dark:bg-[#21262D] flex items-center justify-center shrink-0">
-                        <i class="fa-solid fa-building-columns text-gray-500 dark:text-[#8B949E] text-[10px]"></i>
+                      <div
+                        class="w-6 h-6 rounded-md bg-gray-100 dark:bg-[#21262D] flex items-center justify-center shrink-0"
+                      >
+                        <i
+                          class="fa-solid fa-building-columns text-gray-500 dark:text-[#8B949E] text-[10px]"
+                        ></i>
                       </div>
                       {{ cuentaAbono?.banco || '—' }}
                     </strong>
@@ -590,11 +767,18 @@ import {
                       <span
                         class="text-atu-text-3 dark:text-[#6E7681] font-semibold uppercase tracking-wider block text-[10.5px]"
                       >
-                        Código de Cuenta Interbancario (CCI) <span class="text-red-600 dark:text-red-500 ml-0.5">*</span>
+                        Código de Cuenta Interbancario (CCI)
+                        <span class="text-red-600 dark:text-red-500 ml-0.5"
+                          >*</span
+                        >
                       </span>
                       <div class="relative">
-                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                          <i class="fa-solid fa-money-check text-gray-400 text-xs"></i>
+                        <div
+                          class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+                        >
+                          <i
+                            class="fa-solid fa-money-check text-gray-400 text-xs"
+                          ></i>
                         </div>
                         <input
                           type="text"
@@ -607,7 +791,9 @@ import {
                         />
                       </div>
                       @if (editCci && editCci.length !== 20) {
-                        <p class="mt-1.5 text-[11.5px] font-semibold text-red-600 dark:text-red-400">
+                        <p
+                          class="mt-1.5 text-[11.5px] font-semibold text-red-600 dark:text-red-400"
+                        >
                           El CCI debe contener exactamente 20 dígitos.
                         </p>
                       }
@@ -615,8 +801,13 @@ import {
                   } @else {
                     <!-- OPE -->
                     <div class="space-y-1.5">
-                      <span class="text-atu-text-3 dark:text-[#6E7681] font-semibold uppercase tracking-wider block text-[10.5px]">
-                        DNI Beneficiario <span class="text-red-600 dark:text-red-500 ml-0.5">*</span>
+                      <span
+                        class="text-atu-text-3 dark:text-[#6E7681] font-semibold uppercase tracking-wider block text-[10.5px]"
+                      >
+                        DNI Beneficiario
+                        <span class="text-red-600 dark:text-red-500 ml-0.5"
+                          >*</span
+                        >
                       </span>
                       <input
                         type="text"
@@ -627,8 +818,13 @@ import {
                       />
                     </div>
                     <div class="space-y-1.5">
-                      <span class="text-atu-text-3 dark:text-[#6E7681] font-semibold uppercase tracking-wider block text-[10.5px]">
-                        Nombre Completo Beneficiario <span class="text-red-600 dark:text-red-500 ml-0.5">*</span>
+                      <span
+                        class="text-atu-text-3 dark:text-[#6E7681] font-semibold uppercase tracking-wider block text-[10.5px]"
+                      >
+                        Nombre Completo Beneficiario
+                        <span class="text-red-600 dark:text-red-500 ml-0.5"
+                          >*</span
+                        >
                       </span>
                       <input
                         type="text"
@@ -643,27 +839,37 @@ import {
                     <span
                       class="text-atu-text-3 dark:text-[#6E7681] font-semibold uppercase tracking-wider block text-[10.5px]"
                     >
-                      {{ cuentaBancariaReal?.tipoAbono === 'OPE' ? 'Beneficiario OPE' : 'Código de Cuenta Interbancario (CCI)' }}
+                      {{
+                        cuentaBancariaReal?.tipoAbono === 'OPE'
+                          ? 'Beneficiario OPE'
+                          : 'Código de Cuenta Interbancario (CCI)'
+                      }}
                     </span>
                     <strong
                       class="text-[15px] text-atu-text dark:text-[#E6EDF3] font-semibold flex items-center gap-3 font-mono tracking-[0.1em]"
                     >
-                      <i class="fa-solid" [ngClass]="cuentaBancariaReal?.tipoAbono === 'OPE' ? 'fa-user-check' : 'fa-money-check'" class="text-gray-400 dark:text-[#8B949E]"></i>
+                      <i
+                        class="fa-solid"
+                        [ngClass]="
+                          cuentaBancariaReal?.tipoAbono === 'OPE'
+                            ? 'fa-user-check'
+                            : 'fa-money-check'
+                        "
+                        class="text-gray-400 dark:text-[#8B949E]"
+                      ></i>
                       @if (cuentaBancariaReal?.tipoAbono === 'OPE') {
-                        {{ cuentaBancariaReal?.nombreBeneficiario }} (DNI: {{ cuentaBancariaReal?.dniBeneficiario }})
+                        {{ cuentaBancariaReal?.nombreBeneficiario }} (DNI:
+                        {{ cuentaBancariaReal?.dniBeneficiario }})
                       } @else {
                         {{ cuentaAbono?.codigoCuentaInterbancario || '—' }}
                       }
                     </strong>
                   </div>
                 }
-
               </div>
 
               <!-- Mensajes Informativos (Dependiendo del banco seleccionado) -->
-              @if (
-                bancoCuentaVisible === 'Banco de la Nación'
-              ) {
+              @if (bancoCuentaVisible === 'Banco de la Nación') {
                 <div
                   class="mx-5 mb-5 bg-red-50 dark:bg-red-950/20 border-l-4 border-red-500 rounded-r-xl p-4 transition-all"
                 >
@@ -682,14 +888,18 @@ import {
                     class="m-0 pl-10 text-[14px] text-red-900/80 dark:text-red-300/80 leading-relaxed"
                   >
                     Si eliges una cuenta del <b>Banco de la Nación</b>, tu
-                    subsidio <b class="text-red-700 dark:text-red-400">pierde la protección de intangibilidad</b> y
-                    podría ser objeto de <b>retención o embargo</b>. En
+                    subsidio
+                    <b class="text-red-700 dark:text-red-400"
+                      >pierde la protección de intangibilidad</b
+                    >
+                    y podría ser objeto de <b>retención o embargo</b>. En
                     cualquier otro banco el monto está protegido. Te
                     recomendamos usar una cuenta de otro banco.
                   </p>
                 </div>
               } @else if (
-                bancoCuentaVisible && bancoCuentaVisible !== 'Banco de la Nación'
+                bancoCuentaVisible &&
+                bancoCuentaVisible !== 'Banco de la Nación'
               ) {
                 <div
                   class="mx-5 mb-5 bg-green-50 dark:bg-green-950/20 border-l-4 border-green-500 rounded-r-xl p-4 transition-all"
@@ -717,11 +927,20 @@ import {
               @if (cuentaAlert) {
                 <div
                   class="mx-5 mb-5 flex items-center gap-2.5 p-3 rounded-[10px] text-[13px] font-semibold border"
-                  [ngClass]="cuentaAlert.type === 'error'
-                    ? 'bg-red-50 text-red-600 dark:bg-[rgba(239,68,68,0.1)] dark:text-red-400 border-red-100 dark:border-red-900/50'
-                    : 'bg-green-50 text-green-600 dark:bg-[rgba(34,197,94,0.1)] dark:text-green-400 border-green-100 dark:border-green-900/50'"
+                  [ngClass]="
+                    cuentaAlert.type === 'error'
+                      ? 'bg-red-50 text-red-600 dark:bg-[rgba(239,68,68,0.1)] dark:text-red-400 border-red-100 dark:border-red-900/50'
+                      : 'bg-green-50 text-green-600 dark:bg-[rgba(34,197,94,0.1)] dark:text-green-400 border-green-100 dark:border-green-900/50'
+                  "
                 >
-                  <i class="fa-solid" [ngClass]="cuentaAlert.type === 'error' ? 'fa-triangle-exclamation' : 'fa-check'"></i>
+                  <i
+                    class="fa-solid"
+                    [ngClass]="
+                      cuentaAlert.type === 'error'
+                        ? 'fa-triangle-exclamation'
+                        : 'fa-check'
+                    "
+                  ></i>
                   {{ cuentaAlert.message }}
                 </div>
               }
@@ -885,6 +1104,7 @@ export class PerfilInfoComponent implements OnInit {
   editTipoAbonoId = 1; // 1 = CCI, 2 = OPE
   editDniBeneficiario = '';
   editNombreBeneficiario = '';
+  editAttempted = false;
 
   private readonly authService = inject(AuthService);
   private readonly apiAuthService = inject(ApiAuthService);
@@ -925,7 +1145,7 @@ export class PerfilInfoComponent implements OnInit {
       },
       error: (err) => {
         console.error('Error al cargar perfil del transportista:', err);
-      }
+      },
     });
   }
 
@@ -935,43 +1155,51 @@ export class PerfilInfoComponent implements OnInit {
 
     // 1. Intentar cargar con la API real de transportista si hay ID numérico o fallback
     const transportistaId = 1; // ID técnico por defecto o asignado al usuario
-    this.apiComprobanteService.obtenerCuentaBancariaTransportista(transportistaId).subscribe({
-      next: (res) => {
-        if (res.data?.lista) {
-          this.cuentaBancariaReal = res.data.lista;
-          const bancoMatch = this.bancosList.find(b => b.uuidBanco === res.data.lista?.uuidBanco);
-          this.cuentaAbono = {
-            banco: bancoMatch?.nombre || res.data.lista.uuidBanco || 'Banco de Crédito del Perú',
-            codigoCuentaInterbancario: res.data.lista.cci || '',
-          };
-        } else {
-          this.cuentaAbono = null;
-        }
-        this.isLoadingCuentaAbono = false;
-        this.cuentaAbonoLoaded = true;
-      },
-      error: () => {
-        // Fallback al endpoint legado si falla
-        this.apiComprobanteService.obtenerCuentaAbono(ruc).subscribe({
-          next: (res) => {
-            this.cuentaAbono = res.data.lista;
-            this.isLoadingCuentaAbono = false;
-            this.cuentaAbonoLoaded = true;
-
-            if (this.usuario) {
-              this.usuario.banco = this.cuentaAbono?.banco ?? '';
-              this.usuario.cci = this.cuentaAbono?.codigoCuentaInterbancario ?? '';
-            }
-          },
-          error: (err) => {
-            this.isLoadingCuentaAbono = false;
-            this.cuentaAbonoLoaded = true;
+    this.apiComprobanteService
+      .obtenerCuentaBancariaTransportista(transportistaId)
+      .subscribe({
+        next: (res) => {
+          if (res.data?.lista) {
+            this.cuentaBancariaReal = res.data.lista;
+            const bancoMatch = this.bancosList.find(
+              (b) => b.uuidBanco === res.data.lista?.uuidBanco,
+            );
+            this.cuentaAbono = {
+              banco:
+                bancoMatch?.nombre ||
+                res.data.lista.uuidBanco ||
+                'Banco de Crédito del Perú',
+              codigoCuentaInterbancario: res.data.lista.cci || '',
+            };
+          } else {
             this.cuentaAbono = null;
-            console.error('Error al cargar la cuenta de abono:', err);
-          },
-        });
-      }
-    });
+          }
+          this.isLoadingCuentaAbono = false;
+          this.cuentaAbonoLoaded = true;
+        },
+        error: () => {
+          // Fallback al endpoint legado si falla
+          this.apiComprobanteService.obtenerCuentaAbono(ruc).subscribe({
+            next: (res) => {
+              this.cuentaAbono = res.data.lista;
+              this.isLoadingCuentaAbono = false;
+              this.cuentaAbonoLoaded = true;
+
+              if (this.usuario) {
+                this.usuario.banco = this.cuentaAbono?.banco ?? '';
+                this.usuario.cci =
+                  this.cuentaAbono?.codigoCuentaInterbancario ?? '';
+              }
+            },
+            error: (err) => {
+              this.isLoadingCuentaAbono = false;
+              this.cuentaAbonoLoaded = true;
+              this.cuentaAbono = null;
+              console.error('Error al cargar la cuenta de abono:', err);
+            },
+          });
+        },
+      });
   }
 
   get avatarLetter(): string {
@@ -991,18 +1219,125 @@ export class PerfilInfoComponent implements OnInit {
     this.editCargo = this.usuario?.cargo ?? '';
 
     // Bind contact edit fields
-    this.editContactoNombre = this.perfilTrans?.contacto?.nombresApellidos ?? '';
-    this.editContactoTipoDoc = this.perfilTrans?.contacto?.tipoDocumento ?? 'DNI';
+    this.editContactoNombre =
+      this.perfilTrans?.contacto?.nombresApellidos ?? '';
+    this.editContactoTipoDoc =
+      this.perfilTrans?.contacto?.tipoDocumento ?? 'DNI';
     this.editContactoNumDoc = this.perfilTrans?.contacto?.numeroDocumento ?? '';
     this.editContactoTelefono = this.perfilTrans?.contacto?.telefono ?? '';
 
     this.editAlert = null;
+    this.editAttempted = false;
     this.editMode = true;
   }
 
   cancelarEdicion(): void {
     this.editMode = false;
     this.editAlert = null;
+    this.editAttempted = false;
+  }
+
+  get contactoDocumentoMaxLength(): number {
+    return this.contactoDocumentoReglas.max;
+  }
+
+  get contactoDocumentoSoloNumeros(): boolean {
+    return this.editContactoTipoDoc === 'DNI';
+  }
+
+  get contactoDocumentoHint(): string {
+    switch (this.editContactoTipoDoc) {
+      case 'DNI':
+        return 'El DNI debe contener exactamente 8 dígitos.';
+      case 'CE':
+        return 'El carné debe contener entre 9 y 12 letras o números.';
+      case 'PASAPORTE':
+        return 'El pasaporte debe contener entre 6 y 12 letras o números.';
+      default:
+        return 'Seleccione el tipo de documento.';
+    }
+  }
+
+  get contactoNombreError(): string {
+    const value = this.editContactoNombre.trim();
+    if (!value)
+      return this.editAttempted ? 'El nombre del contacto es obligatorio.' : '';
+    if (value.length < 3) return 'Ingrese al menos 3 caracteres.';
+    if (!/^[\p{L}]+(?:[ '\-][\p{L}]+)*$/u.test(value)) {
+      return 'Ingrese únicamente letras, espacios, apóstrofes o guiones.';
+    }
+    return '';
+  }
+
+  get contactoTelefonoError(): string {
+    const value = this.editContactoTelefono.trim();
+    if (!value)
+      return this.editAttempted
+        ? 'El teléfono del contacto es obligatorio.'
+        : '';
+    return isValidPhone(value)
+      ? ''
+      : 'Ingrese un celular válido: 9 dígitos y debe comenzar con 9.';
+  }
+
+  get contactoDocumentoError(): string {
+    const value = this.editContactoNumDoc.trim();
+    if (!this.editContactoTipoDoc) {
+      return this.editAttempted ? 'Seleccione el tipo de documento.' : '';
+    }
+    if (!value) {
+      return this.editAttempted
+        ? 'El número de documento del contacto es obligatorio.'
+        : '';
+    }
+    return this.contactoDocumentoReglas.pattern.test(value)
+      ? ''
+      : this.contactoDocumentoHint;
+  }
+
+  onContactoNombreInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const value = input.value
+      .replace(/[^\p{L}\s'\-]/gu, '')
+      .replace(/\s{2,}/g, ' ')
+      .slice(0, 120);
+    input.value = value;
+    this.editContactoNombre = value;
+  }
+
+  onContactoTelefonoInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const value = input.value.replace(/\D/g, '').slice(0, 9);
+    input.value = value;
+    this.editContactoTelefono = value;
+  }
+
+  onContactoTipoDocumentoChange(): void {
+    this.editContactoNumDoc = '';
+  }
+
+  onContactoDocumentoInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const rules = this.contactoDocumentoReglas;
+    const rawValue = this.contactoDocumentoSoloNumeros
+      ? input.value.replace(/\D/g, '')
+      : input.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+    const value = rawValue.slice(0, rules.max);
+    input.value = value;
+    this.editContactoNumDoc = value;
+  }
+
+  private get contactoDocumentoReglas(): { max: number; pattern: RegExp } {
+    switch (this.editContactoTipoDoc) {
+      case 'DNI':
+        return { max: 8, pattern: /^\d{8}$/ };
+      case 'CE':
+        return { max: 12, pattern: /^[A-Z0-9]{9,12}$/ };
+      case 'PASAPORTE':
+        return { max: 12, pattern: /^[A-Z0-9]{6,12}$/ };
+      default:
+        return { max: 12, pattern: /$^/ };
+    }
   }
 
   onCciInput(event: Event): void {
@@ -1013,7 +1348,9 @@ export class PerfilInfoComponent implements OnInit {
   }
 
   get bancoCuentaVisible(): string {
-    return this.cuentaEditMode ? this.editBanco : (this.cuentaAbono?.banco ?? '');
+    return this.cuentaEditMode
+      ? this.editBanco
+      : (this.cuentaAbono?.banco ?? '');
   }
 
   iniciarEdicionCuenta(): void {
@@ -1021,7 +1358,8 @@ export class PerfilInfoComponent implements OnInit {
     this.editCci = this.cuentaAbono?.codigoCuentaInterbancario ?? '';
     this.editTipoAbonoId = this.cuentaBancariaReal?.tipoAbono === 'OPE' ? 2 : 1;
     this.editDniBeneficiario = this.cuentaBancariaReal?.dniBeneficiario ?? '';
-    this.editNombreBeneficiario = this.cuentaBancariaReal?.nombreBeneficiario ?? '';
+    this.editNombreBeneficiario =
+      this.cuentaBancariaReal?.nombreBeneficiario ?? '';
     this.cuentaAlert = null;
     this.cuentaEditMode = true;
   }
@@ -1040,7 +1378,9 @@ export class PerfilInfoComponent implements OnInit {
     this.editBanco = String(this.editBanco ?? '').trim();
     this.editCci = String(this.editCci ?? '').trim();
     this.editDniBeneficiario = String(this.editDniBeneficiario ?? '').trim();
-    this.editNombreBeneficiario = String(this.editNombreBeneficiario ?? '').trim();
+    this.editNombreBeneficiario = String(
+      this.editNombreBeneficiario ?? '',
+    ).trim();
     this.cuentaAlert = null;
 
     if (!this.editBanco) {
@@ -1077,7 +1417,9 @@ export class PerfilInfoComponent implements OnInit {
     }
 
     const transportistaId = 1;
-    const bancoSeleccionado = this.bancosList.find(b => b.nombre === this.editBanco || b.uuidBanco === this.editBanco);
+    const bancoSeleccionado = this.bancosList.find(
+      (b) => b.nombre === this.editBanco || b.uuidBanco === this.editBanco,
+    );
     const bancoIdTecnico = bancoSeleccionado ? 1 : 1; // Default técnico 1
 
     this.isSavingCuenta = true;
@@ -1085,13 +1427,21 @@ export class PerfilInfoComponent implements OnInit {
       bancoId: bancoIdTecnico,
       tipoAbonoId: this.editTipoAbonoId,
       cci: this.editTipoAbonoId === 1 ? this.editCci : null,
-      dniBeneficiario: this.editTipoAbonoId === 2 ? this.editDniBeneficiario : null,
-      nombreBeneficiario: this.editTipoAbonoId === 2 ? this.editNombreBeneficiario : null,
+      dniBeneficiario:
+        this.editTipoAbonoId === 2 ? this.editDniBeneficiario : null,
+      nombreBeneficiario:
+        this.editTipoAbonoId === 2 ? this.editNombreBeneficiario : null,
     };
 
     const action$ = this.cuentaBancariaReal
-      ? this.apiComprobanteService.actualizarCuentaBancariaTransportista(transportistaId, payload)
-      : this.apiComprobanteService.registrarCuentaBancariaTransportista(transportistaId, payload);
+      ? this.apiComprobanteService.actualizarCuentaBancariaTransportista(
+          transportistaId,
+          payload,
+        )
+      : this.apiComprobanteService.registrarCuentaBancariaTransportista(
+          transportistaId,
+          payload,
+        );
 
     action$.subscribe({
       next: (response) => {
@@ -1099,13 +1449,15 @@ export class PerfilInfoComponent implements OnInit {
         this.cuentaBancariaReal = response.data.lista;
         this.cuentaAbono = {
           banco: this.editBanco,
-          codigoCuentaInterbancario: this.editTipoAbonoId === 1 ? this.editCci : 'OPE - Orden de Pago',
+          codigoCuentaInterbancario:
+            this.editTipoAbonoId === 1 ? this.editCci : 'OPE - Orden de Pago',
         };
         this.cuentaAbonoLoaded = true;
         this.cuentaEditMode = false;
 
         this.cuentaAlert = {
-          message: response.data.mensaje || 'Cuenta bancaria guardada correctamente.',
+          message:
+            response.data.mensaje || 'Cuenta bancaria guardada correctamente.',
           type: 'success',
         };
         setTimeout(() => (this.cuentaAlert = null), 4000);
@@ -1124,32 +1476,30 @@ export class PerfilInfoComponent implements OnInit {
     });
   }
 
-
   guardarEdicion(): void {
     this.editAlert = null;
     if (!this.usuario) return;
+    this.editAttempted = true;
 
     // Clean inputs
     this.editEmail = String(this.editEmail ?? '').trim();
     this.editTelefono = String(this.editTelefono ?? '').trim();
     this.editCargo = String(this.editCargo ?? '').trim();
-    this.editContactoNombre = String(this.editContactoNombre ?? '').trim();
+    this.editContactoNombre = String(this.editContactoNombre ?? '')
+      .trim()
+      .replace(/\s+/g, ' ');
     this.editContactoTipoDoc = String(this.editContactoTipoDoc ?? '').trim();
     this.editContactoNumDoc = String(this.editContactoNumDoc ?? '').trim();
     this.editContactoTelefono = String(this.editContactoTelefono ?? '').trim();
 
-    // Validation for new contact edit fields
+    // Validación de los campos editables de contacto antes de invocar el API.
     if (this.editMode) {
-      if (!this.editContactoNombre) {
-        this.editAlert = { message: 'El nombre del contacto es obligatorio.', type: 'error' };
-        return;
-      }
-      if (!this.editContactoNumDoc) {
-        this.editAlert = { message: 'El número de documento del contacto es obligatorio.', type: 'error' };
-        return;
-      }
-      if (!this.editContactoTelefono) {
-        this.editAlert = { message: 'El teléfono del contacto es obligatorio.', type: 'error' };
+      const validationError =
+        this.contactoNombreError ||
+        this.contactoDocumentoError ||
+        this.contactoTelefonoError;
+      if (validationError) {
+        this.editAlert = { message: validationError, type: 'error' };
         return;
       }
     }
@@ -1158,37 +1508,41 @@ export class PerfilInfoComponent implements OnInit {
       this.isSaving = true;
       const ruc = this.perfilTrans.datosEmpresa.ruc;
 
-      this.apiComprobanteService.actualizarContacto(ruc, {
+      this.apiComprobanteService
+        .actualizarContacto(ruc, {
           nombresApellidos: this.editContactoNombre,
           tipoDocumento: this.editContactoTipoDoc,
           numeroDocumento: this.editContactoNumDoc,
           telefono: this.editContactoTelefono,
-        }).subscribe({
-        next: (contacto) => {
-          this.isSaving = false;
-          if (this.perfilTrans) {
-            this.perfilTrans.contacto = contacto.data.lista;
-          }
+        })
+        .subscribe({
+          next: (contacto) => {
+            this.isSaving = false;
+            if (this.perfilTrans) {
+              this.perfilTrans.contacto = contacto.data.lista;
+            }
 
-          this.editMode = false;
-          this.editAlert = {
-            message: contacto.data.mensaje || 'Datos de contacto actualizados correctamente.',
-            type: 'success',
-          };
-          setTimeout(() => (this.editAlert = null), 4000);
-        },
-        error: (err) => {
-          this.isSaving = false;
-          this.editAlert = {
-            message:
-              err?.error?.data?.mensaje ||
-              err?.error?.mensaje ||
-              err?.message ||
-              'Error al guardar los datos de contacto.',
-            type: 'error',
-          };
-        }
-      });
+            this.editMode = false;
+            this.editAlert = {
+              message:
+                contacto.data.mensaje ||
+                'Datos de contacto actualizados correctamente.',
+              type: 'success',
+            };
+            setTimeout(() => (this.editAlert = null), 4000);
+          },
+          error: (err) => {
+            this.isSaving = false;
+            this.editAlert = {
+              message:
+                err?.error?.data?.mensaje ||
+                err?.error?.mensaje ||
+                err?.message ||
+                'Error al guardar los datos de contacto.',
+              type: 'error',
+            };
+          },
+        });
       return;
     }
 
@@ -1203,11 +1557,11 @@ export class PerfilInfoComponent implements OnInit {
       return;
     }
 
-    // Validate phone format (exactly 9 digits)
-    const phoneRegex = /^\d{9}$/;
-    if (!this.editTelefono || !phoneRegex.test(this.editTelefono)) {
+    // Mantiene la misma regla de celular peruano usada en Datos de contacto.
+    if (!isValidPhone(this.editTelefono)) {
       this.editAlert = {
-        message: 'Por favor, ingrese un número de teléfono válido (9 dígitos).',
+        message:
+          'Por favor, ingrese un celular válido (9 dígitos y debe comenzar con 9).',
         type: 'error',
       };
       return;
@@ -1218,7 +1572,8 @@ export class PerfilInfoComponent implements OnInit {
       this.isSaving = true;
       this.apiUsuarioService
         .actualizarCorreoTelefono({
-          usuarioUuid: this.usuario.usuarioUuid || '00000000-0000-0000-0000-000000000000',
+          usuarioUuid:
+            this.usuario.usuarioUuid || '00000000-0000-0000-0000-000000000000',
           correo: this.editEmail,
           telefono: this.editTelefono,
           cargo: this.editCargo,
@@ -1231,14 +1586,24 @@ export class PerfilInfoComponent implements OnInit {
               this.usuario.telefono = this.editTelefono;
               this.usuario.cargo = this.editCargo;
             }
-            this.apiAuthService.updateSessionUser(this.editEmail, this.editTelefono, this.editCargo);
+            this.apiAuthService.updateSessionUser(
+              this.editEmail,
+              this.editTelefono,
+              this.editCargo,
+            );
             this.editMode = false;
-            this.editAlert = { message: res.mensaje || 'Perfil actualizado correctamente.', type: 'success' };
+            this.editAlert = {
+              message: res.mensaje || 'Perfil actualizado correctamente.',
+              type: 'success',
+            };
             setTimeout(() => (this.editAlert = null), 4000);
           },
           error: (err) => {
             this.isSaving = false;
-            this.editAlert = { message: err?.error?.descripcion || 'Error al guardar.', type: 'error' };
+            this.editAlert = {
+              message: err?.error?.descripcion || 'Error al guardar.',
+              type: 'error',
+            };
           },
         });
     } else {
@@ -1249,10 +1614,16 @@ export class PerfilInfoComponent implements OnInit {
       if (res.success) {
         this.usuario = this.resolveSession();
         this.editMode = false;
-        this.editAlert = { message: 'Perfil actualizado correctamente.', type: 'success' };
+        this.editAlert = {
+          message: 'Perfil actualizado correctamente.',
+          type: 'success',
+        };
         setTimeout(() => (this.editAlert = null), 4000);
       } else {
-        this.editAlert = { message: res.error ?? 'Error al guardar.', type: 'error' };
+        this.editAlert = {
+          message: res.error ?? 'Error al guardar.',
+          type: 'error',
+        };
       }
     }
   }

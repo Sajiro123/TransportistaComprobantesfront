@@ -3,8 +3,7 @@
   <div class="flex flex-wrap items-end justify-between gap-3.5 mb-4">
     <div class="min-w-0">
       <div class="flex items-center gap-2 flex-wrap mb-1">
-        <span class="text-[10.5px] font-extrabold tracking-wide text-[var(--primary-contrast)] bg-[var(--primary)] rounded-md px-2 py-0.5 uppercase">Sección 1 · Registro</span>
-        <span class="text-[10.5px] font-bold tracking-wide text-[var(--text-3)] uppercase">Hoja 2 de 2</span>
+        <span class="text-[10.5px] font-extrabold tracking-wide text-[var(--primary-contrast)] bg-[var(--primary)] rounded-md px-2 py-0.5 uppercase">Validación</span>
       </div>
       <h1 class="text-2xl font-extrabold m-0 mt-1 text-[var(--text)]">Mis vehículos</h1>
       <p class="text-[var(--text-3)] text-[13.5px] m-0 mt-1.5 max-w-[560px]">
@@ -276,7 +275,7 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
           <div>
             <label for="vehicle-plate" class="block text-[12.5px] font-bold text-[var(--text-2)] mb-1.5">Placa <span class="text-[var(--bad)]">*</span></label>
-            <input id="vehicle-plate" type="text" maxlength="7" [(ngModel)]="newVehicle.placa" (input)="onVehicleCodeInput('placa', $event)" placeholder="D5R-330" class="w-full bg-[var(--surface-2)] border rounded-xl px-3 py-2.5 text-sm text-[var(--text)] font-mono uppercase outline-none focus:border-[var(--primary)]" [style.border-color]="vehicleFormSubmitted && !isValidPlate ? 'var(--bad)' : 'var(--border)'">
+            <input id="vehicle-plate" type="text" maxlength="7" autocomplete="off" [(ngModel)]="newVehicle.placa" (input)="onVehiclePlateInput($event)" (keydown)="onVehiclePlateKeydown($event)" placeholder="D5R-330" class="w-full bg-[var(--surface-2)] border rounded-xl px-3 py-2.5 text-sm text-[var(--text)] font-mono uppercase outline-none focus:border-[var(--primary)]" [style.border-color]="vehicleFormSubmitted && !isValidPlate ? 'var(--bad)' : 'var(--border)'">
             @if (vehicleFormSubmitted && !isValidPlate) { <p class="m-0 mt-1 text-[11px] font-semibold text-[var(--bad)]">Formato requerido: ABC-123.</p> }
           </div>
           <div>
@@ -312,8 +311,12 @@
           </div>
           <div>
             <label for="owner-document-number" class="block text-[12.5px] font-bold text-[var(--text-2)] mb-1.5">Número de documento <span class="text-[var(--bad)]">*</span></label>
-            <input id="owner-document-number" type="text" inputmode="numeric" [(ngModel)]="newVehicle.propietarioNumeroDocumento" (input)="onOwnerDocumentInput($event)" placeholder="20512345678" class="w-full bg-[var(--surface-2)] border border-[var(--border)] rounded-xl px-3 py-2.5 text-sm text-[var(--text)] font-mono outline-none focus:border-[var(--primary)]">
-            @if (vehicleFormSubmitted && !isValidOwnerDocument) { <p class="m-0 mt-1 text-[11px] font-semibold text-[var(--bad)]">Ingrese un documento válido para el tipo seleccionado.</p> }
+            <input id="owner-document-number" type="text" [attr.inputmode]="ownerDocumentInputMode" [attr.maxlength]="ownerDocumentMaxLength" [(ngModel)]="newVehicle.propietarioNumeroDocumento" (input)="onOwnerDocumentInput($event)" [placeholder]="ownerDocumentPlaceholder" class="w-full bg-[var(--surface-2)] border rounded-xl px-3 py-2.5 text-sm text-[var(--text)] font-mono uppercase outline-none focus:border-[var(--primary)]" [style.border-color]="vehicleFormSubmitted && !isValidOwnerDocument ? 'var(--bad)' : 'var(--border)'">
+            @if (vehicleFormSubmitted && !isValidOwnerDocument) {
+              <p class="m-0 mt-1 text-[11px] font-semibold text-[var(--bad)]">{{ ownerDocumentHint }}</p>
+            } @else {
+              <p class="m-0 mt-1 text-[10.5px] text-[var(--text-3)]">{{ ownerDocumentHint }}</p>
+            }
           </div>
           <div class="sm:col-span-2">
             <label for="owner-name" class="block text-[12.5px] font-bold text-[var(--text-2)] mb-1.5">Nombre o razón social</label>
@@ -321,7 +324,7 @@
           </div>
         </div>
 
-        <div class="mt-5 bg-[var(--surface-2)] border border-[var(--border)] rounded-xl py-3 px-4 text-[12px] text-[var(--text-3)] leading-relaxed">
+        <div class="mt-5 bg-[var(--surface-2)] dark:bg-[#16242F] border border-[var(--border-strong)] dark:border-[#3B5264] rounded-xl py-3 px-4 text-[12px] font-semibold text-[var(--text-2)] dark:text-[#C9D1D9] leading-relaxed">
           Los conductores y sus licencias se registran posteriormente en el comprobante correspondiente.
         </div>
       </div>
@@ -359,7 +362,9 @@
         </div>
         <h2 id="delete-vehicle-title" class="m-0 text-xl font-extrabold text-[var(--text)]">Eliminar vehículo</h2>
         <p class="m-0 mt-2 text-[13.5px] leading-relaxed text-[var(--text-3)]">
-          ¿Deseas eliminar el vehículo <strong class="text-[var(--text)] font-mono">{{ vehiclePendingDelete.placa }}</strong>? Esta acción no se puede deshacer.
+          ¿Estás seguro de que deseas eliminar el registro del vehículo
+          <strong class="text-[var(--text)] font-mono">{{ vehiclePendingDelete.placa }}</strong>?
+          Esta acción no se puede deshacer.
         </p>
 
         @if (deleteVehicleError) {

@@ -1,0 +1,12 @@
+.atu-sidebar__footer--collapsed {
+  padding-inline: 0.625rem;
+
+  .atu-nav-item {
+    justify-content: center;
+    padding-inline: 0;
+  }
+
+  .atu-nav-item__label {
+    display: none;
+  }
+}

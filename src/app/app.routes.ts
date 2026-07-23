@@ -22,12 +22,18 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./pages/perfil/perfil-info.component').then(m => m.PerfilInfoComponent),
       },
-      // Registro
+      // Validación
       {
-        path: 'registro/verificacion',
+        path: 'validacion/verificacion',
         loadComponent: () =>
           import('./pages/registro/verificacion/verificacion.component').then(m => m.VerificacionComponent),
       },
+      {
+        path: 'validacion/vehiculos',
+        loadComponent: () =>
+          import('./pages/registro/verificacion/vehiculo-carga/vehiculo-carga.component').then(m => m.VehiculoCargaComponent),
+      },
+      { path: 'registro/verificacion', redirectTo: 'validacion/verificacion', pathMatch: 'full' },
       // Carga y cálculo
       {
         path: 'carga-calculo/comprobantes',

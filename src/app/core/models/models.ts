@@ -202,11 +202,7 @@ export interface CuentaBancariaTransportistaResponse {
   };
 }
 
-
-export type EstadoValidacionVehiculo =
-  | 'VALIDADO'
-  | 'EN_REVISION'
-  | 'RECHAZADO';
+export type EstadoValidacionVehiculo = 'VALIDADO' | 'EN_REVISION' | 'RECHAZADO';
 
 export interface PropietarioVehiculo {
   tipoDocumento: string;

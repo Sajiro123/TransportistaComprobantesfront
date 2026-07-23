@@ -1,74 +1,37 @@
 <div class="verificacion-page">
 
-  <!-- ══ STEPPER CUSTOM ════════════════════════════════════════ -->
-  <div
-    class="flex items-center gap-0 bg-[var(--surface)] border border-[var(--border)] rounded-2xl px-5 py-3 mb-5 shadow-sm">
-    @for (step of steps; track step.label; let i = $index; let last = $last) {
-
-    <!-- Paso -->
-    <div class="flex items-center gap-2 flex-none cursor-default select-none" [class.opacity-40]="i > activeIndex">
-
-      <!-- Círculo de estado -->
-      <div
-        class="relative flex items-center justify-center w-7 h-7 rounded-full text-[11px] font-bold transition-all duration-300"
-        [ngClass]="{
-               'bg-[var(--primary)] text-white shadow-[0_0_12px_rgba(0,163,224,0.35)]': i === activeIndex,
-               'bg-[var(--ok)] text-white': i < activeIndex,
-               'bg-[var(--surface-3)] text-[var(--text-3)]': i > activeIndex
-             }">
-        @if (i < activeIndex) { <i class="fa-solid fa-check text-[10px]"></i>
-          } @else {
-          <i [class]="step.icon + ' text-[11px]'"></i>
-          }
-      </div>
-
-      <!-- Label & Subtitle -->
-      <div class="flex flex-col gap-0.5 justify-center">
-        <span class="text-[12.5px] font-bold leading-tight transition-colors duration-300" [ngClass]="{
-                  'text-[var(--primary)]': i === activeIndex,
-                  'text-[var(--ok)]': i < activeIndex,
-                  'text-[var(--text-3)]': i > activeIndex
-                }">
-          {{ step.label }}
-        </span>
-        @if (step.subtitle) {
-        <span class="text-[9.5px] font-semibold uppercase tracking-wider text-[var(--text-3)] opacity-70 leading-none">
-          {{ step.subtitle }}
-        </span>
-        }
-      </div>
-    </div>
-
-    <!-- Línea separadora (no en el último) -->
-    @if (!last) {
-    <div class="flex-1 mx-3 h-px relative overflow-hidden rounded-full bg-[var(--border)]">
-      <div class="absolute inset-y-0 left-0 bg-[var(--ok)] transition-all duration-500 rounded-full"
-        [style.width]="i < activeIndex ? '100%' : '0%'"></div>
-    </div>
-    }
-
-    }
-  </div>
-
-  <!-- ══ PASO 1: VERIFICACIÓN ══════════════════════════════════ -->
-  @if (activeIndex === 0) {
   <div class="step-content" style="animation:atu-fade .3s ease both">
+
+    <div class="mb-[18px] grid gap-3 md:grid-cols-2">
+      <div class="flex items-center gap-2.5 rounded-xl border border-[var(--warn)] bg-[var(--warn-bg)] px-3.5 py-2.5">
+        <i class="fa-regular fa-clock text-[var(--warn)]" aria-hidden="true"></i>
+        <span class="text-[13px] font-semibold text-[var(--warn)]">Plazo de compra: 29/05/2026 – 28/07/2026</span>
+        <span
+          class="ml-auto whitespace-nowrap rounded-full bg-[var(--warn)] px-2.5 py-0.5 text-xs font-bold text-white">7
+          días</span>
+      </div>
+      <div
+        class="flex items-center gap-2.5 rounded-xl border border-[var(--primary)] bg-[var(--primary-soft)] px-3.5 py-2.5">
+        <i class="fa-solid fa-circle-info text-[var(--primary)]" aria-hidden="true"></i>
+        <span class="text-[12.5px] font-medium leading-snug text-[var(--primary)]">El beneficiario es el
+          <strong>transportista titular de la autorización</strong>, no el dueño del vehículo.</span>
+      </div>
+    </div>
 
     <!-- Encabezado ─────────────────────────────────────────── -->
     <div class="section-header">
       <div class="section-badges">
-        <span class="badge-primary">Sección 1 · Registro</span>
+        <span class="badge-primary">Sección 1 · Verificación</span>
         <span class="badge-muted">Hoja 1 de 2</span>
       </div>
       <h1 class="section-title">Verificación del transportista</h1>
       <p class="section-subtitle">Datos de los registros oficiales. Revísalos; no son editables.</p>
     </div>
 
-    <!-- Grid 2 columnas: Datos del transportista | Autorizaciones -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+    <div class="verification-stack">
 
       <!-- Tarjeta: Datos del transportista ─────────────────── -->
-      <div class="data-card !mb-0">
+      <div class="data-card">
         <div class="data-card__header data-card__header--flex">
           <span>Datos del transportista</span>
           <span class="badge-count">{{ usandoMocks ? 'Datos mockup' : 'API conectada' }}</span>
@@ -102,10 +65,30 @@
           </ng-template>
         </p-table>
         }
+
+        <div class="refresh-footer" [class.refresh-footer--exhausted]="actualizacionesDatosRestantes === 0">
+          @if (actualizacionesDatosRestantes === 0) {
+          <span>Agotaste tus 5 actualizaciones de hoy</span>
+          } @else {
+          <span>Te quedan {{ actualizacionesDatosRestantes }} de 5 actualizaciones hoy</span>
+          }
+          <button type="button" class="refresh-button" [disabled]="cargandoDatos || actualizacionesDatosRestantes === 0"
+            (click)="actualizarSeccion('datos')">
+            <i class="fa-solid fa-rotate-right" [class.fa-spin]="cargandoDatos"></i>
+            Actualizar datos
+          </button>
+        </div>
+
+        @if (actualizacionesDatosRestantes === 0) {
+        <div class="exhausted-message">
+          <strong>Sin actualizaciones disponibles hoy.</strong>
+          Verifica ante SUNAT que tu RUC esté ACTIVO y HABIDO; el sistema reintentará con los datos oficiales al corte.
+        </div>
+        }
       </div>
 
       <!-- Tarjeta: Autorizaciones ───────────────────────────── -->
-      <div class="data-card !mb-0">
+      <div class="data-card !mb-[14px]">
         <div class="data-card__header data-card__header--flex">
           <span>Autorizaciones del transportista</span>
           <span class="badge-count">{{ autCount }} autorizaciones</span>
@@ -133,6 +116,29 @@
           </ng-template>
         </p-table>
 
+        <div class="refresh-footer refresh-footer--plain"
+          [class.refresh-footer--exhausted]="actualizacionesAutorizacionesRestantes === 0">
+          @if (actualizacionesAutorizacionesRestantes === 0) {
+          <span>Agotaste tus 5 actualizaciones de hoy</span>
+          } @else {
+          <span>Te quedan {{ actualizacionesAutorizacionesRestantes }} de 5 actualizaciones hoy</span>
+          }
+          <button type="button" class="refresh-button"
+            [disabled]="cargandoDatos || actualizacionesAutorizacionesRestantes === 0"
+            (click)="actualizarSeccion('autorizaciones')">
+            <i class="fa-solid fa-rotate-right" [class.fa-spin]="cargandoDatos"></i>
+            Actualizar datos
+          </button>
+        </div>
+
+        @if (actualizacionesAutorizacionesRestantes === 0) {
+        <div class="exhausted-message">
+          <strong>Sin actualizaciones disponibles hoy.</strong>
+          Comunícate con la entidad que otorgó tu autorización (MTC, Gobierno Regional o Municipalidad Provincial)
+          para que cargue las autorizaciones habilitadas de tu servicio de transporte en su sistema.
+        </div>
+        }
+
         <div class="data-card__footer-info">
           ⓘ El subsidio aplica a los vehículos habilitados bajo <strong>cualquiera</strong>
           de tus autorizaciones vigentes. Si una autorización no está vigente, sus
@@ -140,6 +146,32 @@
         </div>
       </div>
 
+    </div>
+
+    <div class="data-card vehicles-source-card">
+      <div class="vehicles-source-card__header">
+        <span>Vehículos habilitados · fuente MTC</span>
+        @if (actualizacionesVehiculosRestantes > 0) {
+        <div class="vehicles-source-card__actions">
+          <span>Te quedan {{ actualizacionesVehiculosRestantes }} de 5 actualizaciones hoy</span>
+          <button type="button" class="refresh-button"
+            [disabled]="cargandoDatos || actualizacionesVehiculosRestantes === 0"
+            (click)="actualizarSeccion('vehiculos')">
+            <i class="fa-solid fa-rotate-right" [class.fa-spin]="cargandoDatos"></i>
+            Actualizar datos
+          </button>
+        </div>
+        }
+      </div>
+      @if (actualizacionesVehiculosRestantes === 0) {
+      <div class="refresh-footer refresh-footer--plain refresh-footer--exhausted">
+        <span>Agotaste tus 5 actualizaciones de hoy</span>
+        <button type="button" class="refresh-button" disabled>
+          <i class="fa-solid fa-rotate-right"></i>
+          Actualizar datos
+        </button>
+      </div>
+      }
     </div>
 
     <!-- Semáforo de condiciones ──────────────────────────── -->
@@ -178,25 +210,7 @@
     </div>
     }
 
-    <!-- Botón Siguiente ─────────────────────────────────── -->
-    @if (!sinAutVigente && !cargandoDatos && !errorDatos) {
-    <div class="step-actions step-actions--end">
-
-    </div>
-    }
 
   </div>
-  }
-
-  <!-- ══ PASO 2: VEHÍCULOS ══════════════════════════════════════ -->
-  @if (activeIndex === 1) {
-  <div class="step-content" style="animation:atu-fade .3s ease both">
-    <app-vehiculo-carga />
-
-    <div class="step-actions step-actions--start">
-
-    </div>
-  </div>
-  }
 
 </div>

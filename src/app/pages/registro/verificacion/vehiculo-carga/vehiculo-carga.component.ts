@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
 import { FormsModule } from '@angular/forms';
+import { isValidRuc } from '../../../../core/utils/validators';
 import { ApiVehiculoService } from '@core/services/api-vehiculo.service';
 import { ApiAuthService } from '@core/services/api-auth.service';
 import { AuthService } from '@core/services/auth.service';
@@ -37,7 +38,10 @@ export interface Vehiculo {
   detailError?: string;
 }
 
-interface VehicleFormModel extends Omit<RegistrarVehiculoRequest, 'topeGalones'> {
+interface VehicleFormModel extends Omit<
+  RegistrarVehiculoRequest,
+  'topeGalones'
+> {
   topeGalones: number | null;
 }
 
@@ -46,7 +50,7 @@ interface VehicleFormModel extends Omit<RegistrarVehiculoRequest, 'topeGalones'>
   standalone: true,
   imports: [CommonModule, TableModule, TagModule, FormsModule],
   templateUrl: './vehiculo-carga.component.html',
-  styleUrl: './vehiculo-carga.component.scss'
+  styleUrl: './vehiculo-carga.component.scss',
 })
 export class VehiculoCargaComponent implements OnInit, OnDestroy {
   vehCount = 0;
@@ -126,30 +130,32 @@ export class VehiculoCargaComponent implements OnInit, OnDestroy {
 
     this.isLoading = true;
     this.loadError = '';
-    this.apiVehiculoService.listarVehiculos({
-      ruc,
-      busqueda: this.vehQ.trim() || undefined,
-      categoria: this.vehCatF || undefined,
-      estado: this.vehValF,
-    }).subscribe({
-      next: (response) => {
-        this.vehiclesView = response.data.lista.map((vehiculo) =>
-          this.toViewModel(vehiculo),
-        );
-        this.vehCount = this.vehiclesView.length;
-        this.isLoading = false;
-      },
-      error: (error) => {
-        this.vehiclesView = [];
-        this.vehCount = 0;
-        this.isLoading = false;
-        this.loadError =
-          error?.error?.data?.mensaje ||
-          error?.error?.mensaje ||
-          error?.message ||
-          'No fue posible cargar los vehículos.';
-      },
-    });
+    this.apiVehiculoService
+      .listarVehiculos({
+        ruc,
+        busqueda: this.vehQ.trim() || undefined,
+        categoria: this.vehCatF || undefined,
+        estado: this.vehValF,
+      })
+      .subscribe({
+        next: (response) => {
+          this.vehiclesView = response.data.lista.map((vehiculo) =>
+            this.toViewModel(vehiculo),
+          );
+          this.vehCount = this.vehiclesView.length;
+          this.isLoading = false;
+        },
+        error: (error) => {
+          this.vehiclesView = [];
+          this.vehCount = 0;
+          this.isLoading = false;
+          this.loadError =
+            error?.error?.data?.mensaje ||
+            error?.error?.mensaje ||
+            error?.message ||
+            'No fue posible cargar los vehículos.';
+        },
+      });
   }
 
   private toViewModel(vehiculo: VehiculoTransportista): Vehiculo {
@@ -192,12 +198,27 @@ export class VehiculoCargaComponent implements OnInit, OnDestroy {
 
   private validationStyle(estado: EstadoValidacionVehiculo) {
     if (estado === 'VALIDADO') {
-      return { bg: 'var(--ok-bg)', fg: 'var(--ok)', glyph: '✓', label: 'Validado' };
+      return {
+        bg: 'var(--ok-bg)',
+        fg: 'var(--ok)',
+        glyph: '✓',
+        label: 'Validado',
+      };
     }
     if (estado === 'RECHAZADO') {
-      return { bg: 'var(--bad-bg)', fg: 'var(--bad)', glyph: '×', label: 'Rechazado' };
+      return {
+        bg: 'var(--bad-bg)',
+        fg: 'var(--bad)',
+        glyph: '×',
+        label: 'Rechazado',
+      };
     }
-    return { bg: 'var(--warn-bg)', fg: 'var(--warn)', glyph: '!', label: 'En revisión' };
+    return {
+      bg: 'var(--warn-bg)',
+      fg: 'var(--warn)',
+      glyph: '!',
+      label: 'En revisión',
+    };
   }
 
   private validationFieldLabel(campo: string): string {
@@ -223,7 +244,7 @@ export class VehiculoCargaComponent implements OnInit, OnDestroy {
   openVedit(vehicle: Vehiculo): void {
     this.editingVehicleId = vehicle.id;
     this.newVehicle = {
-      placa: vehicle.placa,
+      placa: this.formatPlate(vehicle.placa),
       categoria: vehicle.categoria,
       topeGalones: Number(vehicle.topeFmt),
       numeroAutorizacion: vehicle.nHab,
@@ -244,24 +265,86 @@ export class VehiculoCargaComponent implements OnInit, OnDestroy {
     this.vehicleFormError = '';
   }
 
-  onVehicleCodeInput(
-    field: 'placa' | 'numeroAutorizacion' | 'tuc',
-    event: Event,
-  ): void {
+  onVehicleCodeInput(field: 'numeroAutorizacion' | 'tuc', event: Event): void {
     const input = event.target as HTMLInputElement;
     const value = input.value.toUpperCase().replace(/[^A-Z0-9-]/g, '');
     input.value = value;
     this.newVehicle[field] = value;
   }
 
+  onVehiclePlateInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const value = this.formatPlate(input.value);
+    input.value = value;
+    this.newVehicle.placa = value;
+  }
+
+  onVehiclePlateKeydown(event: KeyboardEvent): void {
+    const input = event.target as HTMLInputElement;
+    const cursorAtMask = input.selectionStart === 4 && input.selectionEnd === 4;
+    if (
+      event.key !== 'Backspace' ||
+      !cursorAtMask ||
+      !/^[A-Z0-9]{3}-/.test(input.value)
+    )
+      return;
+
+    event.preventDefault();
+    const value = input.value.slice(0, 2);
+    input.value = value;
+    this.newVehicle.placa = value;
+  }
+
+  private formatPlate(value: string): string {
+    const rawValue = String(value ?? '')
+      .toUpperCase()
+      .replace(/[^A-Z0-9]/g, '')
+      .slice(0, 6);
+    return rawValue.length >= 3
+      ? `${rawValue.slice(0, 3)}-${rawValue.slice(3)}`
+      : rawValue;
+  }
+
   onOwnerDocumentInput(event: Event): void {
     const input = event.target as HTMLInputElement;
     const documentType = this.newVehicle.propietarioTipoDocumento;
-    const value = documentType === 'CE'
-      ? input.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 12)
-      : input.value.replace(/\D/g, '').slice(0, documentType === 'DNI' ? 8 : 11);
+    const value =
+      documentType === 'CE'
+        ? input.value
+            .toUpperCase()
+            .replace(/[^A-Z0-9]/g, '')
+            .slice(0, 12)
+        : input.value
+            .replace(/\D/g, '')
+            .slice(0, documentType === 'DNI' ? 8 : 11);
     input.value = value;
     this.newVehicle.propietarioNumeroDocumento = value;
+  }
+
+  get ownerDocumentMaxLength(): number {
+    if (this.newVehicle.propietarioTipoDocumento === 'DNI') return 8;
+    if (this.newVehicle.propietarioTipoDocumento === 'CE') return 12;
+    return 11;
+  }
+
+  get ownerDocumentInputMode(): 'numeric' | 'text' {
+    return this.newVehicle.propietarioTipoDocumento === 'CE'
+      ? 'text'
+      : 'numeric';
+  }
+
+  get ownerDocumentPlaceholder(): string {
+    if (this.newVehicle.propietarioTipoDocumento === 'DNI') return '12345678';
+    if (this.newVehicle.propietarioTipoDocumento === 'CE') return 'ABC123456';
+    return '20512345678';
+  }
+
+  get ownerDocumentHint(): string {
+    if (this.newVehicle.propietarioTipoDocumento === 'DNI')
+      return 'El DNI debe contener exactamente 8 dígitos.';
+    if (this.newVehicle.propietarioTipoDocumento === 'CE')
+      return 'El carné debe contener entre 9 y 12 letras o números.';
+    return 'El RUC debe contener 11 dígitos e iniciar con 10, 15, 17 o 20.';
   }
 
   onOwnerDocumentTypeChange(): void {
@@ -274,20 +357,27 @@ export class VehiculoCargaComponent implements OnInit, OnDestroy {
     if (!this.isVehicleFormValid) return;
 
     const payload: RegistrarVehiculoRequest = {
-      placa: this.newVehicle.placa.trim().toUpperCase(),
+      placa: this.formatPlate(this.newVehicle.placa),
       categoria: this.newVehicle.categoria,
       topeGalones: Number(this.newVehicle.topeGalones),
-      numeroAutorizacion: this.newVehicle.numeroAutorizacion.trim().toUpperCase(),
+      numeroAutorizacion: this.newVehicle.numeroAutorizacion
+        .trim()
+        .toUpperCase(),
       tuc: this.newVehicle.tuc.trim().toUpperCase(),
       propietarioTipoDocumento: this.newVehicle.propietarioTipoDocumento,
-      propietarioNumeroDocumento: this.newVehicle.propietarioNumeroDocumento.trim(),
+      propietarioNumeroDocumento:
+        this.newVehicle.propietarioNumeroDocumento.trim(),
       propietarioNombre: this.newVehicle.propietarioNombre?.trim() || undefined,
     };
 
     this.isCreatingVehicle = true;
-    const request$ = this.editingVehicleId === null
-      ? this.apiVehiculoService.registrarVehiculo(payload)
-      : this.apiVehiculoService.actualizarVehiculo(this.editingVehicleId, payload);
+    const request$ =
+      this.editingVehicleId === null
+        ? this.apiVehiculoService.registrarVehiculo(payload)
+        : this.apiVehiculoService.actualizarVehiculo(
+            this.editingVehicleId,
+            payload,
+          );
 
     request$.subscribe({
       next: (response) => {
@@ -326,8 +416,10 @@ export class VehiculoCargaComponent implements OnInit, OnDestroy {
   }
 
   get isValidGallons(): boolean {
-    return this.newVehicle.topeGalones !== null &&
-      Number(this.newVehicle.topeGalones) > 0;
+    return (
+      this.newVehicle.topeGalones !== null &&
+      Number(this.newVehicle.topeGalones) > 0
+    );
   }
 
   openDeleteConfirmation(vehicle: Vehiculo): void {
@@ -346,24 +438,26 @@ export class VehiculoCargaComponent implements OnInit, OnDestroy {
 
     this.isDeletingVehicle = true;
     this.deleteVehicleError = '';
-    this.apiVehiculoService.eliminarVehiculo(this.vehiclePendingDelete.id).subscribe({
-      next: (response) => {
-        this.isDeletingVehicle = false;
-        this.vehiclePendingDelete = null;
-        this.actionMessage = response.data.mensaje;
-        this.cargarVehiculos();
-        setTimeout(() => (this.actionMessage = ''), 4500);
-      },
-      error: (error) => {
-        this.isDeletingVehicle = false;
-        this.deleteVehicleError =
-          error?.error?.data?.lista?.descripcion ||
-          error?.error?.data?.mensaje ||
-          error?.error?.mensaje ||
-          error?.message ||
-          'No fue posible eliminar el vehículo.';
-      },
-    });
+    this.apiVehiculoService
+      .eliminarVehiculo(this.vehiclePendingDelete.id)
+      .subscribe({
+        next: (response) => {
+          this.isDeletingVehicle = false;
+          this.vehiclePendingDelete = null;
+          this.actionMessage = response.data.mensaje;
+          this.cargarVehiculos();
+          setTimeout(() => (this.actionMessage = ''), 4500);
+        },
+        error: (error) => {
+          this.isDeletingVehicle = false;
+          this.deleteVehicleError =
+            error?.error?.data?.lista?.descripcion ||
+            error?.error?.data?.mensaje ||
+            error?.error?.mensaje ||
+            error?.message ||
+            'No fue posible eliminar el vehículo.';
+        },
+      });
   }
 
   get isValidPlate(): boolean {
@@ -380,9 +474,11 @@ export class VehiculoCargaComponent implements OnInit, OnDestroy {
 
   get isValidOwnerDocument(): boolean {
     const value = this.newVehicle.propietarioNumeroDocumento;
-    if (this.newVehicle.propietarioTipoDocumento === 'DNI') return /^\d{8}$/.test(value);
-    if (this.newVehicle.propietarioTipoDocumento === 'CE') return /^[A-Z0-9]{9,12}$/.test(value);
-    return /^\d{11}$/.test(value);
+    if (this.newVehicle.propietarioTipoDocumento === 'DNI')
+      return /^\d{8}$/.test(value);
+    if (this.newVehicle.propietarioTipoDocumento === 'CE')
+      return /^[A-Z0-9]{9,12}$/.test(value);
+    return isValidRuc(value);
   }
 
   private emptyVehicleForm(): VehicleFormModel {
@@ -404,7 +500,7 @@ export class VehiculoCargaComponent implements OnInit, OnDestroy {
   closeValidationInfo(): void {
     this.showValidationInfoModal = false;
   }
-  
+
   toggleRow(veh: Vehiculo): void {
     if (veh.expanded) {
       veh.expanded = false;

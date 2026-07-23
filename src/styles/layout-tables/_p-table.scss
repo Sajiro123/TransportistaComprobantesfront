@@ -113,7 +113,7 @@ $texto_table_td: 'Plus Jakarta Sans', system-ui, sans-serif;
       /* Padding reducido para filas más estrechas */
       border: none;
       border-right: 1px solid variables.$surface-3;
-      border-bottom: 1px solid variables.$border;
+      border-bottom: 1px solid variables.$border-strong;
       vertical-align: middle;
 
       &:last-child {
@@ -162,26 +162,36 @@ $texto_table_td: 'Plus Jakarta Sans', system-ui, sans-serif;
     }
 
     .p-paginator-rpp-dropdown {
-      height: 28px;
-      font-size: 12px;
-      border-radius: 6px;
+      min-width: 64px;
+      height: 30px;
+      border-radius: 7px;
       border: 1px solid variables.$border;
-      background: #f8fafc;
-      color: rgb(255, 255, 255) !important;
-      text-align: center !important;
+      background: variables.$surface;
+      color: variables.$text-2;
+      overflow: hidden;
 
-      span {
-        color: black !important;
-        text-align: center !important;
+      .p-select-label {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 28px;
+        padding: 0 7px;
+        color: variables.$text-2;
+        font-family: $texto_table_td;
+        font-size: 12px;
+        font-weight: 700;
+        line-height: 1;
       }
 
-      li {
-        background-color: white !important;
+      .p-select-dropdown {
+        width: 26px;
+        color: variables.$text-3;
+        border-left: 1px solid variables.$border;
       }
 
-      .p-dropdown-label {
-        padding: 4px 6px;
-        background-color: wheat;
+      .p-select-dropdown-icon {
+        width: 10px;
+        height: 10px;
       }
     }
   }
@@ -511,16 +521,13 @@ html.dark {
         border-color: #30363D;
         color: #C9D1D9 !important;
 
-        span {
+        .p-select-label {
           color: #C9D1D9 !important;
         }
 
-        li {
-          background-color: #161B22 !important;
-        }
-
-        .p-dropdown-label {
-          background-color: #21262D;
+        .p-select-dropdown {
+          color: #8B949E;
+          border-left-color: #30363D;
         }
       }
     }

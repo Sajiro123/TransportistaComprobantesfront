@@ -7,47 +7,13 @@
 <div class="flex min-h-screen bg-[#EEF2F6] dark:bg-[#0D1117]">
 
   <!-- ══ SIDEBAR ══════════════════════════════════════════════ -->
-  <aside class="atu-sidebar" [class.atu-sidebar--open]="sidebarOpen">
+  <aside class="atu-sidebar" [class.atu-sidebar--open]="sidebarOpen" [class.atu-sidebar--collapsed]="!sidebarOpen">
 
     <!-- ── Cabecera del sidebar ─────────────────────────────── -->
-    <div class="border-b border-white/10 bg-black/[.10]">
+    <div class="atu-sidebar__header border-b border-white/10 bg-black/[.10]">
 
-      <!-- Fila 1: Logo + botones de acción -->
-      <div class="flex items-center gap-2 px-4 pt-4 pb-2">
-
-        <!-- Logo ATU — horizontal, ocupa todo el espacio disponible -->
-        <div class="flex-1 min-w-0 flex items-center">
-          <img src="images/logo-atu-blanco.png" alt=" ATU — Autoridad de Transporte Urbano" class="h-8 w-auto object-contain object-left select-none
-                   drop-shadow-[0_1px_4px_rgba(0,163,224,0.3)]" draggable="false" />
-        </div>
-
-        <!-- Botón Toggle Tema (sol / luna) -->
-        <button id="sidebar-theme-toggle" class="flex-none w-7 h-7 rounded-lg border border-white/15
-                 bg-transparent text-white/60 cursor-pointer
-                 flex items-center justify-center relative overflow-hidden
-                 hover:bg-white/10 hover:text-white hover:border-white/30
-                 transition-all duration-200" (click)="toggleTheme()"
-          [title]="isDark ? 'Activar modo claro' : 'Activar modo oscuro'" aria-label="Cambiar tema">
-          <!-- Sol -->
-          <svg class="absolute transition-all duration-300" [class.opacity-0]="isDark" [class.rotate-90]="isDark"
-            [class.scale-50]="isDark" [class.opacity-100]="!isDark" [class.rotate-0]="!isDark"
-            [class.scale-100]="!isDark" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-            stroke-width="2" stroke-linecap="round">
-            <circle cx="12" cy="12" r="5" />
-            <path
-              d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" />
-          </svg>
-          <!-- Luna -->
-          <svg class="absolute transition-all duration-300" [class.opacity-0]="!isDark" [class.-rotate-90]="!isDark"
-            [class.scale-50]="!isDark" [class.opacity-100]="isDark" [class.rotate-0]="isDark" [class.scale-100]="isDark"
-            width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-            stroke-linecap="round">
-            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
-          </svg>
-        </button>
-
-        <!-- Botón cerrar (solo móvil) -->
-        <button class="atu-sidebar__close-btn flex-none w-7 h-7 rounded-lg border border-white/15
+      <div class="relative flex flex-col items-center px-5 pb-4 pt-5 text-center">
+        <button class="atu-sidebar__close-btn absolute right-3 top-3 w-7 h-7 rounded-lg border border-white/15
                  bg-transparent text-white/60 cursor-pointer
                  flex items-center justify-center
                  hover:bg-white/10 hover:text-white hover:border-white/30
@@ -57,12 +23,12 @@
             <path d="M18 6 6 18M6 6l12 12" />
           </svg>
         </button>
-      </div>
 
-      <!-- Fila 2: Nombre del sistema -->
-      <div class="px-4 pb-3 pt-0.5">
-        <!-- Separador sutil -->
-        <div class="h-px bg-white/[.07] mb-2.5"></div>
+        <img src="images/logo-atu-blanco.png" alt="ATU — Autoridad de Transporte Urbano"
+          class="h-11 w-auto max-w-full object-contain select-none drop-shadow-[0_2px_8px_rgba(0,163,224,0.28)]"
+          draggable="false" />
+
+        <div class="my-3 h-px w-full bg-white/[.10]"></div>
         <div class="text-[12px] font-bold text-white/90 tracking-[0.3px] leading-tight">
           Padrón de Transporte
         </div>
@@ -76,10 +42,10 @@
 
 
     <!-- ── Navegación principal ─────────────────────────────── -->
-    <app-sidebar-nav></app-sidebar-nav>
+    <app-sidebar-nav [collapsed]="!sidebarOpen" (navigate)="closeSidebar()"></app-sidebar-nav>
 
     <!-- ── Footer del sidebar ───────────────────────────────── -->
-    <app-sidebar-footer (abrirPerfil)="abrirPerfil()" (logout)="onLogout()">
+    <app-sidebar-footer [collapsed]="!sidebarOpen" (abrirPerfil)="abrirPerfil()" (logout)="onLogout()">
     </app-sidebar-footer>
   </aside>
 
