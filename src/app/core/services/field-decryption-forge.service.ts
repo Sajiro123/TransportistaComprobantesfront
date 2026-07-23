@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import * as forge from 'node-forge';
-import { environment } from '../../../environments/environment';
+import { environment } from '@env/environment';
 import { ENCRYPTED_LOGIN_FIELDS, LoginData } from '../models/api.models';
 
 const VERSION = 1;

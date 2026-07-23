@@ -519,9 +519,10 @@
           }
         </div>
 
-        <button (click)="onRecovery()"
-          style="width:100%; background:var(--primary); color:var(--primary-contrast); border:none; border-radius:10px; padding:14px; font-size:15px; font-weight:700; cursor:pointer; box-shadow:0 8px 20px rgba(14,90,138,.28)">
-          Enviar código de recuperación
+        <button (click)="onRecovery()" [disabled]="recoverySendingOtp"
+          style="width:100%; background:var(--primary); color:var(--primary-contrast); border:none; border-radius:10px; padding:14px; font-size:15px; font-weight:700; cursor:pointer; box-shadow:0 8px 20px rgba(14,90,138,.28)"
+          [style.opacity]="recoverySendingOtp ? '0.7' : '1'">
+          {{ recoverySendingOtp ? 'Enviando...' : 'Enviar código de recuperación' }}
         </button>
         } @else if (recoveryStage === 'code') {
         <div class="recovery-code-view">
@@ -535,7 +536,11 @@
             Enviamos un código de 6 dígitos al correo registrado para
           </p>
           <p style="font-size:14px; font-weight:700; margin:0 0 22px; font-family:'JetBrains Mono',monospace">
-            RUC {{ recRuc }}
+            @if (recoveryCorreoEnmascarado) {
+              {{ recoveryCorreoEnmascarado }} (RUC {{ recRuc }})
+            } @else {
+              RUC {{ recRuc }}
+            }
           </p>
 
           @if (alert) {
@@ -549,7 +554,7 @@
 
           <input type="text" inputmode="numeric" maxlength="6" placeholder="______"
             [(ngModel)]="recoveryCode" (input)="onRecoveryCodeInput()"
-            (keydown.enter)="verifyDummyRecoveryCode()" [attr.aria-invalid]="!!recoveryCodeError"
+            (keydown.enter)="verifyRecoveryCode()" [attr.aria-invalid]="!!recoveryCodeError"
             aria-label="Código de recuperación"
             style="width:100%; background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:14px; font-size:26px; letter-spacing:14px; text-align:center; color:var(--text); font-family:'JetBrains Mono',monospace; margin-bottom:10px; outline:none" />
 
@@ -573,14 +578,21 @@
 
           <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:20px">
             <span style="font-size:12.5px; color:var(--text-3)">¿No llegó?</span>
-            <button type="button" (click)="resendDummyRecoveryCode()"
+            @if (recoveryResendCooldown > 0) {
+            <span style="font-size:13px; font-weight:600; color:var(--text-3)">
+              Reenviar en {{ recoveryResendCooldown }}s
+            </span>
+            } @else {
+            <button type="button" (click)="resendRecoveryCode()" [disabled]="recoverySendingOtp"
               style="padding:0; background:transparent; border:none; color:var(--primary); font-size:13px; font-weight:700; cursor:pointer">
-              Reenviar código
+              {{ recoverySendingOtp ? 'Enviando...' : 'Reenviar código' }}
             </button>
+            }
           </div>
-          <button type="button" (click)="verifyDummyRecoveryCode()"
-            style="width:100%; background:var(--primary); color:var(--primary-contrast); border:none; border-radius:10px; padding:14px; font-size:15px; font-weight:700; cursor:pointer; box-shadow:0 8px 20px rgba(14,90,138,.28)">
-            Verificar código
+          <button type="button" (click)="verifyRecoveryCode()" [disabled]="recoveryVerifying"
+            style="width:100%; background:var(--primary); color:var(--primary-contrast); border:none; border-radius:10px; padding:14px; font-size:15px; font-weight:700; cursor:pointer; box-shadow:0 8px 20px rgba(14,90,138,.28)"
+            [style.opacity]="recoveryVerifying ? '0.7' : '1'">
+            {{ recoveryVerifying ? 'Verificando...' : 'Verificar código' }}
           </button>
         </div>
         } @else if (recoveryStage === 'password') {
@@ -620,7 +632,7 @@
             Confirmar nueva clave
           </label>
           <input id="recovery-confirm-password" type="password" [(ngModel)]="recoveryConfirmPassword"
-            placeholder="Repite la clave" (keydown.enter)="saveDummyRecoveryPassword()"
+            placeholder="Repite la clave" (keydown.enter)="saveRecoveryPassword()"
             style="width:100%; background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:12px 13px; font-size:14px; color:var(--text); margin-bottom:8px; outline:none" />
           @if (recoveryConfirmPasswordError) {
           <div
@@ -632,9 +644,10 @@
           }
 
           <div style="height:10px"></div>
-          <button type="button" (click)="saveDummyRecoveryPassword()"
-            style="width:100%; background:var(--primary); color:var(--primary-contrast); border:none; border-radius:10px; padding:14px; font-size:15px; font-weight:700; cursor:pointer; box-shadow:0 8px 20px rgba(14,90,138,.28)">
-            Guardar nueva clave
+          <button type="button" (click)="saveRecoveryPassword()" [disabled]="recoverySaving"
+            style="width:100%; background:var(--primary); color:var(--primary-contrast); border:none; border-radius:10px; padding:14px; font-size:15px; font-weight:700; cursor:pointer; box-shadow:0 8px 20px rgba(14,90,138,.28)"
+            [style.opacity]="recoverySaving ? '0.7' : '1'">
+            {{ recoverySaving ? 'Guardando...' : 'Guardar nueva clave' }}
           </button>
         </div>
         } @else {

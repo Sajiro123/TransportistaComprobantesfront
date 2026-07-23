@@ -2,12 +2,12 @@ import { Component, inject, OnInit } from '@angular/core';
 import { Router, RouterOutlet } from '@angular/router';
 import { SidebarNavComponent } from '../sidebar-nav/sidebar-nav.component';
 import { SidebarFooterComponent } from '../sidebar-footer/sidebar-footer.component';
-import { ApiAuthService } from '../../core/services/api-auth.service';
-import { AuthService } from '../../core/services/auth.service';
-import { SessionService } from '../../core/services/session.service';
-import { ThemeService } from '../../core/services/theme.service';
+import { ApiAuthService } from '@core/services/api-auth.service';
+import { AuthService } from '@core/services/auth.service';
+import { SessionService } from '@core/services/session.service';
+import { ThemeService } from '@core/services/theme.service';
 import { CommonModule } from '@angular/common';
-import { Usuario } from '../../core/models/models';
+import { Usuario } from '@core/models/models';
 
 @Component({
     selector: 'app-shell',

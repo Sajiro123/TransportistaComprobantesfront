@@ -44,27 +44,22 @@
     </div>
 
     <div class="mb-3.5 flex flex-wrap items-center gap-2.5">
-      <div class="relative min-w-[220px] flex-1">
-        <span class="pointer-events-none absolute left-3 top-1/2 z-10 flex -translate-y-1/2 text-[var(--text-3)]">
-          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-            <circle cx="11" cy="11" r="7"></circle>
-            <path d="M21 21l-4.3-4.3"></path>
-          </svg>
-        </span>
-        <input [(ngModel)]="busqueda" type="text" placeholder="Buscar por placa, combustible, factura o grifo…" class="filter-control search-control w-full !rounded-xl !py-2.5 !pl-9 !pr-3" />
-      </div>
-      <select [(ngModel)]="estadoFiltro" class="filter-control cursor-pointer font-semibold">
+      <label class="relative min-w-[220px] flex-1">
+        <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-sm text-[var(--text-3)]"></i>
+        <input [(ngModel)]="busqueda" (ngModelChange)="listarComprobantes()" type="search" placeholder="Buscar por placa, combustible, factura o grifo…" class="filter-control w-full pl-9" />
+      </label>
+      <select [(ngModel)]="estadoFiltro" (ngModelChange)="listarComprobantes()" class="filter-control cursor-pointer font-semibold">
         <option value="todos">Todos los estados</option>
-        <option value="val">Conformes</option>
-        <option value="pend">En validación</option>
-        <option value="obs">Observados / inhabilitados</option>
+        @for(estado of estados; track estado.codigo) {
+          <option [value]="estado.codigo">{{ estado.nombre }}</option>
+        }
       </select>
     </div>
 
     <div class="table-card">
       <p-table
         [value]="comprobantesFiltrados"
-        dataKey="id"
+        dataKey="comprobanteUuid"
         styleClass="comprobantes-table p-datatable-sm"
         [paginator]="true"
         [rows]="5"
@@ -83,19 +78,19 @@
               <span class="sortable-heading">Comprobante <p-sortIcon field="numero" /></span>
             </th>
             <th pSortableColumn="placa" style="width: 17%; min-width: 175px">
-              <span class="sortable-heading">Placa · conductor <p-sortIcon field="placa" /></span>
+              <span class="sortable-heading">Placa <p-sortIcon field="placa" /></span>
             </th>
-            <th pSortableColumn="grifo" style="width: 23%; min-width: 235px">
-              <span class="sortable-heading">Grifo · ubicación <p-sortIcon field="grifo" /></span>
+            <th pSortableColumn="nombreComercialDistribuidor" style="width: 23%; min-width: 235px">
+              <span class="sortable-heading">Grifo · ubicación <p-sortIcon field="nombreComercialDistribuidor" /></span>
             </th>
-            <th pSortableColumn="combustible" style="width: 12%; min-width: 130px">
-              <span class="sortable-heading">Combustible <p-sortIcon field="combustible" /></span>
+            <th pSortableColumn="tipoCombustibleCodigo" style="width: 12%; min-width: 130px">
+              <span class="sortable-heading">Combustible <p-sortIcon field="tipoCombustibleCodigo" /></span>
             </th>
             <th pSortableColumn="galones" style="width: 10%; min-width: 110px">
               <span class="sortable-heading">Galones <p-sortIcon field="galones" /></span>
             </th>
-            <th pSortableColumn="estadoLabel" style="width: 14%; min-width: 165px">
-              <span class="sortable-heading">Estado <p-sortIcon field="estadoLabel" /></span>
+            <th pSortableColumn="estadoComprobanteNombre" style="width: 14%; min-width: 165px">
+              <span class="sortable-heading">Estado <p-sortIcon field="estadoComprobanteNombre" /></span>
             </th>
             <th style="width: 8%; min-width: 105px; text-align: right">Acciones</th>
           </tr>
@@ -103,20 +98,30 @@
 
         <ng-template pTemplate="body" let-item>
           <tr>
-            <td><b class="mono">{{ item.numero }}</b><small>{{ item.fecha }}</small></td>
-            <td><b class="mono text-[13.5px]">{{ item.placa }}</b><small>{{ item.conductor }}</small></td>
-            <td><b>{{ item.grifo }}</b><small>{{ item.ubicacion }}</small></td>
-            <td><span class="fuel-badge">{{ item.combustible }}</span> <small class="mono inline">{{ item.ppm }} ppm</small></td>
+            <td><b class="mono">{{ item.serie }}-{{ item.numero }}</b><small>{{ item.fechaEmision }}</small></td>
+            <td><b class="mono text-[13.5px]">{{ item.placa || 'GRANEL' }}</b></td>
+            <td><b>{{ item.nombreComercialDistribuidor }}</b><small>{{ item.distritoDistribuidor }}, {{ item.provinciaDistribuidor }}</small></td>
+            <td><span class="fuel-badge">{{ item.tipoCombustibleCodigo }}</span> <small class="mono inline">{{ item.azufrePpm }} ppm</small></td>
             <td class="mono">{{ item.galones | number:'1.2-2' }}</td>
             <td>
-              <span class="status-badge" [class.status-badge--ok]="item.estado === 'val'" [class.status-badge--pending]="item.estado === 'pend'" [class.status-badge--bad]="item.estado === 'obs'">
-                <i class="fa-solid" [class]="item.estadoIcon"></i>{{ item.estadoLabel }}
+              <span class="status-badge"
+                    [style.backgroundColor]="item.colorHex + '20'"
+                    [style.color]="item.colorHex"
+                    [class.status-badge--ok]="item.estadoComprobanteCodigo === 'CONFORME'"
+                    [class.status-badge--pending]="item.estadoComprobanteCodigo === 'PENDIENTE'"
+                    [class.status-badge--bad]="item.estadoComprobanteCodigo === 'OBSERVADO' || item.estadoComprobanteCodigo === 'INHABILITADO'">
+                <i class="fa-solid"
+                   [class.fa-check]="item.estadoComprobanteCodigo === 'CONFORME'"
+                   [class.fa-clock]="item.estadoComprobanteCodigo === 'PENDIENTE'"
+                   [class.fa-ban]="item.estadoComprobanteCodigo === 'INHABILITADO'"
+                   [class.fa-exclamation]="item.estadoComprobanteCodigo === 'OBSERVADO'"></i>
+                {{ item.estadoComprobanteNombre }}
               </span>
             </td>
             <td>
               <div class="flex justify-end gap-1.5">
                 <button type="button" class="icon-button" title="Editar" aria-label="Editar comprobante" (click)="abrirEditor(item)"><i class="fa-solid fa-pen"></i></button>
-                <button type="button" class="icon-button icon-button--danger" title="Eliminar" aria-label="Eliminar comprobante" (click)="abrirConfirmacionEliminar(item)"><i class="fa-solid fa-trash"></i></button>
+                <button type="button" class="icon-button icon-button--danger" title="Retirar" aria-label="Retirar comprobante" (click)="retirar(item.comprobanteUuid)"><i class="fa-solid fa-trash"></i></button>
               </div>
             </td>
           </tr>
@@ -187,7 +192,7 @@
         }
       </div>
 
-      <button type="button" class="mt-3 w-full rounded-[10px] border border-dashed border-[var(--primary)] bg-[var(--surface)] p-[13px] text-sm font-bold text-[var(--primary)] transition-colors hover:bg-[var(--primary-soft)]">
+      <button type="button" (click)="abrirRegistro()" class="mt-3 w-full rounded-[10px] border border-dashed border-[var(--primary)] bg-[var(--surface)] p-[13px] text-sm font-bold text-[var(--primary)] transition-colors hover:bg-[var(--primary-soft)]">
         <i class="fa-solid fa-plus mr-1"></i> Registrar compra a granel
       </button>
 
@@ -253,20 +258,28 @@
       </header>
 
       <div class="editor-modal__body">
+
+        @if (editorModo === 'crear') {
+          <div class="editor-section-title">0 · Archivo adjunto</div>
+          <div class="editor-grid">
+            <label class="editor-field editor-field--full">
+              <span>PDF o Imagen del Comprobante *</span>
+              <input type="file" (change)="onFileSelected($event)" accept="application/pdf,image/jpeg,image/png" class="file-input" />
+            </label>
+          </div>
+        }
+
+        @if (forma === 'A') {
         <div class="editor-section-title">1 · Vehículo y conductor</div>
         <div class="editor-grid editor-grid--two">
           <label class="editor-field">
             <span>Placa *</span>
             <select [(ngModel)]="model.placa" class="mono">
               <option value="">Selecciona una placa…</option>
-              <option value="AXG-712">AXG-712</option>
-              <option value="B2W-458">B2W-458</option>
-              <option value="C4T-119">C4T-119</option>
+              @for (v of vehiculos; track v.placa) {
+                <option [value]="v.placa">{{ v.placa }}</option>
+              }
             </select>
-          </label>
-          <label class="editor-field">
-            <span>Conductor</span>
-            <input [(ngModel)]="model.conductor" placeholder="Nombre completo" />
           </label>
         </div>
 
@@ -314,7 +327,7 @@
           </label>
         </div>
 
-        <div class="editor-section-title">3 · Grifo</div>
+        <div class="editor-section-title">3 · Grifo o Distribuidor</div>
         <div class="editor-grid editor-grid--station">
           <label class="editor-field">
             <span>RUC del grifo *</span>
@@ -323,52 +336,7 @@
           </label>
           <label class="editor-field">
             <span>Razón social</span>
-            <input [(ngModel)]="model.razonSocial" placeholder="Se completa según el RUC" />
-          </label>
-        </div>
-
-        @if (editorModo === 'editar') {
-          <div class="station-confirmation">
-            <i class="fa-solid fa-check"></i>
-            Grifo inscrito en Osinergmin — datos traídos por el RUC. Puedes editarlos.
-          </div>
-        }
-
-        <label class="editor-field editor-field--full">
-          <span>Dirección</span>
-          <input [(ngModel)]="model.direccion" placeholder="Av. / Jr. / Calle y número" />
-        </label>
-
-        <div class="editor-grid editor-grid--location">
-          <label class="editor-field">
-            <span>Departamento</span>
-            <select [(ngModel)]="model.departamento">
-              <option value="">—</option>
-              <option value="Lima">Lima</option>
-              <option value="Arequipa">Arequipa</option>
-              <option value="La Libertad">La Libertad</option>
-            </select>
-          </label>
-          <label class="editor-field">
-            <span>Provincia</span>
-            <select [(ngModel)]="model.provincia">
-              <option value="">—</option>
-              <option value="Lima">Lima</option>
-              <option value="Callao">Callao</option>
-            </select>
-          </label>
-          <label class="editor-field">
-            <span>Distrito</span>
-            <select [(ngModel)]="model.distrito">
-              <option value="">—</option>
-              <option value="Villa El Salvador">Villa El Salvador</option>
-              <option value="Santiago de Surco">Santiago de Surco</option>
-              <option value="San Juan de Miraflores">San Juan de Miraflores</option>
-              <option value="Miraflores">Miraflores</option>
-              <option value="Ate">Ate</option>
-              <option value="San Juan de Lurigancho">San Juan de Lurigancho</option>
-              <option value="Cercado de Lima">Cercado de Lima</option>
-            </select>
+            <input [(ngModel)]="model.razonSocial" placeholder="Opcional" />
           </label>
         </div>
 
@@ -377,8 +345,9 @@
           <label class="editor-field">
             <span>Tipo</span>
             <select [(ngModel)]="model.combustible">
-              <option value="B5">B5</option>
-              <option value="B20">B20</option>
+              @for (t of tiposCombustible; track t.codigo) {
+                <option [value]="t.codigo">{{ t.nombre }}</option>
+              }
             </select>
           </label>
           <label class="editor-field">
@@ -391,8 +360,15 @@
           </label>
         </div>
 
+        <div class="editor-grid editor-grid--fuel mt-3">
+          <label class="editor-field">
+            <span>Costo Total (S/)</span>
+            <input [(ngModel)]="model.costo" type="number" min="0.01" step="0.01" class="mono" placeholder="0.00" />
+          </label>
+        </div>
+
         @if (editorError) {
-          <div class="editor-error" role="alert"><i class="fa-solid fa-circle-exclamation"></i>{{ editorError }}</div>
+          <div class="editor-error mt-4" role="alert"><i class="fa-solid fa-circle-exclamation"></i>{{ editorError }}</div>
         }
       </div>
 

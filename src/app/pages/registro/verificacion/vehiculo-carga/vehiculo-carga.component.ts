@@ -3,15 +3,15 @@ import { CommonModule } from '@angular/common';
 import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
 import { FormsModule } from '@angular/forms';
-import { ApiVehiculoService } from '../../../../core/services/api-vehiculo.service';
-import { ApiAuthService } from '../../../../core/services/api-auth.service';
-import { AuthService } from '../../../../core/services/auth.service';
+import { ApiVehiculoService } from '@core/services/api-vehiculo.service';
+import { ApiAuthService } from '@core/services/api-auth.service';
+import { AuthService } from '@core/services/auth.service';
 import { isValidRuc } from '../../../../core/utils/validators';
 import {
   EstadoValidacionVehiculo,
   RegistrarVehiculoRequest,
   VehiculoTransportista,
-} from '../../../../core/models/models';
+} from '@core/models/models';
 
 export interface Vehiculo {
   id: number;
@@ -455,7 +455,7 @@ export class VehiculoCargaComponent implements OnInit, OnDestroy {
   closeValidationInfo(): void {
     this.showValidationInfoModal = false;
   }
-  
+
   toggleRow(veh: Vehiculo): void {
     if (veh.expanded) {
       veh.expanded = false;

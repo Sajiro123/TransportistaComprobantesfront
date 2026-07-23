@@ -286,3 +286,41 @@ export interface VerificarOtpRegistroResponse {
   usuarioUuid: string;
   mensaje: string;
 }
+
+// ── Recuperación pública con OTP ─────────────────────────────
+
+/** Paso 1 — Enviar OTP Recuperación */
+export interface EnviarOtpRecuperacionRequest {
+  ruc: string;
+  recaptchaToken?: string;
+}
+
+export interface EnviarOtpRecuperacionResponse {
+  mensaje: string;
+  expiraEnSegundos: number;
+  correoEnmascarado: string | null;
+}
+
+/** Paso 2 — Verificar OTP Recuperación */
+export interface VerificarOtpRecuperacionRequest {
+  ruc: string;
+  otp: string;
+  recaptchaToken?: string;
+}
+
+export interface VerificarOtpRecuperacionResponse {
+  mensaje: string;
+  expiraEnSegundos: number;
+}
+
+/** Paso 3 — Actualizar Clave Recuperación */
+export interface ActualizarClaveRecuperacionRequest {
+  nuevaClave: string;
+  confirmarClave: string;
+  recaptchaToken?: string;
+}
+
+export interface ActualizarClaveRecuperacionResponse {
+  mensaje: string;
+}
+
