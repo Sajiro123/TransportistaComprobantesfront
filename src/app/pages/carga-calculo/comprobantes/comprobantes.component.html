@@ -454,8 +454,18 @@
         </label>
         <label class="editor-field">
           <span>Emisión *</span>
-          <input [(ngModel)]="model.emision" (ngModelChange)="onEditorEmissionChange()" type="date" [max]="todayDate"
-            class="mono" [class.editor-field--invalid]="editorSubmitted && !isEditorEmissionValid" />
+          <p-datepicker
+            [(ngModel)]="model.emision"
+            (ngModelChange)="onEditorEmissionChange()"
+            dateFormat="yy-mm-dd"
+            dataType="string"
+            [maxDate]="maxDateObj"
+            [showIcon]="true"
+            placeholder="AAAA-MM-DD"
+            styleClass="w-full"
+            inputStyleClass="mono w-full"
+            [class.editor-field--invalid]="editorSubmitted && !isEditorEmissionValid">
+          </p-datepicker>
           <small [class.editor-field-error]="editorSubmitted && !isEditorEmissionValid"
             [class.editor-field-hint]="!editorSubmitted || isEditorEmissionValid">No puede ser posterior a hoy.</small>
         </label>

@@ -872,3 +872,26 @@
     border-radius: 9999px;
   }
 }
+
+p-calendar, .p-calendar {
+  width: 100%;
+  display: block;
+
+  .p-inputtext {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1.5px solid var(--border);
+    border-radius: 9px;
+    background: var(--surface-2);
+    color: var(--text);
+    font-size: 13.5px;
+    font-family: inherit;
+    transition: all .2s ease;
+
+    &:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 18%, transparent);
+    }
+  }
+}

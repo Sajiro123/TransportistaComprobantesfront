@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, HostListener, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { TableModule } from 'primeng/table';
+import { DatePickerModule } from 'primeng/datepicker';
 import { isValidRuc } from '../../../core/utils/validators';
 import { ApiComprobanteService } from '../../../core/services/api-comprobante.service';
 import { ApiAuthService } from '../../../core/services/api-auth.service';
@@ -92,13 +93,15 @@ interface ComprobanteEditor {
 @Component({
   selector: 'app-comprobantes',
   standalone: true,
-  imports: [CommonModule, FormsModule, TableModule],
+  imports: [CommonModule, FormsModule, TableModule, DatePickerModule],
   templateUrl: './comprobantes.component.html',
   styleUrl: './comprobantes.component.scss',
 })
 export class ComprobantesComponent implements OnInit {
   private readonly apiComprobante = inject(ApiComprobanteService);
   private readonly apiAuth = inject(ApiAuthService);
+
+  maxDateObj: Date = new Date();
 
   rucTransportista = '';
 
@@ -355,6 +358,7 @@ export class ComprobantesComponent implements OnInit {
     this.editorModo = 'crear';
     this.archivoSeleccionado = null;
     this.archivoError = '';
+    const hoy = this.todayDate;
     this.editor = {
       uuid: '',
       placa: '',
@@ -364,8 +368,8 @@ export class ComprobantesComponent implements OnInit {
       licencia: '',
       serie: 'F001',
       numero: '',
-      emision: '',
-      mes: '',
+      emision: hoy,
+      mes: this.mesDesdeFecha(hoy),
       anio: new Date().getFullYear(),
       rucGrifo: '',
       razonSocial: '',
