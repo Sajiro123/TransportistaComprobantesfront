@@ -43,12 +43,55 @@ export class ApiComprobanteService {
    * @param ruc RUC del transportista
    */
   obtenerPerfil(ruc: string): Observable<PerfilTransportistaResponse> {
-    return this.http.get<PerfilTransportistaResponse>(
-      `${this.API_URL}/perfil`,
-      {
+    return this.http
+      .get<PerfilTransportistaResponse>(`${this.API_URL}/perfil`, {
         params: { ruc },
-      },
-    );
+      })
+      .pipe(
+        map((res) => {
+          const contacto = res.data?.lista?.contacto as
+            | (PerfilTransportista['contacto'] & {
+                nombres?: string;
+                apellidoPaterno?: string;
+                apellidoMaterno?: string;
+                correo?: string;
+              })
+            | undefined;
+
+          if (!contacto) return res;
+
+          contacto.numeroDocumento = this.decryptSensitiveField(
+            contacto.numeroDocumento,
+          );
+          contacto.correoElectronico = this.decryptSensitiveField(
+            contacto.correoElectronico ?? contacto.correo,
+          );
+          contacto.telefono = this.decryptSensitiveField(contacto.telefono);
+
+          if (!contacto.nombresApellidos) {
+            contacto.nombresApellidos = [
+              contacto.nombres,
+              contacto.apellidoPaterno,
+              contacto.apellidoMaterno,
+            ]
+              .filter(Boolean)
+              .join(' ');
+          }
+
+          return res;
+        }),
+      );
+  }
+
+  private decryptSensitiveField(value: string | null | undefined): string {
+    if (!value) return '';
+
+    try {
+      return this.decryptionService.decrypt(value) ?? '';
+    } catch (error) {
+      console.error('Error al desencriptar un dato de contacto:', error);
+      return value;
+    }
   }
 
   /**

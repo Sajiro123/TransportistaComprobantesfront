@@ -80,12 +80,16 @@ export interface RegistroRaw {
 }
 
 export interface DatosEmpresa {
+  empresaId?: number;
+  empresaUuid?: string;
   razonSocial: string;
-  ruc: string;
-  estadoCondicion: string;
-  tipoEntidad: string;
-  autoridad: string;
-  autorizacionVigente: boolean;
+  numeroRuc: string;
+  flValidadoSunat: boolean;
+  activoSunat: boolean;
+  habidoSunat: boolean;
+  flActivo: boolean;
+  resultado?: string;
+  mensaje?: string;
 }
 
 export interface RepresentanteLegal {
@@ -176,7 +180,7 @@ export interface BancosResponse {
 }
 
 export interface CuentaBancariaTransportistaRequest {
-  bancoId: number;
+  uuidBanco: string;
   tipoAbonoId: number; // 1 = CCI, 2 = OPE
   cci?: string | null;
   dniBeneficiario?: string | null;

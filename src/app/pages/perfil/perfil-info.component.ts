@@ -35,11 +35,11 @@ import {
         </div>
       </div>
 
-      <!-- Main Grid -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <!-- ── User Info Card (2/3) ── -->
+      <!-- Contenido principal a ancho completo -->
+      <div class="grid grid-cols-1 gap-6 w-full">
+        <!-- Información del usuario -->
         <div
-          class="md:col-span-2 bg-white dark:bg-[#161B22] border border-atu-border dark:border-[#30363D] rounded-2xl shadow-sm dark:shadow-[0_1px_4px_rgba(0,0,0,0.3)] p-4 sm:p-6 space-y-6"
+          class="w-full bg-white dark:bg-[#161B22] border border-atu-border dark:border-[#30363D] rounded-2xl shadow-sm dark:shadow-[0_1px_4px_rgba(0,0,0,0.3)] p-4 sm:p-6 space-y-6"
         >
           <!-- Avatar Row -->
           <div class="flex items-center gap-4 justify-between">
@@ -61,40 +61,6 @@ import {
                   {{ tipoLabel }}
                 </p>
               </div>
-            </div>
-            <!-- Botones Editar / Guardar / Cancelar -->
-            <div class="flex items-center gap-2 shrink-0">
-              @if (!editMode) {
-                <button
-                  (click)="iniciarEdicion()"
-                  class="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl text-sm font-bold bg-atu-primary text-white hover:bg-atu-primary-strong active:scale-[0.97] transition-all shadow-sm"
-                >
-                  <i class="fa-solid fa-pen-to-square text-xs"></i>
-                  <span class="hidden sm:inline">Editar perfil</span>
-                </button>
-              } @else {
-                <button
-                  (click)="guardarEdicion()"
-                  [disabled]="isSaving"
-                  class="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl text-sm font-bold bg-atu-primary text-white hover:bg-atu-primary-strong active:scale-[0.97] transition-all shadow-sm"
-                >
-                  @if (isSaving) {
-                    <i class="fa-solid fa-spinner fa-spin text-xs"></i>
-                    <span class="hidden sm:inline">Guardando...</span>
-                  } @else {
-                    <i class="fa-solid fa-floppy-disk text-xs"></i>
-                    <span class="hidden sm:inline">Guardar</span>
-                  }
-                </button>
-                <button
-                  (click)="cancelarEdicion()"
-                  [disabled]="isSaving"
-                  class="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl text-sm font-bold bg-atu-surface-2 dark:bg-[#21262D] text-atu-text-2 dark:text-[#8B949E] border border-atu-border dark:border-[#30363D] hover:border-atu-text-3 dark:hover:border-[#8B949E] active:scale-[0.97] transition-all"
-                >
-                  <i class="fa-solid fa-xmark text-xs"></i>
-                  <span class="hidden sm:inline">Cancelar</span>
-                </button>
-              }
             </div>
           </div>
 
@@ -148,129 +114,91 @@ import {
                   >
                   <strong
                     class="text-[15px] text-atu-text dark:text-[#E6EDF3] font-semibold block group-hover/field:text-atu-primary transition-colors font-mono"
-                    >{{ perfilTrans?.datosEmpresa?.ruc || '—' }}</strong
+                    >{{ perfilTrans?.datosEmpresa?.numeroRuc || '—' }}</strong
                   >
                 </div>
                 <div class="space-y-1.5 group/field">
                   <span
                     class="text-atu-text-3 dark:text-[#6E7681] font-semibold uppercase tracking-wider block text-[10.5px]"
-                    >Estado y Condición</span
+                    >Estado SUNAT</span
                   >
                   <strong
                     class="text-[15px] text-atu-text dark:text-[#E6EDF3] font-semibold block group-hover/field:text-atu-primary transition-colors"
                   >
-                    {{ perfilTrans?.datosEmpresa?.estadoCondicion || '—' }}
+                    {{
+                      perfilTrans?.datosEmpresa?.activoSunat
+                        ? 'Activo'
+                        : 'Inactivo'
+                    }}
                   </strong>
                 </div>
                 <div class="space-y-1.5 group/field">
                   <span
                     class="text-atu-text-3 dark:text-[#6E7681] font-semibold uppercase tracking-wider block text-[10.5px]"
-                    >Tipo de Entidad</span
+                    >Condición SUNAT</span
                   >
                   <strong
                     class="text-[15px] text-atu-text dark:text-[#E6EDF3] font-semibold block group-hover/field:text-atu-primary transition-colors"
                   >
-                    {{ perfilTrans?.datosEmpresa?.tipoEntidad || '—' }}
+                    {{
+                      perfilTrans?.datosEmpresa?.habidoSunat
+                        ? 'Habido'
+                        : 'No habido'
+                    }}
                   </strong>
                 </div>
                 <div class="space-y-1.5 group/field">
                   <span
                     class="text-atu-text-3 dark:text-[#6E7681] font-semibold uppercase tracking-wider block text-[10.5px]"
-                    >Autoridad que Autorizó</span
-                  >
-                  <strong
-                    class="text-[15px] text-atu-text dark:text-[#E6EDF3] font-semibold block group-hover/field:text-atu-primary transition-colors"
-                  >
-                    {{ perfilTrans?.datosEmpresa?.autoridad || '—' }}
-                  </strong>
-                </div>
-                <div class="space-y-1.5 group/field">
-                  <span
-                    class="text-atu-text-3 dark:text-[#6E7681] font-semibold uppercase tracking-wider block text-[10.5px]"
-                    >Autorización Vigente</span
+                    >Validación SUNAT</span
                   >
                   <div class="pt-0.5">
-                    @if (perfilTrans?.datosEmpresa?.autorizacionVigente) {
+                    <span
+                      class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold border"
+                      [ngClass]="
+                        perfilTrans?.datosEmpresa?.flValidadoSunat
+                          ? 'bg-green-50 dark:bg-[#102A1C] text-green-700 dark:text-[#3FC078] border-green-200 dark:border-green-900/30'
+                          : 'bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-900/30'
+                      "
+                    >
+                      <i
+                        class="fa-solid"
+                        [ngClass]="
+                          perfilTrans?.datosEmpresa?.flValidadoSunat
+                            ? 'fa-circle-check'
+                            : 'fa-clock'
+                        "
+                      ></i>
+                      {{
+                        perfilTrans?.datosEmpresa?.flValidadoSunat
+                          ? 'Validado'
+                          : 'Pendiente'
+                      }}
+                    </span>
+                  </div>
+                </div>
+                <div class="space-y-1.5 group/field">
+                  <span
+                    class="text-atu-text-3 dark:text-[#6E7681] font-semibold uppercase tracking-wider block text-[10.5px]"
+                    >Estado del registro</span
+                  >
+                  <div class="pt-0.5">
+                    @if (perfilTrans?.datosEmpresa?.flActivo) {
                       <span
                         class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-green-50 dark:bg-[#102A1C] text-green-700 dark:text-[#3FC078] border border-green-200 dark:border-green-900/30"
                       >
                         <i class="fa-solid fa-circle-check text-[10px]"></i>
-                        Vigente
+                        Activo
                       </span>
                     } @else {
                       <span
                         class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-red-50 dark:bg-[#2C1816] text-red-700 dark:text-[#E27062] border border-red-200 dark:border-red-900/30"
                       >
-                        <i class="fa-solid fa-circle-xmark text-[10px]"></i> No
-                        Vigente
+                        <i class="fa-solid fa-circle-xmark text-[10px]"></i>
+                        Inactivo
                       </span>
                     }
                   </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Representante Legal -->
-            <div
-              class="group bg-white dark:bg-[#0D1117] border border-atu-border dark:border-[#30363D] rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden relative"
-            >
-              <div
-                class="absolute inset-0 bg-gradient-to-r from-atu-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
-              ></div>
-              <div
-                class="flex items-center justify-between px-5 py-4 border-b border-atu-border/50 dark:border-[#30363D]/50 bg-gray-50/50 dark:bg-white/[0.02]"
-              >
-                <div class="flex items-center gap-3">
-                  <div
-                    class="w-8 h-8 rounded-full bg-purple-100 dark:bg-purple-500/20 text-purple-600 dark:text-purple-400 flex items-center justify-center"
-                  >
-                    <i class="fa-solid fa-id-card text-sm"></i>
-                  </div>
-                  <span
-                    class="text-base font-extrabold text-atu-text dark:text-[#E6EDF3]"
-                    >Representante legal</span
-                  >
-                </div>
-                <span
-                  class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10.5px] font-bold bg-gray-100 dark:bg-[#21262D] text-gray-500 dark:text-[#8B949E] border border-gray-200 dark:border-[#30363D]"
-                >
-                  <i class="fa-solid fa-lock text-[9px]"></i> No editable
-                </span>
-              </div>
-              <div
-                class="p-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 gap-x-8 text-xs leading-normal"
-              >
-                <div class="space-y-1.5 group/field">
-                  <span
-                    class="text-atu-text-3 dark:text-[#6E7681] font-semibold uppercase tracking-wider block text-[10.5px]"
-                    >Nombres y apellidos</span
-                  >
-                  <strong
-                    class="text-[15px] text-atu-text dark:text-[#E6EDF3] font-semibold block group-hover/field:text-atu-primary transition-colors"
-                  >
-                    {{
-                      perfilTrans?.representanteLegal?.nombresApellidos || '—'
-                    }}
-                  </strong>
-                </div>
-                <div class="space-y-1.5 group/field">
-                  <span
-                    class="text-atu-text-3 dark:text-[#6E7681] font-semibold uppercase tracking-wider block text-[10.5px]"
-                    >Documento</span
-                  >
-                  <strong
-                    class="inline-flex items-center gap-2 text-[15px] text-atu-text dark:text-[#E6EDF3] font-semibold bg-gray-50 dark:bg-white/[0.03] px-2 py-0.5 rounded-md border border-gray-100 dark:border-white/10 font-mono group-hover/field:border-atu-primary/30 transition-colors"
-                  >
-                    <span
-                      class="text-atu-text-3 dark:text-[#8B949E] text-[11px]"
-                      >{{
-                        perfilTrans?.representanteLegal?.tipoDocumento || 'DNI'
-                      }}</span
-                    >
-                    {{
-                      perfilTrans?.representanteLegal?.numeroDocumento || '—'
-                    }}
-                  </strong>
                 </div>
               </div>
             </div>
@@ -302,17 +230,52 @@ import {
                     <div
                       class="text-[12px] text-atu-text-3 dark:text-[#6E7681] mt-0.5"
                     >
-                      Mantén tus datos actualizados
+                      El correo no es editable; para cambiarlo, contacta a
+                      soporte ATU
                     </div>
                   </div>
                 </div>
-                @if (editMode) {
-                  <span
-                    class="animate-pulse inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold bg-blue-100 dark:bg-blue-500/20 text-blue-700 dark:text-blue-400"
-                  >
-                    <i class="fa-solid fa-pen text-[9px]"></i> Editando
-                  </span>
-                }
+                <div class="flex items-center justify-end gap-2 flex-wrap">
+                  @if (!editMode) {
+                    <button
+                      type="button"
+                      (click)="iniciarEdicion()"
+                      class="inline-flex items-center gap-2 bg-atu-primary text-white rounded-[9px] px-[15px] py-2.5 text-[13px] font-bold cursor-pointer hover:bg-atu-primary-strong active:scale-[0.97] transition-all shadow-sm"
+                    >
+                      <i class="fa-solid fa-pen-to-square text-xs"></i>
+                      Editar
+                    </button>
+                  } @else {
+                    <span
+                      class="animate-pulse inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold bg-blue-100 dark:bg-blue-500/20 text-blue-700 dark:text-blue-400"
+                    >
+                      <i class="fa-solid fa-pen text-[9px]"></i> Editando
+                    </span>
+                    <button
+                      type="button"
+                      (click)="guardarEdicion()"
+                      [disabled]="isSaving"
+                      class="inline-flex items-center gap-2 bg-atu-primary text-white rounded-[9px] px-[15px] py-2.5 text-[13px] font-bold cursor-pointer hover:bg-atu-primary-strong disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.97] transition-all shadow-sm"
+                    >
+                      @if (isSaving) {
+                        <i class="fa-solid fa-spinner fa-spin text-xs"></i>
+                        Guardando...
+                      } @else {
+                        <i class="fa-solid fa-floppy-disk text-xs"></i>
+                        Guardar
+                      }
+                    </button>
+                    <button
+                      type="button"
+                      (click)="cancelarEdicion()"
+                      [disabled]="isSaving"
+                      class="inline-flex items-center gap-2 bg-atu-surface-2 dark:bg-[#21262D] text-atu-text-2 dark:text-[#8B949E] border border-atu-border dark:border-[#30363D] rounded-[9px] px-[15px] py-2.5 text-[13px] font-bold cursor-pointer hover:border-atu-text-3 dark:hover:border-[#8B949E] disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.97] transition-all"
+                    >
+                      <i class="fa-solid fa-xmark text-xs"></i>
+                      Cancelar
+                    </button>
+                  }
+                </div>
               </div>
               <div
                 class="p-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 gap-x-8 text-xs leading-normal"
@@ -690,7 +653,7 @@ import {
                 }
 
                 <!-- Banco -->
-                <div class="space-y-1.5">
+                <div class="space-y-1.5 sm:col-span-2 lg:col-span-3">
                   <span
                     class="text-atu-text-3 dark:text-[#6E7681] font-semibold uppercase tracking-wider block text-[10.5px]"
                   >
@@ -712,26 +675,19 @@ import {
                       </div>
                       <select
                         [(ngModel)]="editBanco"
+                        [disabled]="bancosList.length === 0"
                         class="w-full pl-9 border-2 border-atu-border dark:border-[#30363D] rounded-xl bg-white dark:bg-[#0D1117] px-3 py-2.5 text-[14px] text-atu-text dark:text-[#E6EDF3] focus:outline-none focus:border-atu-primary dark:focus:border-[#00A3E0] focus:ring-4 focus:ring-atu-primary/10 transition-all cursor-pointer shadow-sm appearance-none"
                       >
                         <option value="">Selecciona un banco…</option>
                         @if (bancosList.length > 0) {
                           @for (banco of bancosList; track banco.uuidBanco) {
-                            <option [value]="banco.nombre">
+                            <option [value]="banco.uuidBanco">
                               {{ banco.nombre }} ({{ banco.abreviatura }})
                             </option>
                           }
                         } @else {
-                          <option value="Banco de Crédito del Perú">
-                            Banco de Crédito del Perú
-                          </option>
-                          <option value="BBVA Perú">BBVA Perú</option>
-                          <option value="Interbank">Interbank</option>
-                          <option value="Scotiabank Perú">
-                            Scotiabank Perú
-                          </option>
-                          <option value="Banco de la Nación">
-                            Banco de la Nación
+                          <option value="" disabled>
+                            No hay bancos disponibles
                           </option>
                         }
                       </select>
@@ -763,7 +719,7 @@ import {
                 @if (cuentaEditMode) {
                   @if (editTipoAbonoId === 1) {
                     <!-- CCI -->
-                    <div class="space-y-1.5 sm:col-span-1 lg:col-span-2">
+                    <div class="space-y-1.5 sm:col-span-2 lg:col-span-3">
                       <span
                         class="text-atu-text-3 dark:text-[#6E7681] font-semibold uppercase tracking-wider block text-[10.5px]"
                       >
@@ -800,42 +756,46 @@ import {
                     </div>
                   } @else {
                     <!-- OPE -->
-                    <div class="space-y-1.5">
-                      <span
-                        class="text-atu-text-3 dark:text-[#6E7681] font-semibold uppercase tracking-wider block text-[10.5px]"
-                      >
-                        DNI Beneficiario
-                        <span class="text-red-600 dark:text-red-500 ml-0.5"
-                          >*</span
+                    <div
+                      class="sm:col-span-2 lg:col-span-3 grid grid-cols-1 sm:grid-cols-2 gap-5 gap-x-8"
+                    >
+                      <div class="space-y-1.5">
+                        <span
+                          class="text-atu-text-3 dark:text-[#6E7681] font-semibold uppercase tracking-wider block text-[10.5px]"
                         >
-                      </span>
-                      <input
-                        type="text"
-                        maxlength="8"
-                        [(ngModel)]="editDniBeneficiario"
-                        placeholder="8 dígitos"
-                        class="w-full border-2 border-atu-border dark:border-[#30363D] rounded-xl bg-white dark:bg-[#0D1117] px-3 py-2.5 text-[14px] text-atu-text dark:text-[#E6EDF3] focus:outline-none focus:border-atu-primary font-mono shadow-sm"
-                      />
-                    </div>
-                    <div class="space-y-1.5">
-                      <span
-                        class="text-atu-text-3 dark:text-[#6E7681] font-semibold uppercase tracking-wider block text-[10.5px]"
-                      >
-                        Nombre Completo Beneficiario
-                        <span class="text-red-600 dark:text-red-500 ml-0.5"
-                          >*</span
+                          DNI Beneficiario
+                          <span class="text-red-600 dark:text-red-500 ml-0.5"
+                            >*</span
+                          >
+                        </span>
+                        <input
+                          type="text"
+                          maxlength="8"
+                          [(ngModel)]="editDniBeneficiario"
+                          placeholder="8 dígitos"
+                          class="w-full border-2 border-atu-border dark:border-[#30363D] rounded-xl bg-white dark:bg-[#0D1117] px-3 py-2.5 text-[14px] text-atu-text dark:text-[#E6EDF3] focus:outline-none focus:border-atu-primary font-mono shadow-sm"
+                        />
+                      </div>
+                      <div class="space-y-1.5">
+                        <span
+                          class="text-atu-text-3 dark:text-[#6E7681] font-semibold uppercase tracking-wider block text-[10.5px]"
                         >
-                      </span>
-                      <input
-                        type="text"
-                        [(ngModel)]="editNombreBeneficiario"
-                        placeholder="Nombres y Apellidos completado"
-                        class="w-full border-2 border-atu-border dark:border-[#30363D] rounded-xl bg-white dark:bg-[#0D1117] px-3 py-2.5 text-[14px] text-atu-text dark:text-[#E6EDF3] focus:outline-none focus:border-atu-primary shadow-sm"
-                      />
+                          Nombre Completo Beneficiario
+                          <span class="text-red-600 dark:text-red-500 ml-0.5"
+                            >*</span
+                          >
+                        </span>
+                        <input
+                          type="text"
+                          [(ngModel)]="editNombreBeneficiario"
+                          placeholder="Nombres y Apellidos completado"
+                          class="w-full border-2 border-atu-border dark:border-[#30363D] rounded-xl bg-white dark:bg-[#0D1117] px-3 py-2.5 text-[14px] text-atu-text dark:text-[#E6EDF3] focus:outline-none focus:border-atu-primary shadow-sm"
+                        />
+                      </div>
                     </div>
                   }
                 } @else {
-                  <div class="space-y-1.5 sm:col-span-1 lg:col-span-2">
+                  <div class="space-y-1.5 sm:col-span-2 lg:col-span-3">
                     <span
                       class="text-atu-text-3 dark:text-[#6E7681] font-semibold uppercase tracking-wider block text-[10.5px]"
                     >
@@ -849,13 +809,12 @@ import {
                       class="text-[15px] text-atu-text dark:text-[#E6EDF3] font-semibold flex items-center gap-3 font-mono tracking-[0.1em]"
                     >
                       <i
-                        class="fa-solid"
+                        class="fa-solid text-gray-400 dark:text-[#8B949E]"
                         [ngClass]="
                           cuentaBancariaReal?.tipoAbono === 'OPE'
                             ? 'fa-user-check'
                             : 'fa-money-check'
                         "
-                        class="text-gray-400 dark:text-[#8B949E]"
                       ></i>
                       @if (cuentaBancariaReal?.tipoAbono === 'OPE') {
                         {{ cuentaBancariaReal?.nombreBeneficiario }} (DNI:
@@ -869,7 +828,7 @@ import {
               </div>
 
               <!-- Mensajes Informativos (Dependiendo del banco seleccionado) -->
-              @if (bancoCuentaVisible === 'Banco de la Nación') {
+              @if (esBancoNacion) {
                 <div
                   class="mx-5 mb-5 bg-red-50 dark:bg-red-950/20 border-l-4 border-red-500 rounded-r-xl p-4 transition-all"
                 >
@@ -899,7 +858,7 @@ import {
                 </div>
               } @else if (
                 bancoCuentaVisible &&
-                bancoCuentaVisible !== 'Banco de la Nación'
+                !esBancoNacion
               ) {
                 <div
                   class="mx-5 mb-5 bg-green-50 dark:bg-green-950/20 border-l-4 border-green-500 rounded-r-xl p-4 transition-all"
@@ -908,7 +867,7 @@ import {
                     <div
                       class="w-7 h-7 rounded-full bg-green-100 dark:bg-green-900/50 text-green-600 dark:text-green-400 flex items-center justify-center shrink-0 shadow-sm"
                     >
-                      <i class="fa-solid fa-shield-check text-xs"></i>
+                      <i class="fa-solid fa-shield-halved text-xs"></i>
                     </div>
                     <span
                       class="text-[15px] font-extrabold text-green-700 dark:text-green-400"
@@ -970,11 +929,11 @@ import {
           }
         </div>
 
-        <!-- ── Right Column (1/3) ── -->
-        <div class="space-y-6">
+        <!-- Cambiar contraseña debajo de Cuenta de abono -->
+        <div class="w-full space-y-6">
           <!-- Change Password Card -->
           <div
-            class="bg-white dark:bg-[#161B22] border border-atu-border dark:border-[#30363D] rounded-2xl shadow-sm dark:shadow-[0_1px_4px_rgba(0,0,0,0.3)] p-4 sm:p-5 space-y-4"
+            class="w-full bg-white dark:bg-[#161B22] border border-atu-border dark:border-[#30363D] rounded-2xl shadow-sm dark:shadow-[0_1px_4px_rgba(0,0,0,0.3)] p-4 sm:p-5 space-y-4"
           >
             <h3
               class="font-bold text-base text-atu-primary dark:text-[#00A3E0] flex items-center gap-2"
@@ -1346,13 +1305,53 @@ export class PerfilInfoComponent implements OnInit {
   }
 
   get bancoCuentaVisible(): string {
-    return this.cuentaEditMode
-      ? this.editBanco
-      : (this.cuentaAbono?.banco ?? '');
+    if (!this.cuentaEditMode) return this.cuentaAbono?.banco ?? '';
+
+    return (
+      this.bancosList.find(
+        (banco) => banco.uuidBanco === this.editBanco,
+      )?.nombre ?? ''
+    );
+  }
+
+  get esBancoNacion(): boolean {
+    const bancoSeleccionado = this.cuentaEditMode
+      ? this.bancosList.find(
+          (banco) => banco.uuidBanco === this.editBanco,
+        )
+      : this.bancosList.find(
+          (banco) =>
+            banco.uuidBanco === this.cuentaBancariaReal?.uuidBanco ||
+            banco.nombre === this.cuentaAbono?.banco,
+        );
+
+    const normalizar = (value: string | null | undefined): string =>
+      (value ?? '')
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase()
+        .replace(/[^a-z0-9]/g, '');
+
+    const nombre = normalizar(
+      bancoSeleccionado?.nombre ?? this.bancoCuentaVisible,
+    );
+    const codigo = normalizar(bancoSeleccionado?.codigo);
+    const abreviatura = normalizar(bancoSeleccionado?.abreviatura);
+
+    return (
+      (nombre.includes('banco') && nombre.includes('nacion')) ||
+      codigo === 'bn' ||
+      abreviatura === 'bn'
+    );
   }
 
   iniciarEdicionCuenta(): void {
-    this.editBanco = this.cuentaAbono?.banco ?? '';
+    this.editBanco =
+      this.cuentaBancariaReal?.uuidBanco ??
+      this.bancosList.find(
+        (banco) => banco.nombre === this.cuentaAbono?.banco,
+      )?.uuidBanco ??
+      '';
     this.editCci = this.cuentaAbono?.codigoCuentaInterbancario ?? '';
     this.editTipoAbonoId = this.cuentaBancariaReal?.tipoAbono === 'OPE' ? 2 : 1;
     this.editDniBeneficiario = this.cuentaBancariaReal?.dniBeneficiario ?? '';
@@ -1414,15 +1413,20 @@ export class PerfilInfoComponent implements OnInit {
       }
     }
 
-    const transportistaId = 1;
     const bancoSeleccionado = this.bancosList.find(
-      (b) => b.nombre === this.editBanco || b.uuidBanco === this.editBanco,
+      (banco) => banco.uuidBanco === this.editBanco,
     );
-    const bancoIdTecnico = bancoSeleccionado ? 1 : 1; // Default técnico 1
+    if (!bancoSeleccionado) {
+      this.cuentaAlert = {
+        message: 'El banco seleccionado no es válido.',
+        type: 'error',
+      };
+      return;
+    }
 
     this.isSavingCuenta = true;
     const payload = {
-      bancoId: bancoIdTecnico,
+      uuidBanco: bancoSeleccionado.uuidBanco,
       tipoAbonoId: this.editTipoAbonoId,
       cci: this.editTipoAbonoId === 1 ? this.editCci : null,
       dniBeneficiario:
@@ -1444,7 +1448,7 @@ export class PerfilInfoComponent implements OnInit {
         this.isSavingCuenta = false;
         this.cuentaBancariaReal = response.data.lista;
         this.cuentaAbono = {
-          banco: this.editBanco,
+          banco: bancoSeleccionado.nombre,
           codigoCuentaInterbancario:
             this.editTipoAbonoId === 1 ? this.editCci : 'OPE - Orden de Pago',
         };
@@ -1462,6 +1466,7 @@ export class PerfilInfoComponent implements OnInit {
         this.isSavingCuenta = false;
         this.cuentaAlert = {
           message:
+            error?.error?.data?.lista?.descripcion ||
             error?.error?.data?.mensaje ||
             error?.error?.mensaje ||
             error?.message ||
@@ -1502,7 +1507,7 @@ export class PerfilInfoComponent implements OnInit {
 
     if (this.perfilTrans) {
       this.isSaving = true;
-      const ruc = this.perfilTrans.datosEmpresa.ruc;
+      const ruc = this.perfilTrans.datosEmpresa.numeroRuc;
 
       this.apiComprobanteService
         .actualizarContacto(ruc, {
