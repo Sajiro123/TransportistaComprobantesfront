@@ -2,25 +2,11 @@
   window.__env = window.__env || {};
 
   // URL base del API REST (IAM)
-  // window.__env.API_BASE_URL = 'https://apidev.atu.gob.pe/api-subsidio/api_iam';
-  window.__env.API_BASE_URL = 'http://localhost:8080/api_iam';
-  // URL base del API de Padrón (carga masiva)
-  // window.__env.API_PADRON_URL = 'https://apidev.atu.gob.pe/api-subsidio/api_padron';
-  window.__env.API_PADRON_URL = 'http://localhost:8081/api_padron';
+  window.__env.API_BASE_URL = 'https://apidev.atu.gob.pe/api-subsidio/api_iam';
+  // window.__env.API_BASE_URL = 'http://localhost:8080/api_iam';
 
-  // URL base del API de Organización (entidades y ámbitos)
-  // window.__env.API_ORG_URL = 'http://localhost:8081/api_org';
-  window.__env.API_ORG_URL = 'https://apidev.atu.gob.pe/api-subsidio/api_org';
-
-  // URL base del API de Validación
-  // window.__env.API_VALIDACION_URL = 'https://apidev.atu.gob.pe/api-subsidio/api_validacion';
-  window.__env.API_VALIDACION_URL = 'http://localhost:8081/api_validacion';
-
-  // URL base del API de Comprobantes y modo mock temporal
-  // window.__env.API_COMPROBANTE_URL = 'https://apidev.atu.gob.pe/api-subsidio/api_comprobante';
-  window.__env.API_COMPROBANTE_URL = 'http://localhost:8083/api_comprobante';
-  // Cambiar a false cuando api_comprobante esté integrado y disponible.
-  window.__env.API_COMPROBANTE_MOCK = false;
+  window.__env.API_COMPROBANTE_URL = 'https://apidev.atu.gob.pe/api-subsidio/api_comprobante';
+  // window.__env.API_COMPROBANTE_URL = 'http://localhost:8083/api_comprobante';
 
   // Google reCAPTCHA v3 Site Key
   window.__env.RECAPTCHA_SITE_KEY = '6Ldu6FUrAAAAADnOURKYc9E_uUbGBRC35_ntvznt';

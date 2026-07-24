@@ -1,10 +1,13 @@
 services:
   frontend-comprobantes-trans:
     build: .
-    container_name: subsidio-frontend
+    image: frontend-comprobantes-trans
+    container_name: frontend-subsidio-transportista
     restart: unless-stopped
+    volumes:
+      - ./env.front.js:/usr/share/nginx/html/subsidio_transportista/env.front.js:ro
     ports:
-      - "8084:8084"
+      - "8084:80"
     networks:
       - subsidio-net
 
