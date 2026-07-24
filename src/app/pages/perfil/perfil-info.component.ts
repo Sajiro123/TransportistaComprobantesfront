@@ -1506,13 +1506,27 @@ export class PerfilInfoComponent implements OnInit {
     }
 
     if (this.perfilTrans) {
+      const personaUuid = this.perfilTrans.contacto?.personaUuid;
+      if (!personaUuid) {
+        this.editAlert = {
+          message:
+            'No se encontró el identificador de la persona de contacto. Recargue el perfil e inténtelo nuevamente.',
+          type: 'error',
+        };
+        return;
+      }
+
       this.isSaving = true;
-      const ruc = this.perfilTrans.datosEmpresa.numeroRuc;
+      const nombresContacto = this.separarNombresContacto(
+        this.editContactoNombre,
+      );
 
       this.apiComprobanteService
-        .actualizarContacto(ruc, {
-          nombresApellidos: this.editContactoNombre,
-          tipoDocumento: this.editContactoTipoDoc,
+        .actualizarContacto({
+          personaUuid,
+          ...nombresContacto,
+          razonSocial: this.perfilTrans.contacto.razonSocial,
+          tipoDocumentoId: this.tipoDocumentoId(this.editContactoTipoDoc),
           numeroDocumento: this.editContactoNumDoc,
           telefono: this.editContactoTelefono,
         })
@@ -1520,7 +1534,18 @@ export class PerfilInfoComponent implements OnInit {
           next: (contacto) => {
             this.isSaving = false;
             if (this.perfilTrans) {
-              this.perfilTrans.contacto = contacto.data.lista;
+              this.perfilTrans.contacto = {
+                ...this.perfilTrans.contacto,
+                ...nombresContacto,
+                personaUuid: contacto.data.lista.personaUuid,
+                nombresApellidos: this.editContactoNombre,
+                tipoDocumento: this.editContactoTipoDoc,
+                tipoDocumentoId: this.tipoDocumentoId(
+                  this.editContactoTipoDoc,
+                ),
+                numeroDocumento: this.editContactoNumDoc,
+                telefono: this.editContactoTelefono,
+              };
             }
 
             this.editMode = false;
@@ -1627,6 +1652,34 @@ export class PerfilInfoComponent implements OnInit {
         };
       }
     }
+  }
+
+  private tipoDocumentoId(tipoDocumento: string): number {
+    return (
+      {
+        DNI: 1,
+        CE: 2,
+        PASAPORTE: 3,
+      }[tipoDocumento] ?? 1
+    );
+  }
+
+  private separarNombresContacto(nombresApellidos: string): {
+    nombres: string;
+    apellidoPaterno?: string;
+    apellidoMaterno?: string;
+  } {
+    const partes = nombresApellidos.trim().split(/\s+/);
+    if (partes.length === 1) return { nombres: partes[0] };
+    if (partes.length === 2) {
+      return { nombres: partes[0], apellidoPaterno: partes[1] };
+    }
+
+    return {
+      nombres: partes.slice(0, -2).join(' '),
+      apellidoPaterno: partes.at(-2),
+      apellidoMaterno: partes.at(-1),
+    };
   }
 
   onSavePassword(): void {

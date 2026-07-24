@@ -78,9 +78,24 @@ export class ApiComprobanteService {
               .join(' ');
           }
 
+          if (!contacto.tipoDocumento) {
+            contacto.tipoDocumento =
+              this.tipoDocumentoCodigo(contacto.tipoDocumentoId) ?? '';
+          }
+
           return res;
         }),
       );
+  }
+
+  private tipoDocumentoCodigo(tipoDocumentoId?: number): string | undefined {
+    return (
+      {
+        1: 'DNI',
+        2: 'CE',
+        3: 'PASAPORTE',
+      }[tipoDocumentoId ?? 0] ?? undefined
+    );
   }
 
   private decryptSensitiveField(value: string | null | undefined): string {
@@ -99,13 +114,11 @@ export class ApiComprobanteService {
    * @param payload Nuevos datos de contacto
    */
   actualizarContacto(
-    ruc: string,
     payload: ActualizarContactoRequest,
   ): Observable<ActualizarContactoResponse> {
     return this.http.put<ActualizarContactoResponse>(
       `${this.API_URL}/perfil/contacto`,
       payload,
-      { params: { ruc } },
     );
   }
 

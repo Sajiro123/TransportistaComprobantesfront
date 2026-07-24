@@ -72,6 +72,7 @@ export class VehiculoCargaComponent implements OnInit, OnDestroy {
   isDeletingVehicle = false;
   deleteVehicleError = '';
   private filterTimer: ReturnType<typeof setTimeout> | null = null;
+  private searchWasApplied = false;
 
   private readonly apiVehiculoService = inject(ApiVehiculoService);
   private readonly apiAuthService = inject(ApiAuthService);
@@ -149,6 +150,22 @@ export class VehiculoCargaComponent implements OnInit, OnDestroy {
     this.filterTimer = setTimeout(() => this.cargarVehiculos(), 300);
   }
 
+  onSearchChange(): void {
+    const searchLength = this.vehQ.trim().length;
+
+    if (searchLength > 0 && searchLength < 3) {
+      if (this.filterTimer) clearTimeout(this.filterTimer);
+
+      // Restaura la lista sin búsqueda al borrar un filtro ya aplicado.
+      if (this.searchWasApplied) {
+        this.filterTimer = setTimeout(() => this.cargarVehiculos(), 300);
+      }
+      return;
+    }
+
+    this.onFiltersChange();
+  }
+
   limpiarFiltros(): void {
     this.vehQ = '';
     this.vehCatF = '';
@@ -157,11 +174,14 @@ export class VehiculoCargaComponent implements OnInit, OnDestroy {
   }
 
   cargarVehiculos(): void {
+    const search = this.vehQ.trim();
+    const effectiveSearch = search.length >= 3 ? search : undefined;
+    this.searchWasApplied = Boolean(effectiveSearch);
     this.isLoading = true;
     this.loadError = '';
     this.apiVehiculoService
       .listarVehiculos({
-        busqueda: this.vehQ.trim() || undefined,
+        busqueda: effectiveSearch,
         categoria: this.vehCatF || undefined,
         estado: this.vehValF,
       })

@@ -353,12 +353,19 @@
       <div class="editor-grid editor-grid--pair">
         <label class="editor-field">
           <span>Placa *</span>
+          <input [(ngModel)]="placaBusqueda" type="search" autocomplete="off" class="mono uppercase"
+            placeholder="Buscar placa (mínimo 3 caracteres)…" aria-label="Buscar placa" />
           <select [(ngModel)]="model.placa" class="mono">
             <option value="">Selecciona una placa…</option>
-            @for (v of vehiculos; track v.placa) {
+            @for (v of vehiculosFiltradosPorPlaca; track v.placa) {
             <option [value]="v.placa">{{ v.placa }}</option>
             }
           </select>
+          @if (placaBusqueda.trim().length >= 3 && vehiculosFiltradosPorPlaca.length === 0) {
+          <small class="editor-field-hint">No se encontraron placas coincidentes.</small>
+          } @else {
+          <small class="editor-field-hint">La búsqueda se activa desde el tercer carácter.</small>
+          }
         </label>
         <label class="editor-field">
           <span>Tipo de documento *</span>

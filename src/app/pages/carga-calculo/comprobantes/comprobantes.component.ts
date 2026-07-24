@@ -123,6 +123,7 @@ export class ComprobantesComponent implements OnInit {
   archivoSeleccionado: File | null = null;
   archivoError = '';
   isFileDragging = false;
+  placaBusqueda = '';
 
   comprobantePendienteEliminar: ComprobanteListResponse | null = null;
 
@@ -308,6 +309,7 @@ export class ComprobantesComponent implements OnInit {
 
   abrirRegistro(): void {
     this.editorModo = 'crear';
+    this.placaBusqueda = '';
     this.archivoSeleccionado = null;
     this.archivoError = '';
     this.editor = {
@@ -359,6 +361,7 @@ export class ComprobantesComponent implements OnInit {
         if (res.data?.lista) {
           const c = res.data.lista;
           this.editorModo = 'editar';
+          this.placaBusqueda = '';
           this.archivoSeleccionado = null;
           this.archivoError = '';
 
@@ -406,10 +409,20 @@ export class ComprobantesComponent implements OnInit {
 
   cerrarEditor(): void {
     this.editor = null;
+    this.placaBusqueda = '';
     this.editorError = '';
     this.editorSubmitted = false;
     this.archivoSeleccionado = null;
     this.archivoError = '';
+  }
+
+  get vehiculosFiltradosPorPlaca(): VehiculoAsociadoResponse[] {
+    const search = this.placaBusqueda.trim().toLocaleUpperCase('es');
+    if (search.length < 3) return this.vehiculos;
+
+    return this.vehiculos.filter((vehiculo) =>
+      vehiculo.placa.toLocaleUpperCase('es').includes(search),
+    );
   }
 
   get editorDocumentoMaxLength(): number {
