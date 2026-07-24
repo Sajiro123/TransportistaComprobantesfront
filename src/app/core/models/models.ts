@@ -217,21 +217,29 @@ export interface ValidacionVehiculo {
 }
 
 export interface VehiculoTransportista {
-  id: number;
+  id?: number | string;
+  cargaUuid?: string;
+  cargaVehiculoUuid?: string;
+  vehiculoUuid?: string;
   placa: string;
   categoria: string;
-  topeGalones: number;
+  topeGalones?: number;
   numeroAutorizacion: string;
-  entidadAutorizadora: string | null;
+  entidadAutorizadora?: string | null;
   tuc: string;
-  tucVencida: boolean;
-  estadoValidacion: EstadoValidacionVehiculo;
-  propietario: PropietarioVehiculo;
-  validaciones: ValidacionVehiculo[];
+  tucVencida?: boolean;
+  estadoValidacion?: EstadoValidacionVehiculo;
+  propietario?: PropietarioVehiculo;
+  validaciones?: ValidacionVehiculo[];
+  tipoDocumento?: string;
+  numeroDocumento?: string;
+  razonSocial?: string;
+  estadoRegistro?: string;
+  estadoCarga?: string;
+  fechaRegistro?: string;
 }
 
 export interface VehiculosFiltros {
-  ruc: string;
   busqueda?: string;
   categoria?: string;
   estado?: EstadoValidacionVehiculo | '';

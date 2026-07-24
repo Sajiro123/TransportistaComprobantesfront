@@ -1,7 +1,14 @@
 // ── Animación fade (igual que el prototipo) ──────────────────
 @keyframes atu-fade {
-  from { opacity: 0; transform: translateY(8px); }
-  to   { opacity: 1; transform: none; }
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
 }
 
 // ── Contenedor principal ─────────────────────────────────────
@@ -83,9 +90,9 @@
   background: var(--surface-2);
   padding: 13px 18px;
   border-bottom: 1px solid var(--border);
-  font-size: 11.5px;
-  font-weight: 700;
-  color: var(--text-3);
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--text);
   text-transform: uppercase;
   letter-spacing: .5px;
 
@@ -105,6 +112,24 @@
   border-radius: 999px;
   padding: 3px 10px;
   text-transform: none;
+}
+
+.badge-api-conectada {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #15803d;
+  background: #dcfce7;
+  border-radius: 9999px;
+  padding: 4px 12px;
+  text-transform: uppercase;
+  letter-spacing: .3px;
+
+  i {
+    font-size: 11px;
+  }
 }
 
 .data-card__footer-info {
@@ -209,72 +234,104 @@
   text-transform: none;
 }
 
-// ── p-table: Datos del transportista ─────────────────────────
-::ng-deep .datos-transportista-table {
-  .p-datatable-thead { display: none; }
-  .p-datatable-tbody > tr { border: none !important; }
+// ── Grid: Datos del transportista ────────────────────────────
+.datos-transportista-grid {
+  display: grid;
+  grid-template-columns: repeat(1, minmax(0, 1fr));
+  gap: 18px 36px;
+  padding: 20px 24px;
+  background: var(--surface);
 
-  .datos-row {
-    border-bottom: 1px solid var(--border-strong) !important;
-
-    &:last-child { border-bottom: none !important; }
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
-.datos-row {
+.dato-item {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 16px;
+  flex-direction: column;
+  gap: 4px;
 }
 
-.datos-key {
-  font-size: 13px;
+.dato-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-3);
+}
+
+.dato-value {
+  font-size: 14.5px;
   font-weight: 700;
-  color: var(--text-2);
-  padding: 12px 0 12px 18px !important;
-  border: none !important;
-  background: transparent !important;
+  color: var(--text);
+  word-break: break-word;
 }
 
-.datos-val {
-  font-size: 13.5px;
-  font-weight: 700;
-  text-align: right;
-  padding: 12px 18px 12px 0 !important;
-  border: none !important;
-  background: transparent !important;
+// ── Autorizaciones ───────────────────────────────────────────
+.autorizaciones-list {
+  display: flex;
+  flex-direction: column;
 }
 
-// ── p-table: Autorizaciones ──────────────────────────────────
-::ng-deep .autorizaciones-table {
-  .p-datatable-thead { display: none; }
-  .p-datatable-tbody > tr { border: none !important; }
-}
+.aut-card-item {
+  padding: 16px 20px;
+  background: var(--surface);
+  transition: background-color 0.15s ease;
+  border-left: 4px solid transparent;
 
-.aut-row {
-  border-bottom: 1px solid var(--border-strong) !important;
+  &:nth-child(5n + 1) {
+    border-left-color: #00A3E0;
+  }
 
-  &:last-child { border-bottom: none !important; }
-}
+  &:nth-child(5n + 2) {
+    border-left-color: #15803D;
+  }
 
-.aut-cell {
-  padding: 13px 18px !important;
-  border: none !important;
-  background: transparent !important;
+  &:nth-child(5n + 3) {
+    border-left-color: #B45309;
+  }
+
+  &:nth-child(5n + 4) {
+    border-left-color: #8E44AD;
+  }
+
+  &:nth-child(5n + 5) {
+    border-left-color: #C0392B;
+  }
+
+  &:hover {
+    background: var(--surface-2);
+  }
+
+  &--border {
+    border-bottom: 1px solid var(--border);
+  }
 }
 
 .aut-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.aut-top-left {
   display: flex;
   align-items: center;
   gap: 10px;
   flex-wrap: wrap;
 }
 
+.aut-icon {
+  font-size: 15px;
+  color: var(--primary-mid);
+}
+
 .aut-servicio {
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 800;
   color: var(--text);
+  letter-spacing: -0.2px;
 }
 
 .aut-badge {
@@ -284,22 +341,72 @@
   border-radius: 999px !important;
 }
 
-.aut-resolucion {
-  margin-left: auto;
-  font-size: 11.5px;
-  color: var(--text-3);
+.aut-resolucion-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
   font-family: 'JetBrains Mono', monospace;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--primary);
+  background: var(--primary-soft);
+  border: 1px solid rgba(0, 76, 151, 0.15);
+  padding: 4px 10px;
+  border-radius: 6px;
+
+  i {
+    font-size: 10px;
+    color: var(--primary-mid);
+  }
 }
 
 .aut-meta {
   display: flex;
+  align-items: center;
+  gap: 16px 24px;
   flex-wrap: wrap;
-  gap: 6px 20px;
-  margin-top: 7px;
-  font-size: 12.5px;
-  color: var(--text-2);
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px dashed var(--border-strong);
+}
 
-  .mono { font-family: 'JetBrains Mono', monospace; }
+.aut-meta-group {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.aut-label {
+  font-size: 10.5px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--primary);
+  opacity: 0.7;
+}
+
+.aut-val {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--text);
+
+  &.mono {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12.5px;
+    font-weight: 600;
+  }
+}
+
+.aut-divider {
+  width: 1px;
+  height: 26px;
+  background-color: var(--border-strong);
+  align-self: center;
+  flex-shrink: 0;
+
+  @media (max-width: 640px) {
+    display: none;
+  }
 }
 
 // ── Semáforo de condiciones ──────────────────────────────────
@@ -360,9 +467,17 @@
   text-transform: uppercase;
   letter-spacing: .4px;
 
-  &.estado-ok   { color: var(--ok); }
-  &.estado-warn { color: var(--warn); }
-  &.estado-bad  { color: var(--bad); }
+  &.estado-ok {
+    color: var(--ok);
+  }
+
+  &.estado-warn {
+    color: var(--warn);
+  }
+
+  &.estado-bad {
+    color: var(--bad);
+  }
 }
 
 .semaforo-item__why {
@@ -414,6 +529,7 @@
 }
 
 @media (max-width: 640px) {
+
   .refresh-footer,
   .vehicles-source-card__header,
   .vehicles-source-card__actions {
@@ -445,8 +561,13 @@
   display: flex;
   margin-top: 24px;
 
-  &--end   { justify-content: flex-end; }
-  &--start { justify-content: flex-start; }
+  &--end {
+    justify-content: flex-end;
+  }
+
+  &--start {
+    justify-content: flex-start;
+  }
 }
 
 .btn-primary {

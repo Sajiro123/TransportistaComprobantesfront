@@ -67,6 +67,10 @@ export class ShellComponent implements OnInit {
     }
   }
 
+  openSidebar(): void {
+    this.sidebarOpen = true;
+  }
+
   toggleTheme(): void {
     this.themeService.toggle();
   }

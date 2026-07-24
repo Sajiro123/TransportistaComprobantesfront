@@ -14,7 +14,8 @@ import {
 } from '@core/models/models';
 
 export interface Vehiculo {
-  id: number;
+  id: string | number;
+  cargaVehiculoUuid?: string;
   placa: string;
   categoria: string;
   topeFmt: string;
@@ -63,7 +64,8 @@ export class VehiculoCargaComponent implements OnInit, OnDestroy {
   showVehicleModal = false;
   showValidationInfoModal = false;
   isCreatingVehicle = false;
-  editingVehicleId: number | null = null;
+  isFetchingVehicleDetail = false;
+  editingVehicleId: string | number | null = null;
   vehicleFormSubmitted = false;
   vehicleFormError = '';
   vehiclePendingDelete: Vehiculo | null = null;
@@ -155,16 +157,10 @@ export class VehiculoCargaComponent implements OnInit, OnDestroy {
   }
 
   cargarVehiculos(): void {
-    const ruc =
-      this.apiAuthService.getUserFromSession()?.numDocumento ||
-      this.authService.getSession()?.numDocumento ||
-      '20512345678';
-
     this.isLoading = true;
     this.loadError = '';
     this.apiVehiculoService
       .listarVehiculos({
-        ruc,
         busqueda: this.vehQ.trim() || undefined,
         categoria: this.vehCatF || undefined,
         estado: this.vehValF,
@@ -178,6 +174,7 @@ export class VehiculoCargaComponent implements OnInit, OnDestroy {
           this.isLoading = false;
         },
         error: (error) => {
+          console.error('[VehiculoCarga] Error en cargarVehiculos:', error);
           this.vehiclesView = [];
           this.vehCount = 0;
           this.isLoading = false;
@@ -194,9 +191,11 @@ export class VehiculoCargaComponent implements OnInit, OnDestroy {
     const state = this.validationStyle(vehiculo?.estadoValidacion);
     const topeNum = Number(vehiculo?.topeGalones);
     const topeFmt = !isNaN(topeNum) ? topeNum.toFixed(2) : '0.00';
+    const uuid = vehiculo?.cargaVehiculoUuid || (vehiculo as any)?.vehiculoUuid || vehiculo?.id;
 
     return {
-      id: vehiculo?.id,
+      id: uuid,
+      cargaVehiculoUuid: uuid ? String(uuid) : '',
       placa: vehiculo?.placa ?? '',
       categoria: vehiculo?.categoria ?? '',
       topeFmt: topeFmt,
@@ -208,9 +207,9 @@ export class VehiculoCargaComponent implements OnInit, OnDestroy {
       estadoColor: state.fg,
       estadoGlyph: state.glyph,
       estadoLabel: state.label,
-      propNom: vehiculo?.propietario?.nombre ?? '',
-      propTipo: vehiculo?.propietario?.tipoDocumento ?? '',
-      propDoc: vehiculo?.propietario?.numeroDocumento ?? '',
+      propNom: vehiculo?.propietario?.nombre ?? vehiculo?.razonSocial ?? '',
+      propTipo: vehiculo?.propietario?.tipoDocumento ?? vehiculo?.tipoDocumento ?? '',
+      propDoc: vehiculo?.propietario?.numeroDocumento ?? vehiculo?.numeroDocumento ?? '',
       observed: vehiculo?.estadoValidacion !== 'VALIDADO',
       motivo: vehiculo?.tucVencida
         ? 'La TUC se encuentra vencida y requiere regularización.'
@@ -231,7 +230,7 @@ export class VehiculoCargaComponent implements OnInit, OnDestroy {
     };
   }
 
-  private validationStyle(estado: EstadoValidacionVehiculo) {
+  private validationStyle(estado?: EstadoValidacionVehiculo) {
     if (estado === 'VALIDADO') {
       return {
         bg: 'var(--ok-bg)',
@@ -273,24 +272,45 @@ export class VehiculoCargaComponent implements OnInit, OnDestroy {
     this.vehicleFormSubmitted = false;
     this.vehicleFormError = '';
     this.editingVehicleId = null;
+    this.isFetchingVehicleDetail = false;
     this.showVehicleModal = true;
   }
 
   openVedit(vehicle: Vehiculo): void {
-    this.editingVehicleId = vehicle.id;
-    this.newVehicle = {
-      placa: this.formatPlate(vehicle.placa),
-      categoria: vehicle.categoria,
-      topeGalones: Number(vehicle.topeFmt),
-      numeroAutorizacion: vehicle.nHab,
-      tuc: vehicle.tuc,
-      propietarioTipoDocumento: vehicle.propTipo || 'RUC',
-      propietarioNumeroDocumento: vehicle.propDoc || '',
-      propietarioNombre: vehicle.propNom || '',
-    };
+    const uuid = vehicle.cargaVehiculoUuid || vehicle.id;
+    this.editingVehicleId = uuid;
+    this.newVehicle = this.emptyVehicleForm();
     this.vehicleFormSubmitted = false;
     this.vehicleFormError = '';
     this.showVehicleModal = true;
+
+    if (uuid) {
+      this.isFetchingVehicleDetail = true;
+      this.apiVehiculoService.obtenerVehiculoPorId(uuid).subscribe({
+        next: (response) => {
+          this.isFetchingVehicleDetail = false;
+          const detail = response?.data?.lista;
+          if (detail) {
+            const topeNum = Number(detail.topeGalones);
+            this.newVehicle = {
+              placa: this.formatPlate(detail.placa || ''),
+              categoria: detail.categoria || '',
+              topeGalones: !isNaN(topeNum) && topeNum > 0 ? topeNum : (Number(vehicle.topeFmt) || null),
+              numeroAutorizacion: detail.numeroAutorizacion || '',
+              tuc: detail.tuc || '',
+              propietarioTipoDocumento: detail.tipoDocumento || detail.propietario?.tipoDocumento || 'RUC',
+              propietarioNumeroDocumento: detail.numeroDocumento || detail.propietario?.numeroDocumento || '',
+              propietarioNombre: detail.razonSocial || detail.propietario?.nombre || '',
+            };
+          }
+        },
+        error: (error) => {
+          this.isFetchingVehicleDetail = false;
+          console.error('[VehiculoCarga] Error al obtener detalle del vehículo para editar:', error);
+          this.vehicleFormError = 'No fue posible cargar los datos del vehículo desde el servidor.';
+        },
+      });
+    }
   }
 
   closeVehicleModal(): void {
@@ -424,6 +444,7 @@ export class VehiculoCargaComponent implements OnInit, OnDestroy {
         setTimeout(() => (this.actionMessage = ''), 4500);
       },
       error: (error) => {
+        console.error('[VehiculoCarga] Error en guardarVehiculo:', error);
         this.isCreatingVehicle = false;
         this.vehicleFormError =
           error?.error?.data?.lista?.descripcion ||
@@ -484,6 +505,7 @@ export class VehiculoCargaComponent implements OnInit, OnDestroy {
           setTimeout(() => (this.actionMessage = ''), 4500);
         },
         error: (error) => {
+          console.error('[VehiculoCarga] Error en eliminarVehiculo:', error);
           this.isDeletingVehicle = false;
           this.deleteVehicleError =
             error?.error?.data?.lista?.descripcion ||
@@ -542,30 +564,11 @@ export class VehiculoCargaComponent implements OnInit, OnDestroy {
       return;
     }
 
+    // El detalle ya viene completo de listarVehiculos (valChips, propietario, etc.)
     veh.expanded = true;
-    if (veh.detailLoaded) return;
-
-    veh.detailLoading = true;
+    veh.detailLoaded = true;
+    veh.detailLoading = false;
     veh.detailError = '';
-    this.apiVehiculoService.obtenerVehiculoPorId(veh.id).subscribe({
-      next: (response) => {
-        const detail = this.toViewModel(response.data.lista);
-        Object.assign(veh, detail, {
-          expanded: true,
-          detailLoaded: true,
-          detailLoading: false,
-          detailError: '',
-        });
-      },
-      error: (error) => {
-        veh.detailLoading = false;
-        veh.detailError =
-          error?.error?.data?.lista?.descripcion ||
-          error?.error?.data?.mensaje ||
-          error?.message ||
-          'No fue posible obtener el detalle del vehículo.';
-      },
-    });
   }
 
   reintentarDetalle(veh: Vehiculo): void {

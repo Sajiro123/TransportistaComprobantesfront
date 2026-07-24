@@ -2,21 +2,41 @@
 
   <div class="step-content" style="animation:atu-fade .3s ease both">
 
-    <div class="mb-[18px] grid gap-3 md:grid-cols-2">
-      <div class="flex items-center gap-2.5 rounded-xl border border-[var(--warn)] bg-[var(--warn-bg)] px-3.5 py-2.5">
-        <i class="fa-regular fa-clock text-[var(--warn)]" aria-hidden="true"></i>
-        <span class="text-[13px] font-semibold text-[var(--warn)]">Plazo de compra: 29/05/2026 – 28/07/2026</span>
-        <span
-          class="ml-auto whitespace-nowrap rounded-full bg-[var(--warn)] px-2.5 py-0.5 text-xs font-bold text-white">7
-          días</span>
+    <div class="mb-5 grid gap-4 md:grid-cols-2">
+      <!-- Alerta de Plazo -->
+      <div
+        class="relative overflow-hidden rounded-lg bg-white border border-[#DCE4EC] shadow-[0_1px_3px_rgba(16,36,52,0.05)]">
+        <div class="absolute left-0 top-0 bottom-0 w-1 bg-[var(--warn)]"></div>
+        <div class="flex items-center gap-3.5 px-4 py-3.5">
+          <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--warn-bg)]">
+            <i class="fa-regular fa-clock text-[var(--warn)] text-sm"></i>
+          </div>
+          <div class="flex flex-col">
+            <span class="text-[10.5px] font-bold text-[var(--text-3)] uppercase tracking-wider">Plazo de compra</span>
+            <span class="text-[13px] font-bold text-[var(--text)]">29/05/2026 – 28/07/2026</span>
+          </div>
+          <div class="ml-auto">
+            <span
+              class="inline-block rounded-md bg-[var(--warn-bg)] px-2.5 py-1 text-[11px] font-bold tracking-wide text-[var(--warn)] border border-[var(--warn)]/20">
+              Quedan 7 días
+            </span>
+          </div>
+        </div>
       </div>
 
+      <!-- Alerta de Información -->
       <div
-        class="flex items-center gap-2.5 rounded-xl border border-[var(--primary)] bg-[var(--primary-soft)] px-3.5 py-2.5">
-        <i class="fa-solid fa-circle-info text-[var(--primary)]" aria-hidden="true"></i>
-        <span class="text-[12.5px] font-medium leading-snug text-[var(--primary)]">
-          El beneficiario es el <strong>transportista titular de la autorización</strong>, no el dueño del vehículo.
-        </span>
+        class="relative overflow-hidden rounded-lg bg-white border border-[#DCE4EC] shadow-[0_1px_3px_rgba(16,36,52,0.05)]">
+        <div class="absolute left-0 top-0 bottom-0 w-1 bg-[var(--primary-mid)]"></div>
+        <div class="flex items-center gap-3.5 px-4 py-3.5">
+          <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--primary-soft)]">
+            <i class="fa-solid fa-circle-info text-[var(--primary-mid)] text-sm"></i>
+          </div>
+          <div class="text-[12.5px] leading-relaxed text-[var(--text-2)]">
+            El beneficiario es el <strong class="text-[var(--text)] font-bold">transportista titular</strong> de la
+            autorización, no el dueño del vehículo.
+          </div>
+        </div>
       </div>
     </div>
 
@@ -26,7 +46,7 @@
         <span class="badge-primary">Sección 1 · Verificación</span>
         <span class="badge-muted">Hoja 1 de 2</span>
       </div>
-      <h1 class="section-title">Verificación del transportista</h1>
+      <h1 class="section-title">Verificación del Transportista</h1>
       <p class="section-subtitle">Datos de los registros oficiales. Revísalos; no son editables.</p>
     </div>
 
@@ -35,8 +55,11 @@
       <!-- Tarjeta: Datos del transportista ─────────────────── -->
       <div class="data-card">
         <div class="data-card__header data-card__header--flex">
-          <span>Datos del transportista</span>
-          <span class="badge-count">{{ usandoMocks ? 'Datos mockup' : 'API conectada' }}</span>
+          <span>DATOS DEL TRANSPORTISTA</span>
+          <span class="badge-api-conectada">
+            <i class="fa-solid fa-tower-broadcast"></i>
+            API CONECTADA
+          </span>
         </div>
 
         @if (cargandoDatos) {
@@ -57,15 +80,38 @@
           </button>
         </div>
         } @else {
-        <p-table [value]="datosTransportista" [showGridlines]="false" styleClass="datos-transportista-table"
-          [tableStyle]="{'min-width': '100%'}">
-          <ng-template pTemplate="body" let-row>
-            <tr class="datos-row">
-              <td class="datos-key">{{ row.k }}</td>
-              <td class="datos-val">{{ row.v }}</td>
-            </tr>
-          </ng-template>
-        </p-table>
+        <div class="aut-card-item">
+          <!-- Fila superior: Razón Social + Badge Estado -->
+          <div class="aut-top">
+            <div class="aut-top-left">
+              <i class="fa-solid fa-building-user aut-icon"></i>
+              <span class="aut-servicio">{{ getDatoVal('Razón social') }}</span>
+              <p-tag [value]="getDatoVal('Estado')" severity="success" styleClass="aut-badge" />
+            </div>
+          </div>
+
+          <!-- Fila de metadatos con líneas divisorias verticales -->
+          <div class="aut-meta">
+            <div class="aut-meta-group">
+              <span class="aut-label">RUC</span>
+              <span class="aut-val font-semibold">{{ getDatoVal('RUC') }}</span>
+            </div>
+
+            <span class="aut-divider"></span>
+
+            <div class="aut-meta-group">
+              <span class="aut-label">Tipo de entidad</span>
+              <span class="aut-val font-semibold">{{ getDatoVal('Tipo de entidad') }}</span>
+            </div>
+
+            <span class="aut-divider"></span>
+
+            <div class="aut-meta-group">
+              <span class="aut-label">Total de autorizaciones</span>
+              <span class="aut-val font-semibold">{{ getDatoVal('Total de autorizaciones') }}</span>
+            </div>
+          </div>
+        </div>
         }
 
         <div class="refresh-footer" [class.refresh-footer--exhausted]="actualizacionesDatosRestantes === 0">
@@ -77,7 +123,7 @@
           <button type="button" class="refresh-button" [disabled]="cargandoDatos || actualizacionesDatosRestantes === 0"
             (click)="actualizarSeccion('datos')">
             <i class="fa-solid fa-rotate-right" [class.fa-spin]="cargandoDatos"></i>
-            Actualizar datos
+            Actualizar
           </button>
         </div>
 
@@ -96,27 +142,46 @@
           <span class="badge-count">{{ autCount }} autorizaciones</span>
         </div>
 
-        <p-table [value]="autorizaciones" [showGridlines]="false" styleClass="autorizaciones-table"
-          [tableStyle]="{'min-width': '100%'}">
-          <ng-template pTemplate="body" let-a>
-            <tr class="aut-row">
-              <td class="aut-cell">
-                <!-- Fila superior: Servicio + Badge + Resolución -->
-                <div class="aut-top">
-                  <span class="aut-servicio">{{ a.servicio }}</span>
-                  <p-tag [value]="a.estado" [severity]="a.badgeSeverity" styleClass="aut-badge" />
-                  <span class="aut-resolucion">{{ a.resolucion }}</span>
-                </div>
-                <!-- Fila inferior: metadatos -->
-                <div class="aut-meta">
-                  <span>Autoridad: <strong>{{ a.autoridad }}</strong></span>
-                  <span>Ámbito: {{ a.ambito }}</span>
-                  <span class="mono">Vigencia: {{ a.vigencia }}</span>
-                </div>
-              </td>
-            </tr>
-          </ng-template>
-        </p-table>
+        <div class="autorizaciones-list">
+          @for (a of autorizaciones; track a.resolucion; let last = $last) {
+          <div class="aut-card-item" [class.aut-card-item--border]="!last">
+            <!-- Fila superior: Servicio + Badge + Resolución -->
+            <div class="aut-top">
+              <div class="aut-top-left">
+                <i class="fa-solid fa-file-contract aut-icon"></i>
+                <span class="aut-servicio">{{ a.servicio }}</span>
+                <p-tag [value]="a.estado" [severity]="a.badgeSeverity" styleClass="aut-badge" />
+              </div>
+              <div class="aut-resolucion-chip">
+                <i class="fa-solid fa-hashtag"></i>
+                <span>{{ a.resolucion }}</span>
+              </div>
+            </div>
+
+            <!-- Fila de metadatos con líneas divisorias -->
+            <div class="aut-meta">
+              <div class="aut-meta-group">
+                <span class="aut-label">Autoridad</span>
+                <span class="aut-val font-semibold">{{ a.autoridad }}</span>
+              </div>
+
+              <span class="aut-divider"></span>
+
+              <div class="aut-meta-group">
+                <span class="aut-label">Ámbito</span>
+                <span class="aut-val">{{ a.ambito }}</span>
+              </div>
+
+              <span class="aut-divider"></span>
+
+              <div class="aut-meta-group">
+                <span class="aut-label">Vigencia</span>
+                <span class="aut-val mono">{{ a.vigencia }}</span>
+              </div>
+            </div>
+          </div>
+          }
+        </div>
 
         <div class="refresh-footer refresh-footer--plain"
           [class.refresh-footer--exhausted]="actualizacionesAutorizacionesRestantes === 0">

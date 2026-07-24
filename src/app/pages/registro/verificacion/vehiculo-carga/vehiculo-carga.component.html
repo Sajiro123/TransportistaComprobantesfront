@@ -42,20 +42,6 @@
         Volver a intentar
       </button>
     </div>
-  } @else if (vehCount === 0) {
-    <!-- Empty state -->
-    <div class="text-center py-11 px-5 text-[var(--text-3)] bg-[var(--surface)] border border-dashed border-[var(--border-strong)] rounded-2xl">
-      @if (vehQ || vehCatF || vehValF) {
-        <div class="font-bold text-[var(--text-2)] text-sm">Sin resultados</div>
-        <div class="text-[13px] mt-1">Ningún vehículo coincide con los filtros aplicados.</div>
-        <button (click)="limpiarFiltros()" class="mt-3 bg-[var(--surface)] text-[var(--primary)] border border-[var(--primary)] rounded-lg py-2 px-3 text-[12.5px] font-bold cursor-pointer">
-          Limpiar filtros
-        </button>
-      } @else {
-        <div class="font-bold text-[var(--text-2)] text-sm">Aún no has registrado vehículos</div>
-        <div class="text-[13px] mt-1">Regístralos por uno o cárgalos por Excel arriba.</div>
-      }
-    </div>
   } @else {
     <!-- Info banner -->
     <div class="flex flex-wrap gap-3 items-center justify-between bg-[var(--primary-soft)] border border-[var(--primary)] rounded-xl py-3 px-4 mb-3.5">
@@ -229,9 +215,22 @@
         
         <ng-template pTemplate="emptymessage">
           <tr>
-            <td colspan="6" class="text-center py-11 text-[var(--text-3)]">
-              <div class="font-bold text-[var(--text-2)]">Sin resultados</div>
-              <div class="text-[13px]">Ningún vehículo coincide con los filtros aplicados.</div>
+            <td colspan="6">
+              <div class="flex flex-col items-center justify-center min-h-[250px] text-center text-[var(--text-3)]">
+                <div class="font-bold text-[var(--text-2)] text-sm">No existe información</div>
+                <div class="text-[13px] mt-1">
+                  @if (vehQ || vehCatF || vehValF) {
+                    Ningún vehículo coincide con los filtros aplicados.
+                  } @else {
+                    No se encontraron vehículos registrados.
+                  }
+                </div>
+                @if (vehQ || vehCatF || vehValF) {
+                  <button (click)="limpiarFiltros()" class="mt-4 bg-[var(--surface)] text-[var(--primary)] border border-[var(--primary)] rounded-lg py-2 px-4 text-[12.5px] font-bold cursor-pointer hover:bg-[var(--primary-soft)] transition-colors">
+                    Limpiar filtros
+                  </button>
+                }
+              </div>
             </td>
           </tr>
         </ng-template>
@@ -244,7 +243,6 @@
   <div
     class="fixed inset-0 z-[1000] flex items-center justify-center bg-black/55 backdrop-blur-[2px] p-4"
     role="presentation"
-    (click)="closeVehicleModal()"
   >
     <section
       class="w-full max-w-[650px] max-h-[92vh] flex flex-col bg-[var(--surface)] border border-[var(--border)] rounded-[18px] shadow-2xl overflow-hidden"
@@ -271,6 +269,13 @@
           </div>
         }
 
+        @if (isFetchingVehicleDetail) {
+          <div class="flex flex-col items-center justify-center gap-3 py-16 text-[var(--primary)]">
+            <i class="fa-solid fa-spinner fa-spin text-3xl"></i>
+            <span class="text-sm font-bold text-[var(--text)]">Cargando datos del vehículo…</span>
+            <span class="text-xs text-[var(--text-3)] font-mono">Consultando datos oficiales</span>
+          </div>
+        } @else {
         <div class="text-xs font-extrabold text-[var(--primary)] uppercase tracking-wide mb-3">1 · Datos del vehículo</div>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
           <div>
@@ -327,11 +332,12 @@
         <div class="mt-5 bg-[var(--surface-2)] dark:bg-[#16242F] border border-[var(--border-strong)] dark:border-[#3B5264] rounded-xl py-3 px-4 text-[12px] font-semibold text-[var(--text-2)] dark:text-[#C9D1D9] leading-relaxed">
           Los conductores y sus licencias se registran posteriormente en el comprobante correspondiente.
         </div>
+        }
       </div>
 
       <footer class="flex justify-end gap-2.5 px-5 sm:px-6 py-4 border-t border-[var(--border)] bg-[var(--surface)]">
-        <button type="button" (click)="closeVehicleModal()" [disabled]="isCreatingVehicle" class="border border-[var(--border)] bg-[var(--surface)] text-[var(--text-2)] rounded-xl px-4 py-2.5 text-[13.5px] font-semibold cursor-pointer disabled:opacity-50">Cancelar</button>
-        <button type="button" (click)="guardarVehiculo()" [disabled]="isCreatingVehicle" class="inline-flex items-center gap-2 bg-[var(--primary)] text-[var(--primary-contrast)] border-0 rounded-xl px-5 py-2.5 text-[13.5px] font-bold cursor-pointer disabled:opacity-60">
+        <button type="button" (click)="closeVehicleModal()" [disabled]="isCreatingVehicle || isFetchingVehicleDetail" class="border border-[var(--border)] bg-[var(--surface)] text-[var(--text-2)] rounded-xl px-4 py-2.5 text-[13.5px] font-semibold cursor-pointer disabled:opacity-50">Cancelar</button>
+        <button type="button" (click)="guardarVehiculo()" [disabled]="isCreatingVehicle || isFetchingVehicleDetail" class="inline-flex items-center gap-2 bg-[var(--primary)] text-[var(--primary-contrast)] border-0 rounded-xl px-5 py-2.5 text-[13.5px] font-bold cursor-pointer disabled:opacity-60">
           @if (isCreatingVehicle) {
             <i class="fa-solid fa-spinner fa-spin"></i> {{ isEditingVehicle ? 'Guardando…' : 'Registrando…' }}
           } @else {

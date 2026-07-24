@@ -51,6 +51,14 @@ export const authInterceptor: HttpInterceptorFn = (
 
   return next(authReq).pipe(
     catchError((err: HttpErrorResponse) => {
+      console.error('[AuthInterceptor] Error HTTP interceptado:', {
+        url: req.url,
+        method: req.method,
+        status: err.status,
+        statusText: err.statusText,
+        error: err.error,
+      });
+
       const errMessage = err?.error?.message || err?.error?.descripcion || err?.message || '';
       const isTokenExpired =
         err.status === 401 ||
@@ -73,6 +81,7 @@ export const authInterceptor: HttpInterceptorFn = (
               return next(req.clone({ withCredentials: true }));
             }),
             catchError((refreshErr) => {
+                console.error('[AuthInterceptor] Falló el refresco de token:', refreshErr);
                 isRefreshing = false;
 
                 sessionService.stopSession();
@@ -102,6 +111,24 @@ export const authInterceptor: HttpInterceptorFn = (
           );
         }
       }
+      if (err.status === 403 && !isPublicRoute) {
+        console.warn('[AuthInterceptor] 403 Forbidden interceptado. Redirigiendo a login.');
+        sessionService.stopSession();
+        apiAuthService.clearSession();
+
+        Swal.fire({
+          icon: 'warning',
+          title: 'Sesión finalizada',
+          text: 'Su sesión ha caducado o no tiene permisos. Inicie sesión nuevamente.',
+          confirmButtonText: 'Aceptar',
+          confirmButtonColor: '#0059bb'
+        }).then(() => {
+          router.navigate(['/login']);
+        });
+
+        return EMPTY;
+      }
+
       return throwError(() => err);
     }),
   );

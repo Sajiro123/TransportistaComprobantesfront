@@ -1155,51 +1155,49 @@ export class PerfilInfoComponent implements OnInit {
 
     // 1. Intentar cargar con la API real de transportista si hay ID numérico o fallback
     const transportistaId = 1; // ID técnico por defecto o asignado al usuario
-    this.apiComprobanteService
-      .obtenerCuentaBancariaTransportista()
-      .subscribe({
-        next: (res) => {
-          if (res.data?.lista) {
-            this.cuentaBancariaReal = res.data.lista;
-            const bancoMatch = this.bancosList.find(
-              (b) => b.uuidBanco === res.data.lista?.uuidBanco,
-            );
-            this.cuentaAbono = {
-              banco:
-                bancoMatch?.nombre ||
-                res.data.lista.uuidBanco ||
-                'Banco de Crédito del Perú',
-              codigoCuentaInterbancario: res.data.lista.cci || '',
-            };
-          } else {
-            this.cuentaAbono = null;
-          }
-          this.isLoadingCuentaAbono = false;
-          this.cuentaAbonoLoaded = true;
-        },
-        error: () => {
-          // Fallback al endpoint legado si falla
-          this.apiComprobanteService.obtenerCuentaAbono(ruc).subscribe({
-            next: (res) => {
-              this.cuentaAbono = res.data.lista;
-              this.isLoadingCuentaAbono = false;
-              this.cuentaAbonoLoaded = true;
+    this.apiComprobanteService.obtenerCuentaBancariaTransportista().subscribe({
+      next: (res) => {
+        if (res.data?.lista) {
+          this.cuentaBancariaReal = res.data.lista;
+          const bancoMatch = this.bancosList.find(
+            (b) => b.uuidBanco === res.data.lista?.uuidBanco,
+          );
+          this.cuentaAbono = {
+            banco:
+              bancoMatch?.nombre ||
+              res.data.lista.uuidBanco ||
+              'Banco de Crédito del Perú',
+            codigoCuentaInterbancario: res.data.lista.cci || '',
+          };
+        } else {
+          this.cuentaAbono = null;
+        }
+        this.isLoadingCuentaAbono = false;
+        this.cuentaAbonoLoaded = true;
+      },
+      error: () => {
+        // Fallback al endpoint legado si falla
+        this.apiComprobanteService.obtenerCuentaAbono(ruc).subscribe({
+          next: (res) => {
+            this.cuentaAbono = res.data.lista;
+            this.isLoadingCuentaAbono = false;
+            this.cuentaAbonoLoaded = true;
 
-              if (this.usuario) {
-                this.usuario.banco = this.cuentaAbono?.banco ?? '';
-                this.usuario.cci =
-                  this.cuentaAbono?.codigoCuentaInterbancario ?? '';
-              }
-            },
-            error: (err) => {
-              this.isLoadingCuentaAbono = false;
-              this.cuentaAbonoLoaded = true;
-              this.cuentaAbono = null;
-              console.error('Error al cargar la cuenta de abono:', err);
-            },
-          });
-        },
-      });
+            if (this.usuario) {
+              this.usuario.banco = this.cuentaAbono?.banco ?? '';
+              this.usuario.cci =
+                this.cuentaAbono?.codigoCuentaInterbancario ?? '';
+            }
+          },
+          error: (err) => {
+            this.isLoadingCuentaAbono = false;
+            this.cuentaAbonoLoaded = true;
+            this.cuentaAbono = null;
+            console.error('Error al cargar la cuenta de abono:', err);
+          },
+        });
+      },
+    });
   }
 
   get avatarLetter(): string {

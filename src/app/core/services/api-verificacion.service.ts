@@ -110,7 +110,7 @@ export class ApiVerificacionService {
   private readonly http = inject(HttpClient);
   private readonly baseUrl = environment.API_COMPROBANTE_URL.replace(/\/$/, '');
 
-  readonly usandoMocks = environment.API_COMPROBANTE_MOCK;
+  readonly usandoMocks = false;
 
   obtenerDatosTransportista(ruc: string): Observable<DatosTransportista> {
     if (this.usandoMocks) {

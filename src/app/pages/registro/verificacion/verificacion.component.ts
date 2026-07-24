@@ -58,7 +58,6 @@ export class VerificacionComponent implements OnInit {
   actualizacionesDatosRestantes = 5;
   actualizacionesAutorizacionesRestantes = 5;
   actualizacionesVehiculosRestantes = 5;
-  readonly usandoMocks = this.apiVerificacion.usandoMocks;
   private transportista: DatosTransportista | null = null;
 
   // ── Autorizaciones ──────────────────────────────────────────
@@ -67,6 +66,14 @@ export class VerificacionComponent implements OnInit {
   get autCount(): number {
     return (
       this.transportista?.totalAutorizaciones ?? this.autorizaciones.length
+    );
+  }
+
+  getDatoVal(key: string): string {
+    return (
+      this.datosTransportista.find(
+        (d) => d.k.toLowerCase().trim() === key.toLowerCase().trim(),
+      )?.v || '—'
     );
   }
 
@@ -83,7 +90,7 @@ export class VerificacionComponent implements OnInit {
     const usuarioSesion =
       this.apiAuth.getUserFromSession() ?? this.auth.getSession();
     const rucSesion = usuarioSesion?.numDocumento || '';
-    this.rucConsulta = this.usandoMocks ? '20512345678' : rucSesion;
+    this.rucConsulta = rucSesion;
 
     if (!this.rucConsulta) {
       this.errorDatos =
@@ -121,7 +128,7 @@ export class VerificacionComponent implements OnInit {
     const usuarioSesion =
       this.apiAuth.getUserFromSession() ?? this.auth.getSession();
     const rucSesion = usuarioSesion?.numDocumento || '';
-    this.rucConsulta = this.usandoMocks ? '20512345678' : rucSesion;
+    this.rucConsulta = rucSesion;
 
     if (!this.rucConsulta) {
       this.errorDatos =
@@ -178,7 +185,6 @@ export class VerificacionComponent implements OnInit {
   private aplicarDatosTransportista(datos: DatosTransportista): void {
     this.transportista = datos;
     this.datosTransportista = [
-      { k: 'ID interno', v: String(datos.id) },
       { k: 'RUC', v: datos.ruc },
       { k: 'Razón social', v: datos.razonSocial },
       { k: 'Tipo de entidad', v: datos.tipoEntidad },

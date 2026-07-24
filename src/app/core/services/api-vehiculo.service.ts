@@ -20,7 +20,7 @@ export class ApiVehiculoService {
   private readonly apiUrl = environment.API_COMPROBANTE_URL;
 
   listarVehiculos(filtros: VehiculosFiltros): Observable<VehiculosResponse> {
-    let params = new HttpParams().set('ruc', filtros.ruc);
+    let params = new HttpParams();
     if (filtros.busqueda) params = params.set('busqueda', filtros.busqueda);
     if (filtros.categoria) params = params.set('categoria', filtros.categoria);
     if (filtros.estado) params = params.set('estado', filtros.estado);
@@ -32,9 +32,9 @@ export class ApiVehiculoService {
 
   /**
    * Obtiene el detalle y las validaciones de un vehículo.
-   * GET /api_comprobante/vehiculos/{id}
+   * GET /api_comprobante/vehiculos/{cargaVehiculoUuid}
    */
-  obtenerVehiculoPorId(id: number): Observable<VehiculoDetalleResponse> {
+  obtenerVehiculoPorId(id: string | number): Observable<VehiculoDetalleResponse> {
     return this.http.get<VehiculoDetalleResponse>(`${this.apiUrl}/vehiculos/${id}`);
   }
 
@@ -53,10 +53,10 @@ export class ApiVehiculoService {
 
   /**
    * Actualiza un vehículo existente y reinicia su validación.
-   * PUT /api_comprobante/vehiculos/{id}
+   * PUT /api_comprobante/vehiculos/{cargaVehiculoUuid}
    */
   actualizarVehiculo(
-    id: number,
+    id: string | number,
     payload: ActualizarVehiculoRequest,
   ): Observable<ActualizarVehiculoResponse> {
     return this.http.put<ActualizarVehiculoResponse>(
@@ -67,9 +67,9 @@ export class ApiVehiculoService {
 
   /**
    * Elimina un vehículo registrado.
-   * DELETE /api_comprobante/vehiculos/{id}
+   * DELETE /api_comprobante/vehiculos/{cargaVehiculoUuid}
    */
-  eliminarVehiculo(id: number): Observable<EliminarVehiculoResponse> {
+  eliminarVehiculo(id: string | number): Observable<EliminarVehiculoResponse> {
     return this.http.delete<EliminarVehiculoResponse>(
       `${this.apiUrl}/vehiculos/${id}`,
     );

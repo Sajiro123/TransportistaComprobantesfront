@@ -244,14 +244,15 @@
     width: 36px;
     height: 36px;
     border-radius: 10px;
-    background: rgba(255, 255, 255, 0.07);  // ← ligeramente más visible
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.14);
     flex: none;
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 
     svg {
-      opacity: 0.85;                        // ← antes 0.7, ahora más legible
-      transition: opacity 0.2s;
+      opacity: 1;
+      color: #ffffff;
+      transition: opacity 0.2s, color 0.2s;
     }
   }
 
@@ -282,10 +283,10 @@
     color: #ffffff;
 
     .atu-nav-item__icon {
-      background: rgba(0, 163, 224, 0.15);
-      border-color: rgba(0, 163, 224, 0.28);
+      background: rgba(0, 163, 224, 0.20);
+      border-color: rgba(0, 163, 224, 0.35);
 
-      svg { opacity: 1; }
+      svg { opacity: 1; color: #ffffff; }
     }
   }
 
@@ -300,14 +301,14 @@
     }
 
     .atu-nav-item__icon {
-      background: rgba(0, 163, 224, 0.22);
-      border-color: rgba(0, 163, 224, 0.38);
+      background: rgba(0, 163, 224, 0.28);
+      border-color: rgba(0, 163, 224, 0.45);
       box-shadow: 0 0 16px rgba(0, 163, 224, 0.2),
                   inset 0 0 8px rgba(0, 163, 224, 0.08);
 
       svg {
         opacity: 1;
-        color: #00C4FF;  // ← azul brillante en activo
+        color: #ffffff;
       }
     }
 
@@ -329,8 +330,10 @@
     color: rgba(255, 255, 255, 0.5);
 
     .atu-nav-item__icon {
-      background: rgba(192, 57, 43, 0.06);
-      border-color: transparent;
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.10);
+
+      svg { color: rgba(255, 255, 255, 0.65); }
     }
 
     &:hover {

@@ -84,16 +84,10 @@
       <sc-if value="{{ authLogin }}" hint-placeholder-val="{{ true }}">
       <div>
         <h2 style="font-size:24px;font-weight:800;margin:0 0 6px">Ingreso al sistema</h2>
-        <p style="color:var(--text-3);font-size:14px;margin:0 0 24px">Autentícate con tu documento y clave</p>
+        <p style="color:var(--text-3);font-size:14px;margin:0 0 24px">Autentícate con tu RUC y clave</p>
 
-        <label style="display:block;font-size:12.5px;font-weight:700;color:var(--text-2);margin-bottom:7px">Tipo de documento</label>
-        <div style="display:flex;gap:8px;margin-bottom:16px">
-          <button onClick="{{ setDocRuc }}" style="flex:1;padding:11px;border-radius:10px;border:1.5px solid {{ rucBorder }};background:{{ rucBg }};color:{{ rucColor }};font-size:14px;font-weight:700;cursor:pointer">RUC</button>
-          <button onClick="{{ setDocDni }}" style="flex:1;padding:11px;border-radius:10px;border:1.5px solid {{ dniBorder }};background:{{ dniBg }};color:{{ dniColor }};font-size:14px;font-weight:700;cursor:pointer">DNI</button>
-        </div>
-
-        <label style="display:block;font-size:12.5px;font-weight:700;color:var(--text-2);margin-bottom:7px">Número de {{ docLabel }}</label>
-        <input value="{{ docNumber }}" onInput="{{ onDocNum }}" inputmode="numeric" placeholder="{{ docPlaceholder }}" style="width:100%;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 13px;font-size:14px;color:var(--text);font-family:'JetBrains Mono',monospace;margin-bottom:16px" />
+        <label style="display:block;font-size:12.5px;font-weight:700;color:var(--text-2);margin-bottom:7px">Número de RUC</label>
+        <input value="{{ docNumber }}" onInput="{{ onDocNum }}" inputmode="numeric" maxlength="11" placeholder="Ej. 20512345678" style="width:100%;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 13px;font-size:14px;color:var(--text);font-family:'JetBrains Mono',monospace;margin-bottom:16px" />
 
         <label style="display:block;font-size:12.5px;font-weight:700;color:var(--text-2);margin-bottom:7px">Clave</label>
         <div style="position:relative;margin-bottom:8px">
@@ -326,7 +320,7 @@
         <!-- S2 VERIFICACION -->
         <sc-if value="{{ s2 }}" hint-placeholder-val="{{ false }}">
           <div style="animation:atu-fade .3s ease both">
-            <div style="margin-bottom:16px"><div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap"><span style="font-size:10.5px;font-weight:800;letter-spacing:.6px;color:var(--primary-contrast);background:var(--primary);border-radius:6px;padding:3px 9px;text-transform:uppercase">Sección 1 · Registro</span><span style="font-size:10.5px;font-weight:700;letter-spacing:.5px;color:var(--text-3);text-transform:uppercase">Hoja 1 de 2</span></div><h1 style="font-size:24px;font-weight:800;margin:4px 0 0">Verificación del transportista</h1><p style="color:var(--text-3);font-size:13.5px;margin:6px 0 0">Datos de los registros oficiales. Revísalos; no son editables.</p></div>
+            <div style="margin-bottom:16px"><div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap"><span style="font-size:10.5px;font-weight:800;letter-spacing:.6px;color:var(--primary-contrast);background:var(--primary);border-radius:6px;padding:3px 9px;text-transform:uppercase">Sección 1 · Verificación</span><span style="font-size:10.5px;font-weight:700;letter-spacing:.5px;color:var(--text-3);text-transform:uppercase">Hoja 1 de 2</span></div><h1 style="font-size:24px;font-weight:800;margin:4px 0 0">Validación del transportista</h1><p style="color:var(--text-3);font-size:13.5px;margin:6px 0 0">Datos de los registros oficiales. Revísalos; no son editables.</p></div>
             <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow);overflow:hidden;margin-bottom:16px">
               <div style="background:var(--surface-2);padding:13px 18px;border-bottom:1px solid var(--border);font-size:11.5px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.5px">Datos del transportista</div>
               <div style="padding:4px 18px">
@@ -334,6 +328,13 @@
                   <div style="display:flex;justify-content:space-between;gap:16px;padding:12px 0;border-bottom:1px solid var(--border)"><span style="font-size:13px;color:var(--text-3)">{{ d.k }}</span><span style="font-size:13.5px;font-weight:700;text-align:right">{{ d.v }}</span></div>
                 </sc-for>
               </div>
+              <div style="padding:12px 18px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;background:var(--surface-2)">
+                <span style="font-size:12px;font-weight:700;color:{{ refSunatLeftColor }}">{{ refSunatLeftTxt }}</span>
+                <button onClick="{{ refSunatDo }}" disabled="{{ refSunatDisabled }}" style="{{ refSunatBtn }}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.6-6.4M21 3v6h-6"/></svg> Actualizar datos</button>
+              </div>
+              <sc-if value="{{ refSunatExhausted }}" hint-placeholder-val="{{ false }}">
+                <div style="padding:12px 18px;background:var(--bad-bg);border-top:1px solid var(--bad);font-size:12.5px;color:var(--text-2);line-height:1.45"><b style="color:var(--bad)">Sin actualizaciones disponibles hoy.</b> {{ refSunatMsg }}</div>
+              </sc-if>
             </div>
             <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow);overflow:hidden;margin-bottom:14px">
               <div style="background:var(--surface-2);padding:13px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:10px"><span style="font-size:11.5px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.5px">Autorizaciones del transportista</span><span style="font-size:11px;font-weight:700;color:var(--primary);background:var(--primary-soft);border-radius:999px;padding:3px 10px">{{ autCount }} autorizaciones</span></div>
@@ -349,7 +350,20 @@
                   </div>
                 </sc-for>
               </div>
+              <div style="padding:12px 18px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+                <span style="font-size:12px;font-weight:700;color:{{ refAutLeftColor }}">{{ refAutLeftTxt }}</span>
+                <button onClick="{{ refAutDo }}" disabled="{{ refAutDisabled }}" style="{{ refAutBtn }}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.6-6.4M21 3v6h-6"/></svg> Actualizar datos</button>
+              </div>
+              <sc-if value="{{ refAutExhausted }}" hint-placeholder-val="{{ false }}">
+                <div style="padding:12px 18px;background:var(--bad-bg);border-top:1px solid var(--bad);font-size:12.5px;color:var(--text-2);line-height:1.45"><b style="color:var(--bad)">Sin actualizaciones disponibles hoy.</b> {{ refAutMsg }}</div>
+              </sc-if>
               <div style="padding:11px 18px;background:var(--surface-2);font-size:12px;color:var(--text-2);line-height:1.45">ⓘ El subsidio aplica a los vehículos habilitados bajo <b>cualquiera</b> de tus autorizaciones vigentes. Si una autorización no está vigente, sus vehículos no serán reconocidos.</div>
+            </div>
+            <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow);overflow:hidden;margin-bottom:16px">
+              <div style="padding:12px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap"><span style="font-size:11.5px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.5px">Vehículos habilitados · fuente MTC</span><div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"><span style="font-size:12px;font-weight:700;color:{{ refVehLeftColor }}">{{ refVehLeftTxt }}</span><button onClick="{{ refVehDo }}" disabled="{{ refVehDisabled }}" style="{{ refVehBtn }}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.6-6.4M21 3v6h-6"/></svg> Actualizar datos</button></div></div>
+              <sc-if value="{{ refVehExhausted }}" hint-placeholder-val="{{ false }}">
+                <div style="padding:12px 18px;background:var(--bad-bg);border-top:1px solid var(--bad);font-size:12.5px;color:var(--text-2);line-height:1.45"><b style="color:var(--bad)">Sin actualizaciones disponibles hoy.</b> {{ refVehMsg }}</div>
+              </sc-if>
             </div>
             <div style="font-size:11.5px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.5px;margin:0 2px 10px">Semáforo de condiciones</div>
             <div style="display:flex;flex-direction:column;gap:10px">
@@ -446,7 +460,8 @@
                 <sc-if value="{{ ctaLockedView }}" hint-placeholder-val="{{ false }}">
                   <div style="display:flex;flex-wrap:wrap;gap:14px 26px;align-items:flex-end">
                     <div><div style="font-size:11px;color:var(--text-3);text-transform:uppercase;margin-bottom:3px">Banco</div><div style="font-size:14.5px;font-weight:700">{{ bancoLabel }}</div></div>
-                    <div><div style="font-size:11px;color:var(--text-3);text-transform:uppercase;margin-bottom:3px">CCI</div><div style="font-size:14.5px;font-weight:700;font-family:'JetBrains Mono',monospace">{{ cciMask }}</div></div>
+                    <sc-if value="{{ savedCci }}" hint-placeholder-val="{{ true }}"><div><div style="font-size:11px;color:var(--text-3);text-transform:uppercase;margin-bottom:3px">CCI</div><div style="font-size:14.5px;font-weight:700;font-family:'JetBrains Mono',monospace">{{ cciMask }}</div></div></sc-if>
+                    <sc-if value="{{ savedPn }}" hint-placeholder-val="{{ false }}"><div><div style="font-size:11px;color:var(--text-3);text-transform:uppercase;margin-bottom:3px">Cobra (persona natural)</div><div style="font-size:14.5px;font-weight:700">{{ bnNombre }} <span style="font-family:'JetBrains Mono',monospace;color:var(--text-3);font-weight:600">· DNI {{ bnDni }}</span></div><div style="font-size:11.5px;color:var(--ok);font-weight:700;margin-top:2px">✓ Orden de Pago Electrónico solicitada</div></div></sc-if>
                     <button onClick="{{ pedirCambioCuenta }}" disabled="{{ locked }}" style="margin-left:auto;display:inline-flex;align-items:center;gap:7px;background:var(--surface-2);color:var(--text);border:1px solid var(--border-strong);border-radius:9px;padding:10px 15px;font-size:13px;font-weight:700;cursor:pointer">🔒 Cambiar cuenta</button>
                   </div>
                   <div style="margin-top:12px;font-size:12px;color:var(--text-3);line-height:1.45">Por seguridad, cambiar la cuenta requiere <b>validación por correo</b>.</div>
@@ -473,8 +488,28 @@
                     <option value="">Selecciona un banco…</option>
                     <sc-for list="{{ bancoOpts }}" as="b" hint-placeholder-count="5"><option value="{{ b.id }}">{{ b.label }}</option></sc-for>
                   </select>
-                  <label style="display:block;font-size:12.5px;font-weight:700;color:var(--text-2);margin-bottom:7px">Código de Cuenta Interbancario (CCI)</label>
-                  <input value="{{ cciDraft }}" onInput="{{ onCciDraft }}" inputmode="numeric" placeholder="20 dígitos" maxlength="20" style="width:100%;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 13px;font-size:14px;color:var(--text);font-family:'JetBrains Mono',monospace;letter-spacing:.05em;margin-bottom:14px" />
+                  <sc-if value="{{ cciVisible }}" hint-placeholder-val="{{ true }}">
+                    <label style="display:block;font-size:12.5px;font-weight:700;color:var(--text-2);margin-bottom:7px">Código de Cuenta Interbancario (CCI)</label>
+                    <input value="{{ cciDraft }}" onInput="{{ onCciDraft }}" inputmode="numeric" placeholder="20 dígitos" maxlength="20" style="width:100%;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 13px;font-size:14px;color:var(--text);font-family:'JetBrains Mono',monospace;letter-spacing:.05em;margin-bottom:14px" />
+                  </sc-if>
+                  <sc-if value="{{ pnBlock }}" hint-placeholder-val="{{ false }}">
+                    <label style="display:flex;align-items:flex-start;gap:11px;padding:13px;border-radius:11px;border:1.5px solid {{ bnPnBorder }};background:{{ bnPnBg }};cursor:pointer;margin-bottom:14px">
+                      <input type="checkbox" checked="{{ bnPersonaNatural }}" onChange="{{ toggleBnPn }}" style="width:18px;height:18px;accent-color:var(--primary);cursor:pointer;flex:none;margin-top:1px" />
+                      <span><span style="display:block;font-size:13.5px;font-weight:700;color:var(--text)">El cobro lo realiza una persona natural</span><span style="display:block;font-size:12px;color:var(--text-3);line-height:1.4;margin-top:2px">Para cuentas del Banco de la Nación, una persona natural puede cobrar el subsidio mediante Orden de Pago Electrónico (no se requiere CCI).</span></span>
+                    </label>
+                    <sc-if value="{{ bnPersonaNatural }}" hint-placeholder-val="{{ false }}">
+                      <div style="display:grid;grid-template-columns:1fr 1.4fr;gap:14px;margin-bottom:14px">
+                        <div><label style="display:block;font-size:12.5px;font-weight:700;color:var(--text-2);margin-bottom:7px">DNI de quien cobra *</label><input value="{{ bnDni }}" onInput="{{ onBnDni }}" inputmode="numeric" maxlength="8" placeholder="8 dígitos" style="width:100%;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 13px;font-size:14px;color:var(--text);font-family:'JetBrains Mono',monospace" /></div>
+                        <div><label style="display:block;font-size:12.5px;font-weight:700;color:var(--text-2);margin-bottom:7px">Nombre completo *</label><input value="{{ bnNombre }}" onInput="{{ onBnNombre }}" placeholder="Nombres y apellidos" style="width:100%;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 13px;font-size:14px;color:var(--text)" /></div>
+                      </div>
+                      <sc-if value="{{ bnOpeSolicitada }}" hint-placeholder-val="{{ false }}">
+                        <div style="display:flex;align-items:center;gap:9px;background:var(--ok-bg);border:1px solid var(--ok);border-radius:10px;padding:12px 14px;margin-bottom:14px"><span style="width:22px;height:22px;border-radius:50%;background:var(--ok);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px">✓</span><div style="font-size:13px;font-weight:700;color:var(--ok)">Orden de Pago Electrónico solicitada</div></div>
+                      </sc-if>
+                      <sc-if value="{{ bnOpePending }}" hint-placeholder-val="{{ true }}">
+                        <button onClick="{{ solicitarOpe }}" style="width:100%;background:var(--surface);border:1.5px dashed var(--primary);color:var(--primary);border-radius:10px;padding:12px;font-size:13.5px;font-weight:700;cursor:pointer;margin-bottom:14px">Solicitar Orden de Pago Electrónico</button>
+                      </sc-if>
+                    </sc-if>
+                  </sc-if>
                   <div style="display:flex;gap:10px">
                     <sc-if value="{{ ctaEditingExisting }}" hint-placeholder-val="{{ false }}"><button onClick="{{ cancelarEdicion }}" style="flex:none;background:var(--surface);color:var(--text-2);border:1px solid var(--border);border-radius:10px;padding:13px 18px;font-size:14px;font-weight:600;cursor:pointer">Cancelar</button></sc-if>
                     <button onClick="{{ guardarCuenta }}" disabled="{{ locked }}" style="{{ guardarCuentaStyle }}">{{ guardarCuentaLabel }}</button>
@@ -498,7 +533,7 @@
         <sc-if value="{{ s4 }}" hint-placeholder-val="{{ false }}">
           <div style="animation:atu-fade .3s ease both">
             <div style="display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:14px;margin-bottom:18px">
-              <div style="min-width:0"><div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap"><span style="font-size:10.5px;font-weight:800;letter-spacing:.6px;color:var(--primary-contrast);background:var(--primary);border-radius:6px;padding:3px 9px;text-transform:uppercase">Sección 1 · Registro</span><span style="font-size:10.5px;font-weight:700;letter-spacing:.5px;color:var(--text-3);text-transform:uppercase">Hoja 2 de 2</span></div><h1 style="font-size:24px;font-weight:800;margin:4px 0 0">Mis vehículos</h1><p style="color:var(--text-3);font-size:13.5px;margin:6px 0 0;max-width:560px">Registra tus vehículos habilitados <b>uno por uno</b> o carga <b>varios</b> a la vez por Excel. La <b>categoría</b> define el tope de galones que el sistema valida contra el MTC.</p></div>
+              <div style="min-width:0"><div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap"><span style="font-size:10.5px;font-weight:800;letter-spacing:.6px;color:var(--primary-contrast);background:var(--primary);border-radius:6px;padding:3px 9px;text-transform:uppercase">Sección 1 · Verificación</span><span style="font-size:10.5px;font-weight:700;letter-spacing:.5px;color:var(--text-3);text-transform:uppercase">Hoja 2 de 2</span></div><h1 style="font-size:24px;font-weight:800;margin:4px 0 0">Mis vehículos</h1><p style="color:var(--text-3);font-size:13.5px;margin:6px 0 0;max-width:560px">Registra tus vehículos habilitados <b>uno por uno</b> o carga <b>varios</b> a la vez por Excel. La <b>categoría</b> define el tope de galones que el sistema valida contra el MTC.</p></div>
               <div style="display:flex;gap:10px;flex-wrap:wrap">
                 <button onClick="{{ openBulk }}" disabled="{{ locked }}" style="display:inline-flex;align-items:center;gap:8px;background:var(--surface);color:var(--text);border:1px solid var(--border-strong);border-radius:10px;padding:11px 16px;font-size:13.5px;font-weight:700;cursor:pointer;white-space:nowrap"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg> Cargar Excel</button>
                 <button onClick="{{ openVadd }}" disabled="{{ locked }}" style="display:inline-flex;align-items:center;gap:8px;background:var(--primary);color:var(--primary-contrast);border:none;border-radius:10px;padding:11px 18px;font-size:13.5px;font-weight:700;cursor:pointer;white-space:nowrap;box-shadow:0 6px 16px rgba(14,90,138,.22)"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg> Agregar vehículo</button>
@@ -619,14 +654,14 @@
                 <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow);overflow:hidden">
                   <div style="overflow-x:auto"><div style="min-width:1040px">
                     <div style="display:grid;grid-template-columns:1.3fr 1.4fr 1.9fr 1.1fr 1fr 1.2fr 0.8fr;gap:10px;padding:13px 18px;background:var(--surface-2);border-bottom:1px solid var(--border);font-size:11px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.5px">
-                      <div>Comprobante</div><div>Placa · conductor</div><div>Grifo · ubicación</div><div>Combustible</div><div>Galones</div><div>Estado</div><div style="text-align:right">Acciones</div>
+                      <div>Comprobante</div><div>Placas asociadas</div><div>Grifo · ubicación</div><div>Combustible</div><div>Galones</div><div>Estado</div><div style="text-align:right">Acciones</div>
                     </div>
                     <sc-for list="{{ compsAView }}" as="c" hint-placeholder-count="4">
                       <div style="display:grid;grid-template-columns:1.3fr 1.4fr 1.9fr 1.1fr 1fr 1.2fr 0.8fr;gap:10px;padding:13px 18px;align-items:center;font-size:13px;border-bottom:1px solid var(--border)">
                         <div style="min-width:0"><div style="font-weight:700;font-family:'JetBrains Mono',monospace;font-size:13px">{{ c.serie }}-{{ c.numero }}</div><div style="font-size:11px;color:var(--text-3)">{{ c.fecha }}</div></div>
-                        <div style="min-width:0"><div style="font-family:'JetBrains Mono',monospace;font-weight:700;font-size:13.5px">{{ c.placa }}</div><div style="font-size:11.5px;color:var(--text-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ c.condNom }}</div></div>
+                        <div style="min-width:0"><div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap"><span style="font-family:'JetBrains Mono',monospace;font-weight:700;font-size:13.5px">{{ c.placasHead }}</span><sc-if value="{{ c.placasMulti }}" hint-placeholder-val="{{ false }}"><span style="font-size:10.5px;font-weight:700;background:var(--primary-soft);color:var(--primary);border-radius:6px;padding:2px 7px">{{ c.placasExtra }}</span></sc-if></div><div style="font-size:11px;color:var(--text-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ c.placasQ }}</div></div>
                         <div style="min-width:0"><div style="font-weight:600;font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ c.grifo }}</div><div style="font-size:11px;color:var(--text-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ c.ubi }}</div></div>
-                        <div><span style="font-size:12px;font-weight:700;background:var(--surface-3);padding:3px 9px;border-radius:7px">{{ c.comb }}</span> <span style="font-size:11px;color:var(--text-3);font-family:'JetBrains Mono',monospace">{{ c.azufreTxt }}</span></div>
+                        <div><span style="font-size:12px;font-weight:700;background:var(--surface-3);padding:3px 9px;border-radius:7px">{{ c.comb }}</span></div>
                         <div style="font-family:'JetBrains Mono',monospace;font-size:12.5px">{{ c.galFmt }}</div>
                         <div><span style="display:inline-flex;align-items:center;gap:5px;background:{{ c.badgeBg }};color:{{ c.badgeColor }};border-radius:999px;padding:4px 11px;font-size:11px;font-weight:700"><sc-if value="{{ c.spinning }}" hint-placeholder-val="{{ false }}"><span style="width:11px;height:11px;border:2px solid var(--border-strong);border-top-color:var(--primary);border-radius:50%;animation:atu-spin .8s linear infinite"></span></sc-if><sc-if value="{{ c.notSpinning }}" hint-placeholder-val="{{ true }}"><span style="font-size:10px">{{ c.badgeGlyph }}</span></sc-if>{{ c.badgeLabel }}</span></div>
                         <div style="display:flex;justify-content:flex-end;gap:6px">
@@ -880,16 +915,21 @@
         <button onClick="{{ closeCompA }}" style="width:34px;height:34px;border-radius:9px;border:1px solid var(--border);background:var(--surface-2);color:var(--text-2);cursor:pointer;font-size:18px;line-height:1">×</button>
       </div>
       <div style="padding:20px 22px;overflow:auto;flex:1">
-        <div style="font-size:12px;font-weight:800;color:var(--primary);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">1 · Vehículo y conductor</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
-          <div><label style="display:block;font-size:12.5px;font-weight:700;color:var(--text-2);margin-bottom:6px">Placa *</label><select value="{{ cfPlaca }}" onChange="{{ onCfPlaca }}" style="width:100%;background:var(--surface-2);border:1px solid var(--border);border-radius:9px;padding:11px 12px;font-size:14px;color:var(--text);cursor:pointer;font-family:'JetBrains Mono',monospace"><option value="">Selecciona una placa…</option><sc-for list="{{ placaOpts }}" as="o" hint-placeholder-count="3"><option value="{{ o }}">{{ o }}</option></sc-for></select></div>
-          <div><label style="display:block;font-size:12.5px;font-weight:700;color:var(--text-2);margin-bottom:6px">Conductor</label><input value="{{ cfCondNom }}" onInput="{{ cfSet.condNom }}" placeholder="Nombre completo" style="width:100%;background:var(--surface-2);border:1px solid var(--border);border-radius:9px;padding:11px 12px;font-size:14px;color:var(--text)" /></div>
-        </div>
-        <div style="display:grid;grid-template-columns:0.7fr 1fr 1fr;gap:14px;margin-bottom:18px">
-          <div><label style="display:block;font-size:12.5px;font-weight:700;color:var(--text-2);margin-bottom:6px">Documento</label><select value="{{ cfCondDocTipo }}" onChange="{{ cfSet.condDocTipo }}" style="width:100%;background:var(--surface-2);border:1px solid var(--border);border-radius:9px;padding:11px 12px;font-size:14px;color:var(--text);cursor:pointer"><sc-for list="{{ docOpts }}" as="o" hint-placeholder-count="2"><option value="{{ o }}">{{ o }}</option></sc-for></select></div>
-          <div><label style="display:block;font-size:12.5px;font-weight:700;color:var(--text-2);margin-bottom:6px">N.° documento</label><input value="{{ cfCondDoc }}" onInput="{{ cfSet.condDoc }}" style="width:100%;background:var(--surface-2);border:1px solid var(--border);border-radius:9px;padding:11px 12px;font-size:14px;color:var(--text);font-family:'JetBrains Mono',monospace" /></div>
-          <div><label style="display:block;font-size:12.5px;font-weight:700;color:var(--text-2);margin-bottom:6px">Licencia de conducir</label><input value="{{ cfCondLic }}" onInput="{{ cfSet.condLic }}" placeholder="Q00000000" style="width:100%;background:var(--surface-2);border:1px solid var(--border);border-radius:9px;padding:11px 12px;font-size:14px;color:var(--text);font-family:'JetBrains Mono',monospace" /></div>
-        </div>
+        <div style="font-size:12px;font-weight:800;color:var(--primary);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">1 · Comprobante (archivo)</div>
+        <sc-if value="{{ cfNoFile }}" hint-placeholder-val="{{ true }}">
+          <div onClick="{{ pickCompFile }}" style="border:1.5px dashed var(--border-strong);border-radius:12px;padding:22px 18px;text-align:center;background:var(--surface-2);cursor:pointer;margin-bottom:6px">
+            <div style="width:40px;height:40px;margin:0 auto 9px;border-radius:10px;background:var(--primary-soft);color:var(--primary);display:flex;align-items:center;justify-content:center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg></div>
+            <div style="font-size:13.5px;font-weight:700">Arrastra el comprobante o haz clic para seleccionar</div>
+            <div style="font-size:12px;color:var(--text-3);margin-top:3px">PDF o imagen JPG/PNG · máx. 5 MB</div>
+          </div>
+        </sc-if>
+        <sc-if value="{{ cfHasFile }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;border-radius:11px;background:var(--surface-2);border:1px solid var(--border)">
+            <div style="display:flex;align-items:center;gap:10px;min-width:0"><span style="color:var(--primary);flex:none"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg></span><div style="min-width:0"><div style="font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ cfFileName }}</div><div style="font-size:11px;color:var(--text-3)">Se validará en SUNAT y Osinergmin</div></div></div>
+            <button onClick="{{ removeCompFile }}" title="Quitar" style="flex:none;width:30px;height:30px;border-radius:8px;border:1px solid var(--bad);background:var(--bad-bg);color:var(--bad);cursor:pointer;font-size:16px;line-height:1">×</button>
+          </div>
+        </sc-if>
+        <div style="font-size:11.5px;color:var(--text-3);margin:7px 2px 18px">El archivo es tu respaldo. El sistema verificará que la factura exista en SUNAT y que el grifo esté inscrito en Osinergmin.</div>
 
         <div style="font-size:12px;font-weight:800;color:var(--primary);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">2 · Factura</div>
         <div style="display:grid;grid-template-columns:0.8fr 1.1fr 1fr 1fr;gap:14px;margin-bottom:18px">
@@ -907,18 +947,49 @@
         <sc-if value="{{ cfGrifoKnown }}" hint-placeholder-val="{{ false }}">
           <div style="display:flex;align-items:center;gap:8px;margin:-4px 0 12px;font-size:12px;color:var(--ok);font-weight:600"><span style="width:18px;height:18px;border-radius:50%;background:var(--ok-bg);color:var(--ok);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800">✓</span> Grifo inscrito en Osinergmin — datos traídos por el RUC. Puedes editarlos.</div>
         </sc-if>
-        <div style="margin-bottom:14px"><label style="display:block;font-size:12.5px;font-weight:700;color:var(--text-2);margin-bottom:6px">Dirección</label><input value="{{ cfDir }}" onInput="{{ cfSet.dir }}" placeholder="Av. / Jr. / Calle y número" style="width:100%;background:var(--surface-2);border:1px solid var(--border);border-radius:9px;padding:11px 12px;font-size:14px;color:var(--text)" /></div>
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:16px">
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:14px">
           <div><label style="display:block;font-size:12.5px;font-weight:700;color:var(--text-2);margin-bottom:6px">Departamento</label><select value="{{ cfDep }}" onChange="{{ onCompDep }}" style="width:100%;background:var(--surface-2);border:1px solid var(--border);border-radius:9px;padding:11px 12px;font-size:14px;color:var(--text);cursor:pointer"><option value="">—</option><sc-for list="{{ depOpts }}" as="o" hint-placeholder-count="3"><option value="{{ o }}">{{ o }}</option></sc-for></select></div>
           <div><label style="display:block;font-size:12.5px;font-weight:700;color:var(--text-2);margin-bottom:6px">Provincia</label><select value="{{ cfProv }}" onChange="{{ onCompProv }}" style="width:100%;background:var(--surface-2);border:1px solid var(--border);border-radius:9px;padding:11px 12px;font-size:14px;color:var(--text);cursor:pointer"><option value="">—</option><sc-for list="{{ provOpts }}" as="o" hint-placeholder-count="3"><option value="{{ o }}">{{ o }}</option></sc-for></select></div>
-          <div><label style="display:block;font-size:12.5px;font-weight:700;color:var(--text-2);margin-bottom:6px">Distrito</label><select value="{{ cfDist }}" onChange="{{ cfSet.dist }}" style="width:100%;background:var(--surface-2);border:1px solid var(--border);border-radius:9px;padding:11px 12px;font-size:14px;color:var(--text);cursor:pointer"><option value="">—</option><sc-for list="{{ distOpts }}" as="o" hint-placeholder-count="4"><option value="{{ o }}">{{ o }}</option></sc-for></select></div>
+          <div><label style="display:block;font-size:12.5px;font-weight:700;color:var(--text-2);margin-bottom:6px">Distrito</label><select value="{{ cfDist }}" onChange="{{ onCompDist }}" style="width:100%;background:var(--surface-2);border:1px solid var(--border);border-radius:9px;padding:11px 12px;font-size:14px;color:var(--text);cursor:pointer"><option value="">—</option><sc-for list="{{ distOpts }}" as="o" hint-placeholder-count="4"><option value="{{ o }}">{{ o }}</option></sc-for></select></div>
         </div>
+        <div style="margin-bottom:16px"><label style="display:block;font-size:12.5px;font-weight:700;color:var(--text-2);margin-bottom:6px">Dirección del grifo</label><select value="{{ cfDir }}" onChange="{{ cfSet.dir }}" disabled="{{ cfDirDisabled }}" style="width:100%;background:var(--surface-2);border:1px solid var(--border);border-radius:9px;padding:11px 12px;font-size:14px;color:var(--text);cursor:pointer"><option value="">{{ cfDirPlaceholder }}</option><sc-for list="{{ dirOpts }}" as="o" hint-placeholder-count="3"><option value="{{ o }}">{{ o }}</option></sc-for></select><div style="font-size:11.5px;color:var(--text-3);margin-top:5px">Las direcciones se filtran según el departamento, provincia y distrito seleccionados.</div></div>
 
         <div style="font-size:12px;font-weight:800;color:var(--primary);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">4 · Combustible</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px">
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:18px">
           <div><label style="display:block;font-size:12.5px;font-weight:700;color:var(--text-2);margin-bottom:6px">Tipo</label><select value="{{ cfComb }}" onChange="{{ cfSet.comb }}" style="width:100%;background:var(--surface-2);border:1px solid var(--border);border-radius:9px;padding:11px 12px;font-size:14px;color:var(--text);cursor:pointer"><sc-for list="{{ combOpts }}" as="o" hint-placeholder-count="2"><option value="{{ o }}">{{ o }}</option></sc-for></select></div>
-          <div><label style="display:block;font-size:12.5px;font-weight:700;color:var(--text-2);margin-bottom:6px">Azufre (ppm)</label><input value="{{ cfAzufre }}" onInput="{{ cfSet.azufre }}" inputmode="numeric" placeholder="45" style="width:100%;background:var(--surface-2);border:1px solid var(--border);border-radius:9px;padding:11px 12px;font-size:14px;color:var(--text);font-family:'JetBrains Mono',monospace" /></div>
           <div><label style="display:block;font-size:12.5px;font-weight:700;color:var(--text-2);margin-bottom:6px">Galones *</label><input value="{{ cfGalones }}" onInput="{{ cfSet.galones }}" inputmode="decimal" placeholder="0.00" style="width:100%;background:var(--surface-2);border:1px solid var(--border);border-radius:9px;padding:11px 12px;font-size:14px;color:var(--text);font-family:'JetBrains Mono',monospace" /></div>
+          <div><label style="display:block;font-size:12.5px;font-weight:700;color:var(--text-2);margin-bottom:6px">Costo (S/) *</label><input value="{{ cfCosto }}" onInput="{{ cfSet.costo }}" inputmode="decimal" placeholder="0.00" style="width:100%;background:var(--surface-2);border:1px solid var(--border);border-radius:9px;padding:11px 12px;font-size:14px;color:var(--text);font-family:'JetBrains Mono',monospace" /></div>
+        </div>
+
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px;flex-wrap:wrap">
+          <div style="font-size:12px;font-weight:800;color:var(--primary);text-transform:uppercase;letter-spacing:.5px">5 · Placas asociadas *</div>
+          <span style="font-size:12px;font-weight:700;background:{{ cfPlacasBg }};color:{{ cfPlacasFg }};border-radius:999px;padding:3px 11px">{{ cfPlacasCount }} de {{ cfPlacasTotal }}</span>
+        </div>
+        <div style="font-size:12px;color:var(--text-3);margin-bottom:11px;line-height:1.45">Marca las placas de tu flota que corresponden a esta carga. La carga total del comprobante se reparte entre las placas seleccionadas.</div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:11px">
+          <div style="position:relative;flex:1;min-width:180px">
+            <span style="position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--text-3);display:flex"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg></span>
+            <input value="{{ compPlacaQ }}" onInput="{{ onCompPlacaQ }}" placeholder="Buscar placa…" style="width:100%;background:var(--surface-2);border:1px solid var(--border);border-radius:9px;padding:10px 12px 10px 34px;font-size:13.5px;color:var(--text);font-family:'JetBrains Mono',monospace" />
+          </div>
+          <button onClick="{{ toggleAllPlacas }}" style="flex:none;background:var(--surface);color:var(--primary);border:1px solid var(--border-strong);border-radius:9px;padding:10px 14px;font-size:12.5px;font-weight:700;cursor:pointer">{{ togglePlacasLabel }}</button>
+        </div>
+        <sc-if value="{{ cfPlacasCount }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-wrap:wrap;gap:7px;margin-bottom:11px">
+            <sc-for list="{{ placaChips }}" as="p" hint-placeholder-count="2">
+              <span style="display:inline-flex;align-items:center;gap:7px;background:var(--primary-soft);color:var(--primary);border-radius:8px;padding:5px 8px 5px 11px;font-size:13px;font-weight:800;font-family:'JetBrains Mono',monospace">{{ p.placa }}<button onClick="{{ p.toggle }}" title="Quitar" style="width:18px;height:18px;border-radius:5px;border:none;background:rgba(14,90,138,.15);color:var(--primary);cursor:pointer;font-size:13px;line-height:1;font-family:inherit">×</button></span>
+            </sc-for>
+          </div>
+        </sc-if>
+        <div style="max-height:216px;overflow-y:auto;border:1px solid var(--border);border-radius:11px;background:var(--surface-2)">
+          <sc-for list="{{ placaChecklist }}" as="p" hint-placeholder-count="4">
+            <label style="display:flex;align-items:center;gap:12px;padding:11px 14px;border-bottom:1px solid var(--border);background:{{ p.bg }};cursor:pointer">
+              <input type="checkbox" checked="{{ p.checked }}" onChange="{{ p.toggle }}" style="width:18px;height:18px;accent-color:var(--primary);cursor:pointer;flex:none" />
+              <span style="font-family:'JetBrains Mono',monospace;font-weight:800;font-size:14.5px">{{ p.placa }}</span>
+            </label>
+          </sc-for>
+          <sc-if value="{{ placaNone }}" hint-placeholder-val="{{ false }}">
+            <div style="padding:22px;text-align:center;font-size:13px;color:var(--text-3)">Ninguna placa coincide con “{{ compPlacaQ }}”.</div>
+          </sc-if>
         </div>
       </div>
       <div style="display:flex;justify-content:flex-end;gap:10px;padding:16px 22px;border-top:1px solid var(--border)">
@@ -1058,6 +1129,8 @@ class Component extends DCLogic {
     ctcNombre:'Rosa María Vílchez Salazar', ctcTipoDoc:'DNI', ctcNumDoc:'40218765', ctcCorreo:'contacto@translimasur.pe', ctcTel:'+51 987 654 321',
     ctcEditing:false, ctcNombreDraft:'', ctcTipoDocDraft:'DNI', ctcNumDocDraft:'', ctcTelDraft:'',
     ctaSaved:false, ctaMode:'editable', ctaCode:'', ctaCodeErr:false, bancoDraft:'', cciDraft:'',
+    bnPersonaNatural:false, bnDni:'', bnNombre:'', bnOpeSolicitada:false,
+    refreshLeft:{sunat:5,aut:5,veh:5},
     vehicles:[
       {id:'v1',placa:'AXG-712',categoria:'M3',tope:1915.41,estado:'conforme',propTipo:'RUC',propDoc:'20512345678',propNom:'Transportes Lima Sur S.A.C.',condTipo:'DNI',condDoc:'41258963',condNom:'Juan Pérez Quispe',condLic:'Q41258963',tuc:'T-084512',nHab:'AUT-2024-01123',autEntidad:'Municipalidad Metropolitana de Lima',val:{placa:'val',carroceria:'val',tuc:'val',autorizacion:'val',propietario:'val',conductor:'val'}},
       {id:'v2',placa:'B2W-458',categoria:'N2',tope:888.45,estado:'conforme',propTipo:'RUC',propDoc:'20512345678',propNom:'Transportes Lima Sur S.A.C.',condTipo:'DNI',condDoc:'09876543',condNom:'María Flores Ríos',condLic:'B09876543',tuc:'T-084513',nHab:'AUT-2024-01124',autEntidad:'Gobierno Regional de Lima',val:{placa:'val',carroceria:'val',tuc:'pend',autorizacion:'ini',propietario:'pend',conductor:'val'}},
@@ -1068,13 +1141,13 @@ class Component extends DCLogic {
     vAddOpen:false, bulkOpen:false, bulkStep:'drop', bulkImporting:false,
     vehResult:null,
     compsA:[
-      {id:'c1',tipo:'factura',serie:'F001',numero:'0001234',fecha:'12/06/2026',mes:'Junio',rucGrifo:'20487654321',grifo:'Grifo Repsol Villa El Salvador',dir:'Av. Separadora Industrial 1450',dep:'Lima',prov:'Lima',dist:'Villa El Salvador',comb:'B5',azufre:45,galones:320.50,placa:'AXG-712',condNom:'Juan Pérez Quispe',condDocTipo:'DNI',condDoc:'41258963',condLic:'Q41258963',status:'conforme'},
-      {id:'c2',tipo:'factura',serie:'F001',numero:'0001450',fecha:'25/06/2026',mes:'Junio',rucGrifo:'20487654321',grifo:'Grifo Repsol Villa El Salvador',dir:'Av. Separadora Industrial 1450',dep:'Lima',prov:'Lima',dist:'Villa El Salvador',comb:'B5',azufre:45,galones:210.00,placa:'AXG-712',condNom:'María López Torres',condDocTipo:'DNI',condDoc:'09876543',condLic:'Q09876543',status:'inhabilitado',ncRef:'F002-0091'},
-      {id:'c3',tipo:'factura',serie:'F002',numero:'0000087',fecha:'03/07/2026',mes:'Julio',rucGrifo:'20999888777',grifo:'Grifo El Sol S.A.C.',dir:'Av. Los Héroes 820',dep:'Lima',prov:'Lima',dist:'San Juan de Miraflores',comb:'B20',azufre:62,galones:180.00,placa:'B2W-458',condNom:'Pedro Ríos Vega',condDocTipo:'DNI',condDoc:'44551122',condLic:'Q44551122',status:'observado',reason:'azufre'},
-      {id:'c4',tipo:'factura',serie:'F001',numero:'0001600',fecha:'08/07/2026',mes:'Julio',rucGrifo:'20111222333',grifo:'Estación no identificada',dir:'Av. Central s/n',dep:'Lima',prov:'Lima',dist:'Ate',comb:'B5',azufre:40,galones:150.00,placa:'AXG-712',condNom:'Juan Pérez Quispe',condDocTipo:'DNI',condDoc:'41258963',condLic:'Q41258963',status:'observado',reason:'osinergmin'}
+      {id:'c1',tipo:'factura',serie:'F001',numero:'0001234',fecha:'12/06/2026',mes:'Junio',rucGrifo:'20487654321',grifo:'Grifo Repsol Villa El Salvador',dir:'Av. Separadora Industrial 1450',dep:'Lima',prov:'Lima',dist:'Villa El Salvador',comb:'B5',azufre:45,galones:320.50,costo:1602.50,placa:'AXG-712',placas:['AXG-712'],file:{name:'factura_F001-0001234.pdf'},status:'conforme'},
+      {id:'c2',tipo:'factura',serie:'F001',numero:'0001450',fecha:'25/06/2026',mes:'Junio',rucGrifo:'20487654321',grifo:'Grifo Repsol Villa El Salvador',dir:'Av. Separadora Industrial 1450',dep:'Lima',prov:'Lima',dist:'Villa El Salvador',comb:'B5',azufre:45,galones:210.00,costo:1050.00,placa:'AXG-712',placas:['AXG-712','B2W-458'],file:{name:'factura_F001-0001450.pdf'},status:'inhabilitado',ncRef:'F002-0091'},
+      {id:'c3',tipo:'factura',serie:'F002',numero:'0000087',fecha:'03/07/2026',mes:'Julio',rucGrifo:'20999888777',grifo:'Grifo El Sol S.A.C.',dir:'Av. Los Héroes 820',dep:'Lima',prov:'Lima',dist:'San Juan de Miraflores',comb:'B20',azufre:62,galones:180.00,costo:918.00,placa:'B2W-458',placas:['B2W-458'],file:{name:'factura_F002-0000087.pdf'},status:'observado',reason:'azufre'},
+      {id:'c4',tipo:'factura',serie:'F001',numero:'0001600',fecha:'08/07/2026',mes:'Julio',rucGrifo:'20111222333',grifo:'Estación no identificada',dir:'Av. Central s/n',dep:'Lima',prov:'Lima',dist:'Ate',comb:'B5',azufre:40,galones:150.00,costo:750.00,placa:'AXG-712',placas:['AXG-712'],file:{name:'factura_F001-0001600.pdf'},status:'observado',reason:'osinergmin'}
     ],
     compForm:{placa:'',condNom:'',condDoc:'',condDocTipo:'DNI',condLic:'',serie:'F001',numero:'',fecha:'',mes:'Julio',rucGrifo:'',grifo:'',dir:'',dep:'',prov:'',dist:'',comb:'B5',azufre:'',galones:''},
-    compAddOpen:false, editingCompId:null, compQ:'', compValF:'todos', compBulkOpen:false, compBulkStep:'drop',
+    compAddOpen:false, editingCompId:null, compQ:'', compPlacaQ:'', compValF:'todos', compBulkOpen:false, compBulkStep:'drop',
     comprasB:[
       {id:'b1',tipo:'factura',serie:'F050',numero:'0000210',fecha:'18/06/2026',mes:'Junio',rucProv:'20600500400',prov:'Distribuidora de Combustibles Andina S.A.',comb:'B5',azufre:38,galones:1800.00,status:'conforme'},
       {id:'b2',tipo:'factura',serie:'F050',numero:'0000355',fecha:'05/07/2026',mes:'Julio',rucProv:'20600500400',prov:'Distribuidora de Combustibles Andina S.A.',comb:'B5',azufre:38,galones:1200.00,status:'conforme'}
@@ -1222,16 +1295,37 @@ class Component extends DCLogic {
     'Arequipa':{'Arequipa':['Yanahuara','Cerro Colorado','Cayma','Arequipa','Paucarpata'],'Islay':['Mollendo','Mej\u00eda','Cocachacra']},
     'La Libertad':{'Trujillo':['Trujillo','La Esperanza','El Porvenir','V\u00edctor Larco Herrera']}
   };
-  emptyCompForm(){ return {placa:'',condNom:'',condDoc:'',condDocTipo:'DNI',condLic:'',serie:'F001',numero:'',fecha:'',mes:'Julio',rucGrifo:'',grifo:'',dir:'',dep:'',prov:'',dist:'',comb:'B5',azufre:'',galones:''}; }
+  emptyCompForm(){ return {placas:[],file:null,serie:'F001',numero:'',fecha:'',mes:'Julio',rucGrifo:'',grifo:'',dir:'',dep:'',prov:'',dist:'',comb:'B5',azufre:'',galones:'',costo:''}; }
+  DIRS={
+    'Lima|Lima|Villa El Salvador':['Av. Separadora Industrial 1450','Av. El Sol 320','Av. Pastor Sevilla 900'],
+    'Lima|Lima|Santiago de Surco':['Av. Caminos del Inca 2900','Av. Benavides 3866','Av. Primavera 120'],
+    'Lima|Lima|San Juan de Miraflores':['Av. Los Héroes 820','Av. Pedro Miotta 540'],
+    'Lima|Lima|Miraflores':['Av. Larco 1300','Av. Benavides 450'],
+    'Lima|Lima|Ate':['Carretera Central km 8.5','Av. Nicolás Ayllón 3820'],
+    'Lima|Lima|San Juan de Lurigancho':['Av. Próceres de la Independencia 1650','Av. Canto Grande 400'],
+    'Lima|Lima|Cercado de Lima':['Av. Alfonso Ugarte 1250','Av. Argentina 2200'],
+    'Lima|Callao|Callao':['Av. Óscar R. Benavides 3000','Av. Néstor Gambetta 1500'],
+    'Lima|Callao|Ventanilla':['Av. Néstor Gambetta km 14','Av. La Playa 200'],
+    'Arequipa|Arequipa|Yanahuara':['Av. Ejército 500','Av. Emmel 310'],
+    'Arequipa|Arequipa|Cerro Colorado':['Av. Aviación 1400','Variante de Uchumayo km 4'],
+    'La Libertad|Trujillo|Trujillo':['Av. España 1800','Av. Mansiche 700']
+  };
+  dirsFor(dep,prov,dist){ const key=[dep,prov,dist].join('|'); const base=(this.DIRS[key]||[]).slice(); Object.keys(this.GRIFOS).forEach(r=>{const g=this.GRIFOS[r]; if(g.dep===dep&&g.prov===prov&&g.dist===dist&&!base.includes(g.dir))base.unshift(g.dir);}); return base; }
   openCompA(){ this.setState({compAddOpen:true,editingCompId:null,compForm:this.emptyCompForm()}); }
-  editCompA(id){ const c=this.state.compsA.find(x=>x.id===id); if(!c)return; this.setState({compAddOpen:true,editingCompId:id,compForm:{placa:c.placa||'',condNom:c.condNom||'',condDoc:c.condDoc||'',condDocTipo:c.condDocTipo||'DNI',condLic:c.condLic||'',serie:c.serie||'F001',numero:c.numero||'',fecha:c.fecha||'',mes:c.mes||'Julio',rucGrifo:c.rucGrifo||'',grifo:c.grifo||'',dir:c.dir||'',dep:c.dep||'',prov:c.prov||'',dist:c.dist||'',comb:c.comb||'B5',azufre:c.azufre||'',galones:c.galones||''}}); }
+  editCompA(id){ const c=this.state.compsA.find(x=>x.id===id); if(!c)return; const placas=c.placas||(c.placa?[c.placa]:[]); this.setState({compAddOpen:true,editingCompId:id,compForm:{placas:placas.slice(),file:c.file||{name:'comprobante_'+(c.serie||'F001')+'-'+(c.numero||'')+'.pdf'},serie:c.serie||'F001',numero:c.numero||'',fecha:c.fecha||'',mes:c.mes||'Julio',rucGrifo:c.rucGrifo||'',grifo:c.grifo||'',dir:c.dir||'',dep:c.dep||'',prov:c.prov||'',dist:c.dist||'',comb:c.comb||'B5',azufre:c.azufre||'',galones:c.galones||'',costo:c.costo||''}}); }
   closeCompA(){ this.setState({compAddOpen:false,editingCompId:null,compForm:this.emptyCompForm()}); }
   deleteCompA(id){ this.setState(s=>({compsA:s.compsA.filter(x=>x.id!==id)})); this.toast('Comprobante retirado'); }
   onCompForm(f,e){ const v=e.target.value; this.setState(s=>({compForm:Object.assign({},s.compForm,{[f]:v})})); }
+  pickCompFile(){ this.setState(s=>({compForm:Object.assign({},s.compForm,{file:{name:'comprobante_'+(s.compForm.serie||'F001')+'-'+(s.compForm.numero||'0000')+'.pdf'}})})); this.toast('Comprobante adjuntado'); }
+  removeCompFile(){ this.setState(s=>({compForm:Object.assign({},s.compForm,{file:null})})); }
+  togglePlaca(placa){ this.setState(s=>{ const cur=s.compForm.placas||[]; const placas=cur.includes(placa)?cur.filter(p=>p!==placa):[...cur,placa]; return {compForm:Object.assign({},s.compForm,{placas})}; }); }
   onRucGrifo(e){ const ruc=e.target.value; const g=this.GRIFOS[ruc]; this.setState(s=>{ const patch={rucGrifo:ruc}; if(g){patch.grifo=g.nom;patch.dir=g.dir;patch.dep=g.dep;patch.prov=g.prov;patch.dist=g.dist;} return {compForm:Object.assign({},s.compForm,patch)}; }); }
-  onCompDep(e){ const dep=e.target.value; const provs=Object.keys(this.UBIGEO[dep]||{}); const prov=provs[0]||''; const dist=((this.UBIGEO[dep]||{})[prov]||[])[0]||''; this.setState(s=>({compForm:Object.assign({},s.compForm,{dep,prov,dist})})); }
-  onCompProv(e){ const prov=e.target.value; const dep=this.state.compForm.dep; const dist=((this.UBIGEO[dep]||{})[prov]||[])[0]||''; this.setState(s=>({compForm:Object.assign({},s.compForm,{prov,dist})})); }
-  saveCompA(){ const f=this.state.compForm; if(!f.placa||!f.numero||!f.galones){ this.toast('Completa placa, N.\u00b0 de factura y galones'); return; } const editId=this.state.editingCompId; const azufre=Number(f.azufre)||45; const galones=Number(f.galones)||0; const base={placa:f.placa,condNom:f.condNom||'\u2014',condDoc:f.condDoc,condDocTipo:f.condDocTipo,condLic:f.condLic,tipo:'factura',serie:f.serie||'F001',numero:f.numero,fecha:f.fecha||'11/07/2026',mes:f.mes,rucGrifo:f.rucGrifo,grifo:f.grifo||'Grifo',dir:f.dir,dep:f.dep,prov:f.prov,dist:f.dist,comb:f.comb,azufre,galones}; if(editId){ this.setState(s=>({compsA:s.compsA.map(c=>c.id===editId?Object.assign({},c,base):c),compAddOpen:false,editingCompId:null,compForm:this.emptyCompForm()})); this.toast('Comprobante actualizado'); return; } const id='c'+Date.now(); const nc=Object.assign({id,status:'sunat'},base); this.setState(s=>({compsA:[...s.compsA,nc],compAddOpen:false,compForm:this.emptyCompForm()})); this.runValidation(id); this.toast('Comprobante registrado'); }
+  onCompDep(e){ const dep=e.target.value; const provs=Object.keys(this.UBIGEO[dep]||{}); const prov=provs[0]||''; const dist=((this.UBIGEO[dep]||{})[prov]||[])[0]||''; this.setState(s=>({compForm:Object.assign({},s.compForm,{dep,prov,dist,dir:''})})); }
+  onCompProv(e){ const prov=e.target.value; const dep=this.state.compForm.dep; const dist=((this.UBIGEO[dep]||{})[prov]||[])[0]||''; this.setState(s=>({compForm:Object.assign({},s.compForm,{prov,dist,dir:''})})); }
+  onCompDist(e){ const dist=e.target.value; this.setState(s=>({compForm:Object.assign({},s.compForm,{dist,dir:''})})); }
+  doRefresh(src){ const names={sunat:'SUNAT',aut:'Autorizaciones',veh:'Vehículos'}; if(((this.state.refreshLeft||{})[src]||0)<=0){ this.toast('Sin actualizaciones disponibles hoy para '+names[src]); return; } this.setState(s=>{ const rl=Object.assign({},s.refreshLeft); rl[src]=Math.max(0,(rl[src]||0)-1); return {refreshLeft:rl}; },()=>{ const left=(this.state.refreshLeft||{})[src]; this.toast('Datos de '+names[src]+' actualizados · te quedan '+left+' de 5 hoy'); }); }
+  toggleAllPlacas(){ this.setState(s=>{ const q=(s.compPlacaQ||'').trim().toUpperCase(); const vis=s.vehicles.map(v=>v.placa).filter(p=>!q||p.toUpperCase().includes(q)); const cur=s.compForm.placas||[]; const allOn=vis.length>0&&vis.every(p=>cur.includes(p)); const placas=allOn?cur.filter(p=>!vis.includes(p)):[...new Set([...cur,...vis])]; return {compForm:Object.assign({},s.compForm,{placas})}; }); }
+  saveCompA(){ const f=this.state.compForm; if(!f.file){ this.toast('Adjunta el comprobante (PDF o imagen)'); return; } if(!(f.placas&&f.placas.length)){ this.toast('Selecciona al menos una placa'); return; } if(!f.numero||!f.galones||!f.costo){ this.toast('Completa N.\u00b0 de factura, galones y costo'); return; } const editId=this.state.editingCompId; const azufre=Number(f.azufre)||45; const galones=Number(f.galones)||0; const costo=Number(f.costo)||0; const base={placas:f.placas.slice(),placa:f.placas[0],file:f.file,tipo:'factura',serie:f.serie||'F001',numero:f.numero,fecha:f.fecha||'11/07/2026',mes:f.mes,rucGrifo:f.rucGrifo,grifo:f.grifo||'Grifo',dir:f.dir,dep:f.dep,prov:f.prov,dist:f.dist,comb:f.comb,azufre,galones,costo}; if(editId){ this.setState(s=>({compsA:s.compsA.map(c=>c.id===editId?Object.assign({},c,base):c),compAddOpen:false,editingCompId:null,compForm:this.emptyCompForm()})); this.toast('Comprobante actualizado'); return; } const id='c'+Date.now(); const nc=Object.assign({id,status:'sunat'},base); this.setState(s=>({compsA:[...s.compsA,nc],compAddOpen:false,compForm:this.emptyCompForm()})); this.runValidation(id); this.toast('Comprobante registrado'); }
   openCompBulk(){ this.setState({compBulkOpen:true,compBulkStep:'drop'}); }
   closeCompBulk(){ this.setState({compBulkOpen:false,compBulkStep:'drop'}); }
   runCompBulk(){ this.setState({compBulkStep:'importing'}); setTimeout(()=>{ const t=Date.now(); const rows=[
@@ -1302,7 +1396,7 @@ primary:{bg:'var(--primary-soft)',fg:'var(--primary)'}}; return m[t]||m.neutral;
     else sidebarStyle=base+'width:'+(collapsed?'74px':'250px')+';flex:none;position:sticky;top:62px;height:calc(100vh - 62px)';
 
     const groups=[
-      {key:'registro',title:'Registro',items:[{n:2,l:'Verificación'},{n:4,l:'Vehículos'}]},
+      {key:'registro',title:'Verificación',items:[{n:2,l:'Validación'},{n:4,l:'Vehículos'}]},
       {key:'carga',title:'Carga y cálculo',items:[{n:6,l:'Comprobantes'},{n:7,l:'Notas de crédito'},{n:8,l:'Resumen'}]},
       {key:'envio',title:'Envío',items:[{n:10,l:'Declaración jurada'}]}
     ];
@@ -1349,11 +1443,8 @@ primary:{bg:'var(--primary-soft)',fg:'var(--primary)'}}; return m[t]||m.neutral;
       editBtnStyle:this.css('margin-top:11px;border:none;border-radius:9px;padding:9px 14px;font-size:12.5px;font-weight:700;'+(s.edicionesRestantes>0?'background:var(--primary);color:var(--primary-contrast);cursor:pointer;':'background:var(--surface-3);color:var(--text-3);cursor:not-allowed;')),
       habilitarEdicion:()=>{ if(s.edicionesRestantes>0){ this.setState(st=>({locked:false,submitted:false,edicionesRestantes:st.edicionesRestantes-1,step:2,dj:false})); if(typeof window!=='undefined')window.scrollTo(0,0);} },
       // login
-      docLabel:isRuc?'RUC':'DNI', docPlaceholder:isRuc?'Ej. 20512345678':'Ej. 45678912', docNumber:s.docNumber, clave:s.clave, noHabil:s.noHabil,
+      docNumber:s.docNumber, clave:s.clave, noHabil:s.noHabil,
       pwdType:s.showPwd?'text':'password', pwdToggleLabel:s.showPwd?'Ocultar':'Mostrar', togglePwd:this.togglePwd,
-      rucBg:isRuc?'var(--primary-soft)':'var(--surface)', rucBorder:isRuc?'var(--primary)':'var(--border)', rucColor:isRuc?'var(--primary)':'var(--text-2)',
-      dniBg:!isRuc?'var(--primary-soft)':'var(--surface)', dniBorder:!isRuc?'var(--primary)':'var(--border)', dniColor:!isRuc?'var(--primary)':'var(--text-2)',
-      setDocRuc:()=>this.setState({docType:'RUC',docNumber:'20512345678'}), setDocDni:()=>this.setState({docType:'DNI',docNumber:'45678912'}),
       onDocNum:e=>this.setState({docNumber:e.target.value}), onClave:e=>this.setState({clave:e.target.value}), doLogin:()=>this.goTo(2),
       showNoHabil:e=>{if(e&&e.preventDefault)e.preventDefault();this.setState({noHabil:true});}, hideNoHabil:e=>{if(e&&e.preventDefault)e.preventDefault();this.setState({noHabil:false});},
       // auth mode
@@ -1367,7 +1458,7 @@ primary:{bg:'var(--primary-soft)',fg:'var(--primary)'}}; return m[t]||m.neutral;
       recPass:s.recPass, onRecPass:e=>this.setState({recPass:e.target.value}), recPass2:s.recPass2, onRecPass2:e=>this.setState({recPass2:e.target.value}),
       recPassMismatch: s.recPass2.length>0 && s.recPass!==s.recPass2, recPass2Border:(s.recPass2.length>0 && s.recPass!==s.recPass2)?'var(--bad)':'var(--border)', recSavePass:()=>this.recSavePass(),
       goRegister:e=>{if(e&&e.preventDefault)e.preventDefault();this.setState({authMode:'register',noHabil:false});},
-      goLogin:e=>{if(e&&e.preventDefault)e.preventDefault();this.setState({authMode:'login',docType:'RUC',docNumber:s.regRuc||s.recRuc||s.docNumber,sunat:'idle',codigo:'',codigoErr:false});},
+      goLogin:e=>{if(e&&e.preventDefault)e.preventDefault();this.setState({authMode:'login',docNumber:s.regRuc||s.recRuc||s.docNumber,sunat:'idle',codigo:'',codigoErr:false});},
       regRuc:s.regRuc, regCorreo:s.regCorreo, regTel:s.regTel, regClave:s.regClave, regContacto:s.regContacto,
       onRegRuc:e=>this.setState({regRuc:e.target.value,sunat:'idle'}), onRegCorreo:e=>this.setState({regCorreo:e.target.value}),
       onRegTel:e=>this.setState({regTel:e.target.value}), onRegClave:e=>this.setState({regClave:e.target.value}), onRegContacto:e=>this.setState({regContacto:e.target.value}),
@@ -1384,7 +1475,13 @@ primary:{bg:'var(--primary-soft)',fg:'var(--primary)'}}; return m[t]||m.neutral;
     };
 
     // S2
-    vals.datosT=[{k:'Razón social',v:'Transportes Lima Sur S.A.C.',mono:false},{k:'RUC',v:s.docNumber,mono:true},{k:'Tipo',v:'Persona jurídica',mono:false},{k:'Estado del transportista',v:'Habilitado',mono:false}];
+    const _rl=s.refreshLeft||{sunat:5,aut:5,veh:5};
+    const _refBtn=(dis)=>this.css('display:inline-flex;align-items:center;gap:7px;border-radius:9px;padding:9px 14px;font-size:12.5px;font-weight:700;'+(dis?'background:var(--surface-3);color:var(--text-3);border:1px solid var(--border);cursor:not-allowed;':'background:var(--surface);color:var(--primary);border:1px solid var(--border-strong);cursor:pointer;'));
+    const _leftTxt=(n)=>n>0?('Te quedan '+n+' de 5 actualizaciones hoy'):'Agotaste tus 5 actualizaciones de hoy';
+    vals.refSunatLeftTxt=_leftTxt(_rl.sunat); vals.refSunatDisabled=_rl.sunat<=0; vals.refSunatExhausted=_rl.sunat<=0; vals.refSunatBtn=_refBtn(_rl.sunat<=0); vals.refSunatLeftColor=_rl.sunat<=0?'var(--bad)':'var(--text-3)'; vals.refSunatMsg='Verifica ante SUNAT que tu RUC esté ACTIVO y HABIDO; el sistema reintentará con los datos oficiales al corte.'; vals.refSunatDo=()=>this.doRefresh('sunat');
+    vals.refAutLeftTxt=_leftTxt(_rl.aut); vals.refAutDisabled=_rl.aut<=0; vals.refAutExhausted=_rl.aut<=0; vals.refAutBtn=_refBtn(_rl.aut<=0); vals.refAutLeftColor=_rl.aut<=0?'var(--bad)':'var(--text-3)'; vals.refAutMsg='Comunícate con la entidad que otorgó tu autorización (MTC, Gobierno Regional o Municipalidad Provincial) para que cargue las autorizaciones habilitadas de tu servicio de transporte en su sistema.'; vals.refAutDo=()=>this.doRefresh('aut');
+    vals.refVehLeftTxt=_leftTxt(_rl.veh); vals.refVehDisabled=_rl.veh<=0; vals.refVehExhausted=_rl.veh<=0; vals.refVehBtn=_refBtn(_rl.veh<=0); vals.refVehLeftColor=_rl.veh<=0?'var(--bad)':'var(--text-3)'; vals.refVehMsg='Comunícate con la entidad que otorgó tu autorización (MTC, Gobierno Regional o Municipalidad Provincial) para que cargue las autorizaciones habilitadas de tu servicio de transporte en su sistema.'; vals.refVehDo=()=>this.doRefresh('veh');
+    vals.datosT=[{k:'Razón social',v:'Transportes Lima Sur S.A.C.',mono:false},{k:'RUC',v:s.docNumber,mono:true},{k:'Tipo',v:'Persona jurídica',mono:false},{k:'Estado del RUC',v:'Activo',mono:false},{k:'Estado de habilitación',v:'Habilitado',mono:false}];
     const _sinAut=!!(this.props&&this.props.sinAutorizacionVigente);
     vals.autorizaciones=_sinAut?[
       {servicio:'Transporte turístico',autoridad:'MTC',ambito:'Nacional',resolucion:'R.D. 1290-2022-MTC',vigencia:'10/01/2022 – 09/01/2026',estado:'Vencida',badgeBg:'var(--bad-bg)',badgeFg:'var(--bad)'}
@@ -1421,6 +1518,16 @@ primary:{bg:'var(--primary-soft)',fg:'var(--primary)'}}; return m[t]||m.neutral;
     const editingCta=(s.ctaMode==='editable'||s.ctaMode==='editing');
     const shownBanco=editingCta?s.bancoDraft:s.banco;
     vals.esBN=shownBanco==='nacion'; vals.esOtro=!!shownBanco&&shownBanco!=='nacion';
+    // BN persona natural
+    const _pnActive=s.bancoDraft==='nacion'&&s.bnPersonaNatural;
+    vals.pnBlock=editingCta&&s.bancoDraft==='nacion';
+    vals.bnPersonaNatural=s.bnPersonaNatural; vals.bnDni=s.bnDni; vals.bnNombre=s.bnNombre; vals.bnOpeSolicitada=s.bnOpeSolicitada; vals.bnOpePending=!s.bnOpeSolicitada;
+    vals.cciVisible=!_pnActive;
+    vals.bnPnBg=s.bnPersonaNatural?'var(--primary-soft)':'var(--surface-2)'; vals.bnPnBorder=s.bnPersonaNatural?'var(--primary)':'var(--border)';
+    vals.toggleBnPn=()=>this.setState(st=>({bnPersonaNatural:!st.bnPersonaNatural}));
+    vals.onBnDni=e=>this.setState({bnDni:e.target.value.replace(/[^0-9]/g,'').slice(0,8)});
+    vals.onBnNombre=e=>this.setState({bnNombre:e.target.value});
+    vals.solicitarOpe=()=>{ if((s.bnDni||'').length!==8){ this.toast('Ingresa el DNI (8 dígitos) de quien cobrará'); return; } if(!(s.bnNombre||'').trim()){ this.toast('Ingresa el nombre de la persona natural'); return; } this.setState({bnOpeSolicitada:true}); this.toast('Orden de Pago Electrónico solicitada'); };
     vals.ctaSaved=s.ctaSaved;
     vals.ctaLockedView=s.ctaSaved && s.ctaMode==='locked';
     vals.ctaVerifying=s.ctaMode==='verifying';
@@ -1430,12 +1537,19 @@ primary:{bg:'var(--primary-soft)',fg:'var(--primary)'}}; return m[t]||m.neutral;
     const bancoNames={bcp:'Banco de Crédito del Perú (BCP)',bbva:'BBVA',interbank:'Interbank',scotiabank:'Scotiabank',nacion:'Banco de la Nación'};
     vals.bancoLabel=bancoNames[s.banco]||'—';
     vals.cciMask=s.cci?('•••• •••• '+s.cci.slice(-6)):'—';
-    vals.guardarCuentaStyle=this.css('flex:1;border:none;border-radius:10px;padding:13px;font-size:14px;font-weight:700;'+((s.bancoDraft&&s.cciDraft.length>=10)?'background:var(--primary);color:var(--primary-contrast);cursor:pointer;':'background:var(--surface-3);color:var(--text-3);cursor:not-allowed;'));
-    vals.guardarCuenta=()=>{ if(!s.bancoDraft){ this.toast('Selecciona un banco'); return; } if(s.cciDraft.length<10){ this.toast('Ingresa un CCI válido'); return; } if(s.ctaSaved){ this.setState({ctaMode:'verifying',ctaCode:'',ctaCodeErr:false}); this.toast('Enviamos un código a tu correo para confirmar el cambio (demo: 482913)'); } else { this.setState({banco:s.bancoDraft,cci:s.cciDraft,ctaSaved:true,ctaMode:'locked'}); this.toast('Cuenta de abono registrada'); } };
+    const _savedPn=s.banco==='nacion'&&s.bnPersonaNatural&&s.bnOpeSolicitada;
+    vals.savedPn=_savedPn; vals.savedCci=!_savedPn;
+    const _canSaveBN=_pnActive&&(s.bnDni||'').length===8&&!!(s.bnNombre||'').trim()&&s.bnOpeSolicitada;
+    const _canSaveNormal=!!s.bancoDraft&&s.bancoDraft!=='nacion'&&s.cciDraft.length>=10;
+    const _canSaveNacionCci=s.bancoDraft==='nacion'&&!s.bnPersonaNatural&&s.cciDraft.length>=10;
+    const _canSave=_canSaveBN||_canSaveNormal||_canSaveNacionCci;
+    vals.guardarCuentaStyle=this.css('flex:1;border:none;border-radius:10px;padding:13px;font-size:14px;font-weight:700;'+(_canSave?'background:var(--primary);color:var(--primary-contrast);cursor:pointer;':'background:var(--surface-3);color:var(--text-3);cursor:not-allowed;'));
+    const _commitCuenta=(mode)=>{ const patch={banco:s.bancoDraft,ctaSaved:true,ctaMode:mode}; if(_pnActive){patch.cci='';} else {patch.cci=s.cciDraft;} this.setState(patch); };
+    vals.guardarCuenta=()=>{ if(!s.bancoDraft){ this.toast('Selecciona un banco'); return; } if(_pnActive){ if((s.bnDni||'').length!==8){ this.toast('Ingresa el DNI (8 dígitos) de quien cobrará'); return; } if(!(s.bnNombre||'').trim()){ this.toast('Ingresa el nombre de la persona natural'); return; } if(!s.bnOpeSolicitada){ this.toast('Solicita la Orden de Pago Electrónico'); return; } } else if(s.cciDraft.length<10){ this.toast('Ingresa un CCI válido'); return; } if(s.ctaSaved){ this.setState({ctaMode:'verifying',ctaCode:'',ctaCodeErr:false}); this.toast('Enviamos un código a tu correo para confirmar el cambio (demo: 482913)'); } else { _commitCuenta('locked'); this.toast('Cuenta de abono registrada'); } };
     vals.pedirCambioCuenta=()=>{ this.setState({ctaMode:'editing',bancoDraft:s.banco,cciDraft:s.cci,ctaCode:'',ctaCodeErr:false}); };
     vals.onCtaCode=e=>this.setState({ctaCode:e.target.value.replace(/[^0-9]/g,''),ctaCodeErr:false});
     vals.ctaCodeBorder=s.ctaCodeErr?'var(--bad)':'var(--border)'; vals.ctaCodeErr=s.ctaCodeErr;
-    vals.confirmarCambioCuenta=()=>{ if(s.ctaCode!=='482913'){ this.setState({ctaCodeErr:true}); return; } this.setState({banco:s.bancoDraft,cci:s.cciDraft,ctaSaved:true,ctaMode:'locked'}); this.toast('Cuenta de abono actualizada'); };
+    vals.confirmarCambioCuenta=()=>{ if(s.ctaCode!=='482913'){ this.setState({ctaCodeErr:true}); return; } const patch={banco:s.bancoDraft,ctaSaved:true,ctaMode:'locked'}; if(_pnActive){patch.cci='';}else{patch.cci=s.cciDraft;} this.setState(patch); this.toast('Cuenta de abono actualizada'); };
     vals.cancelarCambioCuenta=()=>this.setState({ctaMode:'editing'});
     vals.cancelarEdicion=()=>this.setState({ctaMode:'locked'});
     // S4
@@ -1504,9 +1618,9 @@ primary:{bg:'var(--primary-soft)',fg:'var(--primary)'}}; return m[t]||m.neutral;
     const _ra=_countBy(s.compsA), _rb=_countBy(s.comprasB);
     vals.raTotal=_ra.total; vals.raVal=_ra.val; vals.raPend=_ra.pend; vals.raObs=_ra.obs;
     vals.rbTotal=_rb.total; vals.rbVal=_rb.val; vals.rbPend=_rb.pend; vals.rbObs=_rb.obs;
-    const _cAll=s.compsA.map(c=>{ const m=this.statusMeta(c); return Object.assign({},c,{ compLabel:(c.tipo==='factura'?'Factura':'N/C')+' '+c.serie+'-'+c.numero, azufreTxt:c.azufre+' ppm', galFmt:this.fmt(c.galones), monto:this.soles(c.galones*4), badgeLabel:m.label,badgeBg:m.bg,badgeColor:m.color,badgeGlyph:m.glyph,spinning:m.spin,notSpinning:!m.spin, ubi:[c.dist,c.prov].filter(Boolean).join(', ')||'\u2014', condNom:c.condNom||'\u2014', condLic:c.condLic||'\u2014', onEdit:()=>{ if(s.locked){this.lockedNav();return;} this.editCompA(c.id); }, onDelete:()=>{ if(s.locked){this.lockedNav();return;} this.deleteCompA(c.id); } }); });
+    const _cAll=s.compsA.map(c=>{ const m=this.statusMeta(c); const _pl=c.placas||(c.placa?[c.placa]:[]); return Object.assign({},c,{ compLabel:(c.tipo==='factura'?'Factura':'N/C')+' '+c.serie+'-'+c.numero, azufreTxt:c.azufre+' ppm', galFmt:this.fmt(c.galones), monto:this.soles(c.galones*4), costoFmt:this.soles(c.costo||0), badgeLabel:m.label,badgeBg:m.bg,badgeColor:m.color,badgeGlyph:m.glyph,spinning:m.spin,notSpinning:!m.spin, ubi:[c.dist,c.prov].filter(Boolean).join(', ')||'\u2014', placasList:_pl, placasHead:_pl[0]||'\u2014', placasExtra:_pl.length>1?('+'+(_pl.length-1)+' placa'+(_pl.length>2?'s':'')):'', placasMulti:_pl.length>1, placasQ:_pl.join(' '), onEdit:()=>{ if(s.locked){this.lockedNav();return;} this.editCompA(c.id); }, onDelete:()=>{ if(s.locked){this.lockedNav();return;} this.deleteCompA(c.id); } }); });
     const _cq=(s.compQ||'').trim().toUpperCase();
-    vals.compsAView=_cAll.filter(c=>{ if(s.compValF!=='todos'&&_mapV(c.status)!==s.compValF)return false; if(!_cq)return true; return (c.placa||'').toUpperCase().includes(_cq)||(c.comb||'').toUpperCase().includes(_cq)||(c.serie+'-'+c.numero).toUpperCase().includes(_cq)||(c.grifo||'').toUpperCase().includes(_cq); });
+    vals.compsAView=_cAll.filter(c=>{ if(s.compValF!=='todos'&&_mapV(c.status)!==s.compValF)return false; if(!_cq)return true; return (c.placasQ||'').toUpperCase().includes(_cq)||(c.comb||'').toUpperCase().includes(_cq)||(c.serie+'-'+c.numero).toUpperCase().includes(_cq)||(c.grifo||'').toUpperCase().includes(_cq); });
     vals.compCount=s.compsA.length; vals.compNone=s.compsA.length===0; vals.compEmpty=vals.compsAView.length===0&&s.compsA.length>0;
     vals.compQ=s.compQ; vals.onCompQ=e=>this.setState({compQ:e.target.value});
     vals.compValF=s.compValF; vals.onCompValF=e=>this.setState({compValF:e.target.value});
@@ -1520,16 +1634,33 @@ primary:{bg:'var(--primary-soft)',fg:'var(--primary)'}}; return m[t]||m.neutral;
     vals.compFormTitle=s.editingCompId?'Editar comprobante':'Registrar comprobante';
     vals.compSubmitLabel=s.editingCompId?'Guardar cambios':'Validar y registrar';
     const _cf=s.compForm;
-    vals.cfPlaca=_cf.placa; vals.cfCondNom=_cf.condNom; vals.cfCondDoc=_cf.condDoc; vals.cfCondDocTipo=_cf.condDocTipo; vals.cfCondLic=_cf.condLic;
+    vals.cfHasFile=!!_cf.file; vals.cfNoFile=!_cf.file; vals.cfFileName=_cf.file?_cf.file.name:'';
+    vals.pickCompFile=()=>this.pickCompFile(); vals.removeCompFile=()=>this.removeCompFile();
     vals.cfSerie=_cf.serie; vals.cfNumero=_cf.numero; vals.cfFecha=_cf.fecha; vals.cfMes=_cf.mes;
     vals.cfRuc=_cf.rucGrifo; vals.cfGrifo=_cf.grifo; vals.cfDir=_cf.dir; vals.cfDep=_cf.dep; vals.cfProv=_cf.prov; vals.cfDist=_cf.dist;
-    vals.cfComb=_cf.comb; vals.cfAzufre=_cf.azufre; vals.cfGalones=_cf.galones;
+    vals.cfComb=_cf.comb; vals.cfGalones=_cf.galones; vals.cfCosto=_cf.costo;
     vals.cfGrifoKnown=!!this.GRIFOS[_cf.rucGrifo];
+    const _dirOpts=this.dirsFor(_cf.dep,_cf.prov,_cf.dist);
+    vals.dirOpts=_dirOpts;
+    vals.cfDirDisabled=!(_cf.dep&&_cf.prov&&_cf.dist);
+    vals.cfDirPlaceholder=(_cf.dep&&_cf.prov&&_cf.dist)?'Selecciona la dirección…':'Elige departamento, provincia y distrito primero';
+    vals.onCompDist=e=>this.onCompDist(e);
+    const _selP=_cf.placas||[];
+    const _allP=s.vehicles.map(v=>v.placa);
+    const _pq=(s.compPlacaQ||'').trim().toUpperCase();
+    const _visP=_allP.filter(p=>!_pq||p.toUpperCase().includes(_pq));
+    vals.compPlacaQ=s.compPlacaQ; vals.onCompPlacaQ=e=>this.setState({compPlacaQ:e.target.value});
+    vals.cfPlacasCount=_selP.length; vals.cfPlacasTotal=_allP.length;
+    vals.cfPlacasBg=_selP.length?'var(--ok-bg)':'var(--surface-3)'; vals.cfPlacasFg=_selP.length?'var(--ok)':'var(--text-3)';
+    vals.placaNone=_visP.length===0;
+    const _allVisOn=_visP.length>0&&_visP.every(p=>_selP.includes(p));
+    vals.togglePlacasLabel=_allVisOn?'Quitar todas':'Seleccionar todas';
+    vals.toggleAllPlacas=()=>this.toggleAllPlacas();
+    vals.placaChecklist=_visP.map(p=>{ const on=_selP.includes(p); return {placa:p,checked:on,bg:on?'var(--primary-soft)':'transparent',toggle:()=>this.togglePlaca(p)}; });
+    vals.placaChips=_selP.map(p=>({placa:p,toggle:()=>this.togglePlaca(p)}));
     vals.closeCompA=()=>this.closeCompA(); vals.saveCompA=()=>this.saveCompA();
     vals.onRucGrifo=e=>this.onRucGrifo(e); vals.onCompDep=e=>this.onCompDep(e); vals.onCompProv=e=>this.onCompProv(e);
-    vals.cfSet={}; ['condNom','condDoc','condDocTipo','condLic','serie','numero','fecha','mes','grifo','dir','comb','azufre','galones'].forEach(k=>{ vals.cfSet[k]=e=>this.onCompForm(k,e); });
-    vals.onCfPlaca=e=>this.onCompForm('placa',e);
-    vals.placaOpts=s.vehicles.map(v=>v.placa);
+    vals.cfSet={}; ['serie','numero','fecha','mes','grifo','dir','comb','galones','costo'].forEach(k=>{ vals.cfSet[k]=e=>this.onCompForm(k,e); });
     vals.depOpts=Object.keys(this.UBIGEO);
     vals.provOpts=Object.keys(this.UBIGEO[_cf.dep]||{});
     vals.distOpts=(this.UBIGEO[_cf.dep]||{})[_cf.prov]||[];
