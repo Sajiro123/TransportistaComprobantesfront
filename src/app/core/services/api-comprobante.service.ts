@@ -103,15 +103,13 @@ export class ApiComprobanteService {
   // ── Cuenta Bancaria Transportista ────────────────────────
 
   /**
-   * GET /api_comprobante/transportistas/{transportistaId}/cuenta-bancaria
+   * GET /api_comprobante/transportistas/cuenta-bancaria
    * Desencripta automáticamente los campos sensibles si vienen cifrados.
    */
-  obtenerCuentaBancariaTransportista(
-    transportistaId: number,
-  ): Observable<CuentaBancariaTransportistaResponse> {
+  obtenerCuentaBancariaTransportista(): Observable<CuentaBancariaTransportistaResponse> {
     return this.http
       .get<CuentaBancariaTransportistaResponse>(
-        `${this.API_URL}/transportistas/${transportistaId}/cuenta-bancaria`,
+        `${this.API_URL}/transportistas/cuenta-bancaria`,
       )
       .pipe(
         map((res) => {
@@ -140,39 +138,35 @@ export class ApiComprobanteService {
   }
 
   /**
-   * POST /api_comprobante/transportistas/{transportistaId}/cuenta-bancaria
+   * POST /api_comprobante/transportistas/cuenta-bancaria
    */
   registrarCuentaBancariaTransportista(
-    transportistaId: number,
     payload: CuentaBancariaTransportistaRequest,
   ): Observable<CuentaBancariaTransportistaResponse> {
     return this.http.post<CuentaBancariaTransportistaResponse>(
-      `${this.API_URL}/transportistas/${transportistaId}/cuenta-bancaria`,
+      `${this.API_URL}/transportistas/cuenta-bancaria`,
       payload,
     );
   }
 
   /**
-   * PUT /api_comprobante/transportistas/{transportistaId}/cuenta-bancaria
+   * PUT /api_comprobante/transportistas/cuenta-bancaria
    */
   actualizarCuentaBancariaTransportista(
-    transportistaId: number,
     payload: CuentaBancariaTransportistaRequest,
   ): Observable<CuentaBancariaTransportistaResponse> {
     return this.http.put<CuentaBancariaTransportistaResponse>(
-      `${this.API_URL}/transportistas/${transportistaId}/cuenta-bancaria`,
+      `${this.API_URL}/transportistas/cuenta-bancaria`,
       payload,
     );
   }
 
   /**
-   * DELETE /api_comprobante/transportistas/{transportistaId}/cuenta-bancaria
+   * DELETE /api_comprobante/transportistas/cuenta-bancaria
    */
-  eliminarCuentaBancariaTransportista(
-    transportistaId: number,
-  ): Observable<{ data: { respuesta: string; mensaje: string } }> {
+  eliminarCuentaBancariaTransportista(): Observable<{ data: { respuesta: string; mensaje: string } }> {
     return this.http.delete<{ data: { respuesta: string; mensaje: string } }>(
-      `${this.API_URL}/transportistas/${transportistaId}/cuenta-bancaria`,
+      `${this.API_URL}/transportistas/cuenta-bancaria`,
     );
   }
 

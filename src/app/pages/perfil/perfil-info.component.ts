@@ -1156,7 +1156,7 @@ export class PerfilInfoComponent implements OnInit {
     // 1. Intentar cargar con la API real de transportista si hay ID numérico o fallback
     const transportistaId = 1; // ID técnico por defecto o asignado al usuario
     this.apiComprobanteService
-      .obtenerCuentaBancariaTransportista(transportistaId)
+      .obtenerCuentaBancariaTransportista()
       .subscribe({
         next: (res) => {
           if (res.data?.lista) {
@@ -1433,13 +1433,11 @@ export class PerfilInfoComponent implements OnInit {
         this.editTipoAbonoId === 2 ? this.editNombreBeneficiario : null,
     };
 
-    const action$ = this.cuentaBancariaReal
+    const action$ = this.cuentaBancariaReal?.uuidCuentaBancaria
       ? this.apiComprobanteService.actualizarCuentaBancariaTransportista(
-          transportistaId,
           payload,
         )
       : this.apiComprobanteService.registrarCuentaBancariaTransportista(
-          transportistaId,
           payload,
         );
 

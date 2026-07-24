@@ -82,4 +82,23 @@ export class ApiVehiculoService {
   obtenerCategorias(): Observable<any> {
     return this.http.get<any>(`${this.apiUrl}/vehiculos/categorias`);
   }
+  /**
+   * Carga masiva de vehículos vía Excel.
+   * POST /api_comprobante/vehiculos/excel
+   */
+  cargarMasivoExcel(archivo: File): Observable<any> {
+    const formData = new FormData();
+    formData.append('archivo', archivo);
+    return this.http.post<any>(`${this.apiUrl}/vehiculos/excel`, formData);
+  }
+
+  /**
+   * Consulta el Padrón Nacional ATU.
+   * GET /api_comprobante/vehiculos/padron
+   */
+  consultarPadron(ruc: string, buscar?: string): Observable<any> {
+    let params = new HttpParams().set('ruc', ruc);
+    if (buscar) params = params.set('buscar', buscar);
+    return this.http.get<any>(`${this.apiUrl}/vehiculos/padron`, { params });
+  }
 }
