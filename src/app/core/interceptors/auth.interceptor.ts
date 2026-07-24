@@ -62,6 +62,7 @@ export const authInterceptor: HttpInterceptorFn = (
       const errMessage = err?.error?.message || err?.error?.descripcion || err?.message || '';
       const isTokenExpired =
         err.status === 401 ||
+        err.status === 403 ||
         errMessage.toLowerCase().includes('token inválido o expirado') ||
         errMessage.toLowerCase().includes('token expirado');
 
@@ -81,25 +82,25 @@ export const authInterceptor: HttpInterceptorFn = (
               return next(req.clone({ withCredentials: true }));
             }),
             catchError((refreshErr) => {
-                console.error('[AuthInterceptor] Falló el refresco de token:', refreshErr);
-                isRefreshing = false;
+              console.error('[AuthInterceptor] Falló el refresco de token:', refreshErr);
+              isRefreshing = false;
 
-                sessionService.stopSession();
-                apiAuthService.clearSession();
+              sessionService.stopSession();
+              apiAuthService.clearSession();
 
-                Swal.fire({
-                  icon: 'warning',
-                  title: 'Sesión finalizada',
-                  text: 'Su sesión ha expirado y no se pudo renovar de forma automática. Inicie sesión nuevamente.',
-                  confirmButtonText: 'Aceptar',
-                  confirmButtonColor: '#0059bb'
-                }).then(() => {
-                  router.navigate(['/login']);
-                });
+              Swal.fire({
+                icon: 'warning',
+                title: 'Sesión finalizada',
+                text: 'Su sesión ha expirado y no se pudo renovar de forma automática. Inicie sesión nuevamente.',
+                confirmButtonText: 'Aceptar',
+                confirmButtonColor: '#0059bb'
+              }).then(() => {
+                router.navigate(['/login']);
+              });
 
-                return EMPTY;
-              })
-            );
+              return EMPTY;
+            })
+          );
         } else {
           // Esperar a que termine la renovación en curso
           return refreshTokenSubject.pipe(
@@ -110,23 +111,6 @@ export const authInterceptor: HttpInterceptorFn = (
             })
           );
         }
-      }
-      if (err.status === 403 && !isPublicRoute) {
-        console.warn('[AuthInterceptor] 403 Forbidden interceptado. Redirigiendo a login.');
-        sessionService.stopSession();
-        apiAuthService.clearSession();
-
-        Swal.fire({
-          icon: 'warning',
-          title: 'Sesión finalizada',
-          text: 'Su sesión ha caducado o no tiene permisos. Inicie sesión nuevamente.',
-          confirmButtonText: 'Aceptar',
-          confirmButtonColor: '#0059bb'
-        }).then(() => {
-          router.navigate(['/login']);
-        });
-
-        return EMPTY;
       }
 
       return throwError(() => err);

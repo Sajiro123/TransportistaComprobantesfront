@@ -76,7 +76,8 @@ const MOCK_SEMAFORO: SemaforoResponse = {
         codigo: 'RUC_ACTIVO',
         nombre: 'RUC activo y habido',
         estado: 'CUMPLE',
-        descripcion: 'Tu RUC figura en estado ACTIVO y con condición de domicilio HABIDO en SUNAT.',
+        descripcion:
+          'Tu RUC figura en estado ACTIVO y con condición de domicilio HABIDO en SUNAT.',
         icono: 'CHECK',
         colorNombre: 'verde',
         colorHex: '#16A34A',
@@ -85,7 +86,8 @@ const MOCK_SEMAFORO: SemaforoResponse = {
         codigo: 'AUTORIZACION_VIGENTE',
         nombre: 'Autorización de transporte vigente',
         estado: 'CUMPLE',
-        descripcion: 'La ATU registra tu autorización como vigente a la fecha de la solicitud.',
+        descripcion:
+          'La ATU registra tu autorización como vigente a la fecha de la solicitud.',
         icono: 'CHECK',
         colorNombre: 'verde',
         colorHex: '#16A34A',
@@ -110,81 +112,68 @@ export class ApiVerificacionService {
   private readonly http = inject(HttpClient);
   private readonly baseUrl = environment.API_COMPROBANTE_URL.replace(/\/$/, '');
 
-  readonly usandoMocks = false;
-
   obtenerDatosTransportista(ruc: string): Observable<DatosTransportista> {
-    if (this.usandoMocks) {
-      return of(MOCK_DATOS_TRANSPORTISTA).pipe(
-        delay(350),
-        map(response => response.data.lista),
+    if (!/^\d{11}$/.test(ruc)) {
+      return throwError(
+        (): VerificacionServiceError => ({
+          code: 'VER_RUC_INVALIDO',
+          message: 'RUC inválido',
+          descripcion: 'El RUC del transportista debe contener 11 dígitos.',
+        }),
       );
     }
 
-    if (!/^\d{11}$/.test(ruc)) {
-      return throwError((): VerificacionServiceError => ({
-        code: 'VER_RUC_INVALIDO',
-        message: 'RUC inválido',
-        descripcion: 'El RUC del transportista debe contener 11 dígitos.',
-      }));
-    }
-
-    return this.http.get<DatosTransportistaResponse>(
-      `${this.baseUrl}/verificacion/datos`,
-      { params: { ruc } },
-    ).pipe(
-      map(response => response.data.lista),
-      catchError(error => throwError(() => this.normalizarError(error))),
-    );
+    return this.http
+      .get<DatosTransportistaResponse>(`${this.baseUrl}/verificacion/datos`, {
+        params: { ruc },
+      })
+      .pipe(
+        map((response) => response.data.lista),
+        catchError((error) => throwError(() => this.normalizarError(error))),
+      );
   }
 
   obtenerAutorizaciones(ruc: string): Observable<AutorizacionTransportista[]> {
-    if (this.usandoMocks) {
-      return of(MOCK_AUTORIZACIONES).pipe(
-        delay(350),
-        map(response => response.data.lista),
+    if (!/^\d{11}$/.test(ruc)) {
+      return throwError(
+        (): VerificacionServiceError => ({
+          code: 'VER_RUC_INVALIDO',
+          message: 'RUC inválido',
+          descripcion: 'El RUC del transportista debe contener 11 dígitos.',
+        }),
       );
     }
 
-    if (!/^\d{11}$/.test(ruc)) {
-      return throwError((): VerificacionServiceError => ({
-        code: 'VER_RUC_INVALIDO',
-        message: 'RUC inválido',
-        descripcion: 'El RUC del transportista debe contener 11 dígitos.',
-      }));
-    }
-
-    return this.http.get<AutorizacionesResponse>(
-      `${this.baseUrl}/verificacion/autorizaciones`,
-      { params: { ruc } },
-    ).pipe(
-      map(response => response.data.lista),
-      catchError(error => throwError(() => this.normalizarError(error))),
-    );
+    return this.http
+      .get<AutorizacionesResponse>(
+        `${this.baseUrl}/verificacion/autorizaciones`,
+        { params: { ruc } },
+      )
+      .pipe(
+        map((response) => response.data.lista),
+        catchError((error) => throwError(() => this.normalizarError(error))),
+      );
   }
 
   obtenerSemaforo(ruc: string): Observable<SemaforoCondicion[]> {
-    if (this.usandoMocks) {
-      return of(MOCK_SEMAFORO).pipe(
-        delay(350),
-        map(response => response.data.lista),
+    if (!/^\d{11}$/.test(ruc)) {
+      return throwError(
+        (): VerificacionServiceError => ({
+          code: 'VER_RUC_INVALIDO',
+          message: 'RUC inválido',
+          descripcion: 'El RUC del transportista debe contener 11 dígitos.',
+        }),
       );
     }
 
-    if (!/^\d{11}$/.test(ruc)) {
-      return throwError((): VerificacionServiceError => ({
-        code: 'VER_RUC_INVALIDO',
-        message: 'RUC inválido',
-        descripcion: 'El RUC del transportista debe contener 11 dígitos.',
-      }));
-    }
-
-    return this.http.get<SemaforoResponse>(
-      `${this.baseUrl}/verificacion/semaforo`,
-      { params: { ruc } },
-    ).pipe(
-      map(response => response.data.lista),
-      catchError(error => throwError(() => this.normalizarError(error))),
-    );
+    return this.http
+      .get<SemaforoResponse>(`${this.baseUrl}/verificacion/semaforo`, {
+        params: { ruc },
+      })
+      .pipe(
+        map((response) => response.data.lista),
+        catchError((error) => throwError(() => this.normalizarError(error))),
+      );
   }
 
   private normalizarError(error: HttpErrorResponse): VerificacionServiceError {
@@ -196,11 +185,17 @@ export class ApiVerificacionService {
     }
 
     return {
-      code: error.status === 0 ? 'NETWORK_ERROR' : `HTTP_${error.status || 500}`,
-      message: error.status === 0 ? 'No se pudo conectar al servicio' : 'Error al procesar la solicitud',
-      descripcion: error.status === 0
-        ? 'Verifica que api_comprobante esté disponible y que la URL del entorno sea correcta.'
-        : error.message || 'Ocurrió un error inesperado al procesar la solicitud.',
+      code:
+        error.status === 0 ? 'NETWORK_ERROR' : `HTTP_${error.status || 500}`,
+      message:
+        error.status === 0
+          ? 'No se pudo conectar al servicio'
+          : 'Error al procesar la solicitud',
+      descripcion:
+        error.status === 0
+          ? 'Verifica que api_comprobante esté disponible y que la URL del entorno sea correcta.'
+          : error.message ||
+            'Ocurrió un error inesperado al procesar la solicitud.',
       status: error.status,
     };
   }

@@ -1,13 +1,39 @@
 <div class="notas-page">
-  <div class="mb-[18px] grid gap-3 md:grid-cols-2">
-    <div class="flex items-center gap-2.5 rounded-xl border border-[var(--warn)] bg-[var(--warn-bg)] px-3.5 py-2.5">
-      <i class="fa-regular fa-clock text-[var(--warn)]"></i>
-      <span class="text-[13px] font-semibold text-[var(--warn)]">Plazo de compra: 29/05/2026 – 28/07/2026</span>
-      <span class="ml-auto whitespace-nowrap rounded-full bg-[var(--warn)] px-2.5 py-0.5 text-xs font-bold text-white">8 días</span>
+  <div class="mb-5 grid gap-4 md:grid-cols-2">
+    <!-- Alerta de Plazo -->
+    <div
+      class="relative overflow-hidden rounded-lg bg-white border border-[#DCE4EC] shadow-[0_1px_3px_rgba(16,36,52,0.05)]">
+      <div class="absolute left-0 top-0 bottom-0 w-1 bg-[var(--warn)]"></div>
+      <div class="flex items-center gap-3.5 px-4 py-3.5">
+        <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--warn-bg)]">
+          <i class="fa-regular fa-clock text-[var(--warn)] text-sm"></i>
+        </div>
+        <div class="flex flex-col">
+          <span class="text-[10.5px] font-bold text-[var(--text-3)] uppercase tracking-wider">Plazo de compra</span>
+          <span class="text-[13px] font-bold text-[var(--text)]">29/05/2026 – 28/07/2026</span>
+        </div>
+        <div class="ml-auto">
+          <span
+            class="inline-block rounded-md bg-[var(--warn-bg)] px-2.5 py-1 text-[11px] font-bold tracking-wide text-[var(--warn)] border border-[var(--warn)]/20">
+            Quedan 7 días
+          </span>
+        </div>
+      </div>
     </div>
-    <div class="flex items-center gap-2.5 rounded-xl border border-[var(--primary)] bg-[var(--primary-soft)] px-3.5 py-2.5">
-      <i class="fa-solid fa-circle-info text-[var(--primary)]"></i>
-      <span class="text-[12.5px] font-medium leading-snug text-[var(--primary)]">El beneficiario es el <b>transportista titular de la autorización</b>, no el dueño del vehículo.</span>
+
+    <!-- Alerta de Información -->
+    <div
+      class="relative overflow-hidden rounded-lg bg-white border border-[#DCE4EC] shadow-[0_1px_3px_rgba(16,36,52,0.05)]">
+      <div class="absolute left-0 top-0 bottom-0 w-1 bg-[var(--primary-mid)]"></div>
+      <div class="flex items-center gap-3.5 px-4 py-3.5">
+        <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--primary-soft)]">
+          <i class="fa-solid fa-circle-info text-[var(--primary-mid)] text-sm"></i>
+        </div>
+        <div class="text-[12.5px] leading-relaxed text-[var(--text-2)]">
+          El beneficiario es el <strong class="text-[var(--text)] font-bold">transportista titular</strong> de la
+          autorización, no el dueño del vehículo.
+        </div>
+      </div>
     </div>
   </div>
 

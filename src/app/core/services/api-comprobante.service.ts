@@ -285,6 +285,13 @@ export class ApiComprobanteService {
     );
   }
 
+  listarAcumuladoVehiculos(ruc: string): Observable<ApiResponse<any[]>> {
+    return this.http.get<ApiResponse<any[]>>(
+      `${this.API_URL}/comprobantes/acumulado-vehiculos`,
+      { params: { ruc } },
+    );
+  }
+
   registrarComprobante(
     ruc: string,
     request: ComprobanteRequest,

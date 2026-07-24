@@ -51,6 +51,7 @@ export class ApiAuthService {
         map(res => {
           if (res && res.data) {
             res.data = this.decryptor.decryptLoginData(res.data);
+            console.log('🔑 [ApiAuthService] Respuesta /auth/login (DESENCRIPTADA):', res.data);
           }
           return res;
         }),

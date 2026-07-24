@@ -1,0 +1,14 @@
+services:
+  frontend-comprobantes-trans:
+    build: .
+    container_name: subsidio-frontend
+    restart: unless-stopped
+    ports:
+      - "8084:8084"
+    networks:
+      - subsidio-net
+
+networks:
+  subsidio-net:
+    name: subsidio-net
+    driver: bridge

@@ -90,6 +90,7 @@ export class VehiculoCargaComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.cargarCategorias();
+    this.cargarEstados();
     this.cargarVehiculos();
   }
 
@@ -123,6 +124,36 @@ export class VehiculoCargaComponent implements OnInit, OnDestroy {
     });
   }
 
+  private cargarEstados(): void {
+    const cached = localStorage.getItem('sigt_vehiculo_estados');
+    if (cached) {
+      try {
+        const list = JSON.parse(cached);
+        if (Array.isArray(list) && list.length > 0) {
+          this.actualizarOpcionesEstados(list);
+          return;
+        }
+      } catch (e) {
+        console.error('Error al parsear estados guardados:', e);
+      }
+    }
+
+    this.apiVehiculoService.obtenerEstados().subscribe({
+      next: (res) => {
+        const list = res?.data?.lista || res?.data || [];
+        if (Array.isArray(list) && list.length > 0) {
+          localStorage.setItem(
+            'sigt_vehiculo_estados',
+            JSON.stringify(list),
+          );
+          this.actualizarOpcionesEstados(list);
+        }
+      },
+      error: (err) =>
+        console.error('Error al cargar estados vehiculares:', err),
+    });
+  }
+
   private actualizarOpcionesCategorias(list: any[]): void {
     this.vehCatOpts = [
       { value: '', label: 'Todas las categorías' },
@@ -137,6 +168,16 @@ export class VehiculoCargaComponent implements OnInit, OnDestroy {
       ...list.map((c) => ({
         value: c.codigo,
         label: `${c.codigo} · ${c.nombre}${c.topeGalones ? ' (Tope: ' + c.topeGalones + ' gal)' : ''}`,
+      })),
+    ];
+  }
+
+  private actualizarOpcionesEstados(list: any[]): void {
+    this.vehValOpts = [
+      { value: '', label: 'Todos los estados' },
+      ...list.map((e) => ({
+        value: e.codigo,
+        label: e.nombre,
       })),
     ];
   }
@@ -296,6 +337,24 @@ export class VehiculoCargaComponent implements OnInit, OnDestroy {
     this.showVehicleModal = true;
   }
 
+  private ensureCategoryOption(code: string): void {
+    if (!code) return;
+    const exists = this.vehCreateCatOpts.some((opt) => opt.value === code);
+    if (!exists) {
+      this.vehCreateCatOpts.push({
+        value: code,
+        label: `${code} · Categoría ${code}`,
+      });
+      const catExists = this.vehCatOpts.some((opt) => opt.value === code);
+      if (!catExists) {
+        this.vehCatOpts.push({
+          value: code,
+          label: `${code} · Categoría ${code}`,
+        });
+      }
+    }
+  }
+
   openVedit(vehicle: Vehiculo): void {
     const uuid = vehicle.cargaVehiculoUuid || vehicle.id;
     this.editingVehicleId = uuid;
@@ -312,9 +371,11 @@ export class VehiculoCargaComponent implements OnInit, OnDestroy {
           const detail = response?.data?.lista;
           if (detail) {
             const topeNum = Number(detail.topeGalones);
+            const catCode = detail.categoria || vehicle.categoria || '';
+            this.ensureCategoryOption(catCode);
             this.newVehicle = {
               placa: this.formatPlate(detail.placa || ''),
-              categoria: detail.categoria || '',
+              categoria: catCode,
               topeGalones: !isNaN(topeNum) && topeNum > 0 ? topeNum : (Number(vehicle.topeFmt) || null),
               numeroAutorizacion: detail.numeroAutorizacion || '',
               tuc: detail.tuc || '',

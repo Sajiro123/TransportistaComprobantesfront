@@ -75,8 +75,6 @@ export class LoginComponent implements OnInit, OnDestroy {
   loginEmail = '';
   loginPassword = '';
   loginDocumentTouched = false;
-  private readonly mockRuc = '20512345678';
-  private readonly mockPassword = 'demo123';
 
   get loginDocumentLabel(): string {
     return 'Número de RUC';
@@ -861,14 +859,18 @@ export class LoginComponent implements OnInit, OnDestroy {
   ): void {
     this.apiAuthService.login(usuario, password, recaptchaToken).subscribe({
       next: (res) => {
-        if (usuario.trim().toLowerCase() === 'admin') {
-          if (res && res.data) {
-            res.data.numeroDocumento = '20412345670';
+        console.log('🔓 [LoginComponent] Respuesta de /api_iam/auth/login DESENCRIPTADA:', res.data);
+
+        // Si IAM retorna un DNI (ej: 8 dígitos) o sin RUC, asignamos temporalmente el RUC de desarrollo 20614776928
+        let ruc = res.data?.numeroDocumento;
+        if (!ruc || !/^\d{11}$/.test(ruc)) {
+          console.warn(
+            `[Login] El documento recibido ("${ruc}") no es un RUC de 11 dígitos. Asignando RUC mockup de desarrollo: "20614776928"`
+          );
+          ruc = '20614776928';
+          if (res.data) {
+            res.data.numeroDocumento = ruc;
             res.data.tipoDocumento = 'RUC';
-            res.data.razonSocial = 'Transportes Sajiro S.A.C.';
-            res.data.nombrePersona = 'Administrador';
-            res.data.apellidoPaterno = 'Sajiro';
-            res.data.apellidoMaterno = 'Mock';
           }
         }
 
@@ -886,7 +888,19 @@ export class LoginComponent implements OnInit, OnDestroy {
             console.error('Error al precargar categorías vehiculares:', err),
         });
 
-        const ruc = res.data?.numeroDocumento || '20412345670';
+        this.apiVehiculoService.obtenerEstados().subscribe({
+          next: (estRes) => {
+            const list = estRes?.data?.lista || estRes?.data || [];
+            localStorage.setItem(
+              'sigt_vehiculo_estados',
+              JSON.stringify(list),
+            );
+          },
+          error: (err) =>
+            console.error('Error al precargar estados vehiculares:', err),
+        });
+
+        console.log(`[Login] Solicitando perfil de comprobantes para RUC: ${ruc}`);
         this.apiComprobanteService.obtenerPerfil(ruc).subscribe({
           next: (perfilRes) => {
             if (perfilRes && perfilRes.data && perfilRes.data.lista) {
@@ -920,39 +934,6 @@ export class LoginComponent implements OnInit, OnDestroy {
         this.showAlert(msg, 'error');
       },
     });
-  }
-
-  /**
-   * Acceso temporal para desarrollo mientras el servicio IAM no está disponible.
-   * TODO: retirar este método y el aviso visual cuando se habilite el backend.
-   */
-  private loginWithMockData(): void {
-    this.isLoading = true;
-
-    const mockResponse: LoginResponse = {
-      data: {
-        usuarioId: 1,
-        nombrePersona: 'Usuario',
-        apellidoPaterno: 'Mock',
-        apellidoMaterno: null,
-        razonSocial: 'Transportes Demo S.A.C.',
-        nombreEntidad: 'Autoridad de Transporte Urbano para Lima y Callao',
-        cargo: 'Representante del transportista',
-        correo: 'usuario.mock@atu.gob.pe',
-        entidadUuid: 'entidad-mock-atu',
-        numeroDocumento: this.mockRuc,
-        perfilCodigo: 'TRANSPORTISTA',
-        perfilNombre: 'Transportista',
-        telefono: '999999999',
-        tipoDocumento: 'RUC',
-        tipoEntidad: 'ATU',
-        usuarioUuid: 'usuario-mock-transportista',
-      },
-    };
-
-    this.apiAuthService.saveSession(mockResponse);
-    this.sessionService.startSession();
-    this.router.navigate(['/perfil']);
   }
 
   onLoginKeydown(e: KeyboardEvent): void {

@@ -82,6 +82,14 @@ export class ApiVehiculoService {
   obtenerCategorias(): Observable<any> {
     return this.http.get<any>(`${this.apiUrl}/vehiculos/categorias`);
   }
+
+  /**
+   * Obtiene la lista de estados de validación vehicular disponibles.
+   * GET /api_comprobante/vehiculos/estados
+   */
+  obtenerEstados(): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/vehiculos/estados`);
+  }
   /**
    * Carga masiva de vehículos vía Excel.
    * POST /api_comprobante/vehiculos/excel
