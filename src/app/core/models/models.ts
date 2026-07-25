@@ -99,6 +99,13 @@ export interface RepresentanteLegal {
 }
 
 export interface ContactoTransportista {
+  personaId?: number;
+  personaUuid: string;
+  nombres?: string;
+  apellidoPaterno?: string;
+  apellidoMaterno?: string;
+  razonSocial?: string | null;
+  tipoDocumentoId?: number;
   nombresApellidos: string;
   tipoDocumento: string;
   numeroDocumento: string;
@@ -121,15 +128,27 @@ export interface PerfilTransportistaResponse {
 }
 
 export interface ActualizarContactoRequest {
-  nombresApellidos: string;
-  tipoDocumento?: string;
+  personaUuid: string;
+  nombres?: string;
+  apellidoPaterno?: string;
+  apellidoMaterno?: string;
+  razonSocial?: string | null;
+  tipoDocumentoId?: number;
   numeroDocumento?: string;
-  telefono: string;
+  telefono?: string;
+  correo?: string;
+}
+
+export interface ActualizarContactoResultado {
+  personaId: number;
+  personaUuid: string;
+  resultado: string;
+  mensaje: string;
 }
 
 export interface ActualizarContactoResponse {
   data: {
-    lista: ContactoTransportista;
+    lista: ActualizarContactoResultado;
     respuesta: string;
     mensaje: string;
   };

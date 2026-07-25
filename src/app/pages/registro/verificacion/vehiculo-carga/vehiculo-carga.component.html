@@ -65,7 +65,7 @@
         <span class="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-3)] flex">
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
         </span>
-        <input type="text" [(ngModel)]="vehQ" (ngModelChange)="onFiltersChange()" placeholder="Buscar por placa, TUC o autorización…" class="w-full bg-[var(--surface)] border border-[var(--border)] rounded-xl py-2.5 pl-9 pr-3 text-sm text-[var(--text)] outline-none focus:border-[var(--primary)] transition-colors">
+        <input type="text" [(ngModel)]="vehQ" (ngModelChange)="onSearchChange()" placeholder="Buscar por placa, TUC o autorización…" class="w-full bg-[var(--surface)] border border-[var(--border)] rounded-xl py-2.5 pl-9 pr-3 text-sm text-[var(--text)] outline-none focus:border-[var(--primary)] transition-colors">
       </div>
       <select [(ngModel)]="vehCatF" (ngModelChange)="onFiltersChange()" class="bg-[var(--surface)] border border-[var(--border)] rounded-xl py-2.5 px-3 text-[13.5px] text-[var(--text)] cursor-pointer font-semibold outline-none focus:border-[var(--primary)] transition-colors">
         <option *ngFor="let o of vehCatOpts" [value]="o.value">{{ o.label }}</option>
