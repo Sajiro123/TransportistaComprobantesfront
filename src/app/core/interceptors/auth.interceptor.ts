@@ -62,7 +62,6 @@ export const authInterceptor: HttpInterceptorFn = (
       const errMessage = err?.error?.message || err?.error?.descripcion || err?.message || '';
       const isTokenExpired =
         err.status === 401 ||
-        err.status === 403 ||
         errMessage.toLowerCase().includes('token inválido o expirado') ||
         errMessage.toLowerCase().includes('token expirado');
 

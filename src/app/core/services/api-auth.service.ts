@@ -51,7 +51,6 @@ export class ApiAuthService {
         map(res => {
           if (res && res.data) {
             res.data = this.decryptor.decryptLoginData(res.data);
-            console.log('🔑 [ApiAuthService] Respuesta /auth/login (DESENCRIPTADA):', res.data);
           }
           return res;
         }),
@@ -135,6 +134,7 @@ export class ApiAuthService {
       entidad: session.user.nombreEntidad,
       tipoEntidad: session.user.tipoEntidad || '',
       numDocumento: session.user.numeroDocumento || '',
+      ruc: session.user.ruc || '',
       tipoDocumento: session.user.tipoDocumento || 'DNI',
       telefono: session.user.telefono || '',
       cargo: session.user.cargo || '',

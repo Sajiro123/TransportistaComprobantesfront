@@ -3,7 +3,6 @@ import { Router, RouterOutlet } from '@angular/router';
 import { SidebarNavComponent } from '../sidebar-nav/sidebar-nav.component';
 import { SidebarFooterComponent } from '../sidebar-footer/sidebar-footer.component';
 import { ApiAuthService } from '@core/services/api-auth.service';
-import { AuthService } from '@core/services/auth.service';
 import { SessionService } from '@core/services/session.service';
 import { ThemeService } from '@core/services/theme.service';
 import { CommonModule } from '@angular/common';
@@ -27,7 +26,6 @@ export class ShellComponent implements OnInit {
 
   readonly themeService = inject(ThemeService);
   private readonly apiAuthService = inject(ApiAuthService);
-  private readonly authService = inject(AuthService);
   private readonly sessionService = inject(SessionService);
   private readonly router = inject(Router);
 
@@ -53,8 +51,7 @@ export class ShellComponent implements OnInit {
 
   ngOnInit(): void {
     this.sidebarOpen = window.innerWidth > 900;
-    this.usuario = this.apiAuthService.getUserFromSession()
-      ?? this.authService.getSession();
+    this.usuario = this.apiAuthService.getUserFromSession();
   }
 
   toggleSidebar(): void {
@@ -90,12 +87,10 @@ export class ShellComponent implements OnInit {
     this.apiAuthService.logout().subscribe({
       next: () => {
         this.apiAuthService.clearSession();
-        this.authService.logout();
         this.router.navigate(['/login']);
       },
       error: () => {
         this.apiAuthService.clearSession();
-        this.authService.logout();
         this.router.navigate(['/login']);
       },
     });

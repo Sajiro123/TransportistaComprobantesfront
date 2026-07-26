@@ -6,7 +6,6 @@ import { FormsModule } from '@angular/forms';
 import { isValidRuc } from '../../../../core/utils/validators';
 import { ApiVehiculoService } from '@core/services/api-vehiculo.service';
 import { ApiAuthService } from '@core/services/api-auth.service';
-import { AuthService } from '@core/services/auth.service';
 import {
   EstadoValidacionVehiculo,
   RegistrarVehiculoRequest,
@@ -54,6 +53,7 @@ interface VehicleFormModel extends Omit<
   styleUrl: './vehiculo-carga.component.scss',
 })
 export class VehiculoCargaComponent implements OnInit, OnDestroy {
+  readonly vehicleCreationAndEditingEnabled = false;
   vehCount = 0;
   vehQ = '';
   vehCatF = '';
@@ -76,7 +76,6 @@ export class VehiculoCargaComponent implements OnInit, OnDestroy {
 
   private readonly apiVehiculoService = inject(ApiVehiculoService);
   private readonly apiAuthService = inject(ApiAuthService);
-  private readonly authService = inject(AuthService);
 
   vehCatOpts = [{ value: '', label: 'Todas las categorías' }];
 
@@ -472,7 +471,7 @@ export class VehiculoCargaComponent implements OnInit, OnDestroy {
   get ownerDocumentPlaceholder(): string {
     if (this.newVehicle.propietarioTipoDocumento === 'DNI') return '12345678';
     if (this.newVehicle.propietarioTipoDocumento === 'CE') return 'ABC123456';
-    return '20512345678';
+    return 'Ingrese 11 dígitos';
   }
 
   get ownerDocumentHint(): string {

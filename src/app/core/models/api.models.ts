@@ -28,6 +28,7 @@ export interface LoginData {
   correo?: string | null;
   entidadUuid?: string | null;
   numeroDocumento?: string | null;
+  ruc?: string | null;
   perfilCodigo?: string | null;
   perfilNombre?: string | null;
   telefono?: string | null;
@@ -44,6 +45,7 @@ export const ENCRYPTED_LOGIN_FIELDS = [
   'razonSocial',
   'tipoDocumento',
   'numeroDocumento',
+  'ruc',
   'correo',
   'telefono',
 ] as const satisfies ReadonlyArray<keyof LoginData>;
@@ -267,6 +269,7 @@ export interface EnviarOtpRegistroRequest {
   telefono: string;
   clave: string;
   razonSocial?: string;
+  validacionManual?: boolean;
   recaptchaToken?: string;
 }
 

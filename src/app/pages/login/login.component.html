@@ -7,9 +7,10 @@
     </div>
     <div class="welcome-modal-content">
       <p class="welcome-modal-eyebrow">Aviso importante</p>
-      <h2 id="welcome-modal-title">Sistema de comprobantes</h2>
+      <h2 id="welcome-modal-title">Sistema de carga de comprobantes</h2>
       <p id="welcome-modal-description">
-        ESTÁS EN EL SISTEMA PARA LA CARGA DE COMPROBANTES DE LOS TRANSPORTISTAS.
+        ESTÁS EN EL SISTEMA PARA LA CARGA DE COMPROBANTES DE LOS TRANSPORTISTAS REGISTRADOS DESDE EL 01/06/2026 HASTA EL
+        31/07/2026
       </p>
     </div>
     <button type="button" class="welcome-modal-button" (click)="closeWelcomeModal()">
@@ -182,10 +183,15 @@
             {{ loginDocumentLabel }}
           </label>
           <div style="margin-bottom:16px">
-            <input id="login-document" type="text" autocomplete="username"
+            <input id="login-document" type="text" inputmode="numeric" maxlength="11" autocomplete="username"
               class="w-full px-4 py-3 text-sm text-gray-900 bg-white border border-gray-300 rounded-xl outline-none transition-all duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 placeholder:text-gray-400"
-              [(ngModel)]="loginEmail" placeholder="Ingrese su RUC o usuario" (input)="onLoginDocumentInput($event)"
+              [(ngModel)]="loginEmail" placeholder="Ingrese su número de RUC" (input)="onLoginDocumentInput($event)"
               (blur)="loginDocumentTouched = true" (keydown)="onLoginDocumentKeydown($event)" />
+            @if (loginDocumentError) {
+            <p style="margin:6px 2px 0; color:var(--bad); font-size:12px; font-weight:600">
+              {{ loginDocumentError }}
+            </p>
+            }
           </div>
 
 
@@ -306,22 +312,59 @@
           </button>
           }
 
+          @if (registrationManualEntryAvailable && !registrationRucValidated) {
+          <div
+            style="margin-top:12px; padding:12px 13px; border:1px solid var(--warn); border-radius:10px; background:var(--warn-bg); color:var(--text-2)">
+            <div style="font-size:12.5px; font-weight:700; line-height:1.4">
+              El servicio de validación no está disponible. Puedes ingresar los datos del transportista manualmente y
+              continuar con la confirmación por correo.
+            </div>
+            <button type="button" (click)="enableManualRegistration()"
+              style="width:100%; margin-top:10px; border:1px solid var(--warn); border-radius:9px; padding:11px; background:var(--surface); color:var(--text); font-size:13px; font-weight:700; cursor:pointer">
+              Ingresar datos manualmente
+            </button>
+          </div>
+          }
+
           @if (registrationRucValidated) {
           <div class="registration-details">
             <div
-              style="margin-bottom:14px; background:var(--ok-bg); border:1px solid var(--ok); border-radius:10px; padding:11px 13px; display:flex; gap:9px; align-items:flex-start">
+              style="margin-bottom:14px; border:1px solid; border-radius:10px; padding:11px 13px; display:flex; gap:9px; align-items:flex-start"
+              [style.background]="registrationManualMode ? 'var(--warn-bg)' : 'var(--ok-bg)'"
+              [style.border-color]="registrationManualMode ? 'var(--warn)' : 'var(--ok)'">
               <span
-                style="flex:0 0 auto; width:18px; height:18px; border-radius:50%; background:var(--ok); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:11px"
-                aria-hidden="true"><i class="fa-solid fa-check"></i></span>
+                style="flex:0 0 auto; width:18px; height:18px; border-radius:50%; color:#fff; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:11px"
+                [style.background]="registrationManualMode ? 'var(--warn)' : 'var(--ok)'"
+                aria-hidden="true">
+                <i [class]="registrationManualMode ? 'fa-solid fa-pen' : 'fa-solid fa-check'"></i>
+              </span>
               <div style="min-width:0">
-                <div style="font-size:13px; font-weight:700; color:var(--ok)">{{ registrationCompanyName }}</div>
+                <div style="font-size:13px; font-weight:700"
+                  [style.color]="registrationManualMode ? 'var(--warn)' : 'var(--ok)'">
+                  {{ registrationCompanyName }}
+                </div>
                 <div style="font-size:12px; color:var(--text-2); margin-top:2px; line-height:1.4">
-                  RUC ACTIVO y HABIDO en SUNAT. Continúa para confirmar tu correo.
+                  {{ registrationManualMode
+                    ? 'La información quedará pendiente de validación posterior. Continúa para confirmar tu correo.'
+                    : 'RUC ACTIVO y HABIDO en SUNAT. Continúa para confirmar tu correo.' }}
                 </div>
               </div>
             </div>
 
             <div style="border-top:1px solid var(--border); margin-top:8px; padding-top:16px">
+              @if (registrationManualMode) {
+              <label for="registration-business-name"
+                style="display:block; font-size:12.5px; font-weight:700; color:var(--text-2); margin-bottom:7px">
+                Razón social <span style="color:var(--bad)">*</span>
+              </label>
+              <input id="registration-business-name" type="text" maxlength="512"
+                [(ngModel)]="registrationRazonSocial" placeholder="Ingrese la razón social del transportista"
+                style="width:100%; background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:12px 13px; font-size:14px; color:var(--text); margin-bottom:4px" />
+              @if (registrationRazonSocialError) {
+              <p class="registration-field-error">{{ registrationRazonSocialError }}</p>
+              }
+              }
+
               <div
                 style="font-size:11.5px; font-weight:700; color:var(--text-3); text-transform:uppercase; letter-spacing:.5px; margin-bottom:14px">
                 Datos de contacto

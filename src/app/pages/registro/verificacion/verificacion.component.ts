@@ -7,7 +7,6 @@ import { TagModule } from 'primeng/tag';
 import { VehiculoCargaComponent } from './vehiculo-carga/vehiculo-carga.component';
 import { ApiVerificacionService } from '@core/services/api-verificacion.service';
 import { ApiAuthService } from '@core/services/api-auth.service';
-import { AuthService } from '@core/services/auth.service';
 import {
   DatosTransportista,
   VerificacionServiceError,
@@ -50,7 +49,6 @@ export interface Condicion {
 export class VerificacionComponent implements OnInit {
   private readonly apiVerificacion = inject(ApiVerificacionService);
   private readonly apiAuth = inject(ApiAuthService);
-  private readonly auth = inject(AuthService);
 
   // ── Datos del transportista ─────────────────────────────────
   datosTransportista: DatoTransportista[] = [];
@@ -60,6 +58,7 @@ export class VerificacionComponent implements OnInit {
   actualizacionesDatosRestantes = 5;
   actualizacionesAutorizacionesRestantes = 5;
   actualizacionesVehiculosRestantes = 5;
+  showValidationInfoModal = false;
   private transportista: DatosTransportista | null = null;
 
   // ── Autorizaciones ──────────────────────────────────────────
@@ -88,10 +87,17 @@ export class VerificacionComponent implements OnInit {
     this.cargarDatosTransportista();
   }
 
+  openValidationInfo(): void {
+    this.showValidationInfoModal = true;
+  }
+
+  closeValidationInfo(): void {
+    this.showValidationInfoModal = false;
+  }
+
   cargarDatosTransportista(): void {
-    const usuarioSesion =
-      this.apiAuth.getUserFromSession() ?? this.auth.getSession();
-    const rucSesion = usuarioSesion?.numDocumento || '';
+    const usuarioSesion = this.apiAuth.getUserFromSession();
+    const rucSesion = usuarioSesion?.ruc || '';
     this.rucConsulta = rucSesion;
 
     if (!this.rucConsulta) {
@@ -131,9 +137,8 @@ export class VerificacionComponent implements OnInit {
     if (this.actualizacionesDisponibles(seccion) === 0 || this.cargandoDatos)
       return;
 
-    const usuarioSesion =
-      this.apiAuth.getUserFromSession() ?? this.auth.getSession();
-    const rucSesion = usuarioSesion?.numDocumento || '';
+    const usuarioSesion = this.apiAuth.getUserFromSession();
+    const rucSesion = usuarioSesion?.ruc || '';
     this.rucConsulta = rucSesion;
 
     if (!this.rucConsulta) {

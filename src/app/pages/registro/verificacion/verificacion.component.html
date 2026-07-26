@@ -50,6 +50,32 @@
       <p class="section-subtitle">Datos de los registros oficiales. Revísalos; no son editables.</p>
     </div>
 
+    <div
+      class="flex flex-wrap gap-3 items-center justify-between bg-[var(--primary-soft)] border border-[var(--primary)] rounded-xl py-3 px-4 mb-3.5">
+      <div class="flex items-start gap-2.5 flex-1 min-w-[230px]">
+        <span class="flex-none mt-px text-[var(--primary)]">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10" />
+            <path d="M12 16v-4M12 8h.01" />
+          </svg>
+        </span>
+        <div class="text-[12.5px] text-[var(--text-2)] leading-tight">
+          La información que <b>confirmes</b> y que aún <b>no esté validada</b> continuará su validación con los datos
+          remitidos <b>oficialmente por las entidades al corte</b>. Cada dato se contrasta con una fuente distinta.
+        </div>
+      </div>
+      <button type="button" (click)="openValidationInfo()"
+        class="flex-none inline-flex items-center gap-2 bg-[var(--surface)] text-[var(--primary)] border border-[var(--primary)] rounded-lg py-2 px-3 text-[12.5px] font-bold cursor-pointer whitespace-nowrap hover:bg-[var(--primary-soft)] transition-colors">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10" />
+          <path d="M12 16v-4M12 8h.01" />
+        </svg>
+        ¿Quién valida cada dato?
+      </button>
+    </div>
+
     <div class="verification-stack">
 
       <!-- Tarjeta: Datos del transportista ─────────────────── -->
@@ -281,3 +307,86 @@
   </div>
 
 </div>
+
+@if (showValidationInfoModal) {
+<div class="fixed inset-0 z-[1020] flex items-center justify-center bg-black/55 backdrop-blur-[2px] p-4"
+  role="presentation" (click)="closeValidationInfo()">
+  <section
+    class="w-full max-w-[560px] max-h-[90vh] flex flex-col bg-[var(--surface)] border border-[var(--border)] rounded-[18px] shadow-2xl overflow-hidden"
+    role="dialog" aria-modal="true" aria-labelledby="verification-validation-info-title"
+    (click)="$event.stopPropagation()">
+    <header class="flex items-start justify-between gap-3 px-5 sm:px-6 py-5 border-b border-[var(--border)]">
+      <div>
+        <h2 id="verification-validation-info-title" class="m-0 text-xl font-extrabold text-[var(--text)]">
+          ¿Quién valida cada dato?
+        </h2>
+        <p class="m-0 mt-1 text-[13px] text-[var(--text-3)]">Cada campo se contrasta con una fuente oficial</p>
+      </div>
+      <button type="button" (click)="closeValidationInfo()" aria-label="Cerrar modal"
+        class="w-9 h-9 shrink-0 rounded-lg border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text-2)] cursor-pointer hover:text-[var(--primary)]">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </header>
+
+    <div class="flex-1 overflow-y-auto px-5 sm:px-6 py-5 space-y-3">
+      <div class="flex items-start gap-3.5 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] p-4">
+        <div
+          class="w-10 h-10 shrink-0 rounded-xl bg-[var(--primary-soft)] text-[var(--primary)] flex items-center justify-center font-extrabold">
+          P</div>
+        <div>
+          <h3 class="m-0 text-[13.5px] font-extrabold text-[var(--text)]">Placa y categoría / carrocería</h3>
+          <p class="m-0 mt-1 text-[12.5px] leading-relaxed text-[var(--text-3)]">Se validan con el MTC (registro
+            vehicular y clasificación de carrocería).</p>
+        </div>
+      </div>
+
+      <div class="flex items-start gap-3.5 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] p-4">
+        <div
+          class="w-10 h-10 shrink-0 rounded-xl bg-[var(--primary-soft)] text-[var(--primary)] flex items-center justify-center font-extrabold">
+          T</div>
+        <div>
+          <h3 class="m-0 text-[13.5px] font-extrabold text-[var(--text)]">TUC</h3>
+          <p class="m-0 mt-1 text-[12.5px] leading-relaxed text-[var(--text-3)]">Se valida con el MTC (Tarjeta Única de
+            Circulación vigente).</p>
+        </div>
+      </div>
+
+      <div class="flex items-start gap-3.5 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] p-4">
+        <div
+          class="w-10 h-10 shrink-0 rounded-xl bg-[var(--primary-soft)] text-[var(--primary)] flex items-center justify-center font-extrabold">
+          A</div>
+        <div>
+          <h3 class="m-0 text-[13.5px] font-extrabold text-[var(--text)]">Autorización</h3>
+          <p class="m-0 mt-1 text-[12.5px] leading-relaxed text-[var(--text-3)]">Se valida con la entidad que la
+            remitió: Gobierno Regional, Municipalidad Provincial o MTC, según corresponda.</p>
+        </div>
+      </div>
+
+      <div class="flex items-start gap-3.5 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] p-4">
+        <div
+          class="w-10 h-10 shrink-0 rounded-xl bg-[var(--primary-soft)] text-[var(--primary)] flex items-center justify-center font-extrabold">
+          D</div>
+        <div>
+          <h3 class="m-0 text-[13.5px] font-extrabold text-[var(--text)]">Propietario y conductor</h3>
+          <p class="m-0 mt-1 text-[12.5px] leading-relaxed text-[var(--text-3)]">Datos de identidad y licencia se
+            validan con SUNAT / RENIEC y con MTC – Licencias.</p>
+        </div>
+      </div>
+
+      <div
+        class="flex items-start gap-2.5 rounded-xl border border-[var(--border)] bg-[var(--primary-soft)] px-4 py-3 text-[12px] leading-relaxed text-[var(--text-2)]">
+        <i class="fa-solid fa-circle-info mt-0.5 text-[var(--primary)]"></i>
+        <span>Los datos confirmados y aún no validados continúan su validación con la información remitida
+          oficialmente por las entidades al corte.</span>
+      </div>
+    </div>
+
+    <footer class="flex justify-end px-5 sm:px-6 py-4 border-t border-[var(--border)]">
+      <button type="button" (click)="closeValidationInfo()"
+        class="bg-[var(--primary)] text-[var(--primary-contrast)] border-0 rounded-xl px-6 py-2.5 text-[13.5px] font-bold cursor-pointer hover:opacity-90">
+        Entendido
+      </button>
+    </footer>
+  </section>
+</div>
+}
