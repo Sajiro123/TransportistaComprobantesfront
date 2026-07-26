@@ -1,6 +1,7 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { finalize, forkJoin, Observable } from 'rxjs';
+import { finalize, forkJoin, Observable, of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
 import { VehiculoCargaComponent } from './vehiculo-carga/vehiculo-carga.component';
@@ -12,6 +13,7 @@ import {
   VerificacionServiceError,
   AutorizacionTransportista,
   SemaforoCondicion,
+  AutorizacionesData,
 } from '@core/models/verificacion.models';
 
 export interface DatoTransportista {
@@ -24,8 +26,8 @@ export interface Autorizacion {
   estado: string;
   badgeSeverity: 'success' | 'warn' | 'danger' | 'secondary';
   resolucion: string;
-  autoridad: string;
-  ambito: string;
+  autoridad: string | null;
+  ambito: string | null;
   vigencia: string;
 }
 
@@ -102,21 +104,25 @@ export class VerificacionComponent implements OnInit {
     this.errorDatos = '';
 
     forkJoin({
-      datos: this.apiVerificacion.obtenerDatosTransportista(this.rucConsulta),
-      autorizaciones: this.apiVerificacion.obtenerAutorizaciones(
-        this.rucConsulta,
+      datos: this.apiVerificacion.obtenerDatosTransportista(this.rucConsulta).pipe(
+        catchError((error: VerificacionServiceError) => {
+          this.errorDatos = error.descripcion || error.message;
+          return of(null);
+        })
       ),
-      semaforo: this.apiVerificacion.obtenerSemaforo(this.rucConsulta),
+      autorizaciones: this.apiVerificacion.obtenerAutorizaciones(this.rucConsulta).pipe(
+        catchError(() => of({ totalAutorizaciones: 0, totalAtu: 0, totalMtc: 0, autorizaciones: [] } as AutorizacionesData))
+      ),
+      semaforo: this.apiVerificacion.obtenerSemaforo(this.rucConsulta).pipe(
+        catchError(() => of([]))
+      ),
     })
       .pipe(finalize(() => (this.cargandoDatos = false)))
       .subscribe({
         next: ({ datos, autorizaciones, semaforo }) => {
-          this.aplicarDatosTransportista(datos);
-          this.aplicarAutorizaciones(autorizaciones);
+          if (datos) this.aplicarDatosTransportista(datos);
+          this.aplicarAutorizaciones(autorizaciones.autorizaciones);
           this.aplicarSemaforo(semaforo);
-        },
-        error: (error: VerificacionServiceError) => {
-          this.errorDatos = error.descripcion || error.message;
         },
       });
   }
@@ -138,18 +144,35 @@ export class VerificacionComponent implements OnInit {
 
     this.cargandoDatos = true;
     this.errorDatos = '';
-    this.apiVerificacion
-      .obtenerDatosTransportista(this.rucConsulta)
-      .pipe(finalize(() => (this.cargandoDatos = false)))
-      .subscribe({
-        next: (datos) => {
-          this.aplicarDatosTransportista(datos);
-          this.descontarActualizacion(seccion);
-        },
-        error: (error: VerificacionServiceError) => {
-          this.errorDatos = error.descripcion || error.message;
-        },
-      });
+    if (seccion === 'datos') {
+      this.apiVerificacion
+        .obtenerDatosTransportista(this.rucConsulta)
+        .pipe(finalize(() => (this.cargandoDatos = false)))
+        .subscribe({
+          next: (datos) => {
+            this.aplicarDatosTransportista(datos);
+            this.descontarActualizacion(seccion);
+          },
+          error: (error: VerificacionServiceError) => {
+            this.errorDatos = error.descripcion || error.message;
+          },
+        });
+    } else if (seccion === 'autorizaciones') {
+      this.apiVerificacion
+        .obtenerAutorizaciones(this.rucConsulta)
+        .pipe(finalize(() => (this.cargandoDatos = false)))
+        .subscribe({
+          next: (datos) => {
+            this.aplicarAutorizaciones(datos.autorizaciones);
+            this.descontarActualizacion(seccion);
+          },
+          error: (error: VerificacionServiceError) => {
+            this.errorDatos = error.descripcion || error.message;
+          },
+        });
+    } else {
+      this.cargandoDatos = false; // Add remaining logic here later if needed
+    }
   }
 
   private actualizacionesDisponibles(
@@ -194,7 +217,7 @@ export class VerificacionComponent implements OnInit {
   }
 
   private aplicarAutorizaciones(lista: AutorizacionTransportista[]): void {
-    this.autorizaciones = lista.map((item) => {
+    this.autorizaciones = (lista || []).map((item) => {
       let severity: 'success' | 'warn' | 'danger' | 'secondary' = 'secondary';
       const est = item.estado.toLowerCase().trim();
       if (est === 'vigente') {

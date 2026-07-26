@@ -1,5 +1,5 @@
 export interface DatosTransportista {
-  id: number;
+  uuid: string;
   razonSocial: string;
   ruc: string;
   tipoEntidad: string;
@@ -35,19 +35,28 @@ export interface VerificacionServiceError extends VerificacionErrorDetalle {
 
 // ── Autorizaciones del Transportista ───────────────────────
 export interface AutorizacionTransportista {
-  id: number;
+  uuid: string;
   tipoTransporte: string;
   estado: string; // 'Vigente' | 'Vencida'
   numeroResolucion: string;
-  autoridad: string;
-  ambito: string;
+  autoridad: string | null;
+  tipoEntidad?: string | null;
+  ambito: string | null;
   fechaInicioVigencia: string; // YYYY-MM-DD
   fechaFinVigencia: string; // YYYY-MM-DD
+  fuente: string; // 'ATU' | 'MTC'
+}
+
+export interface AutorizacionesData {
+  totalAutorizaciones: number;
+  totalAtu: number;
+  totalMtc: number;
+  autorizaciones: AutorizacionTransportista[];
 }
 
 export interface AutorizacionesResponse {
   data: {
-    lista: AutorizacionTransportista[];
+    lista: AutorizacionesData;
     respuesta: 'OK';
     mensaje: string;
   };

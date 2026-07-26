@@ -1,7 +1,7 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { isValidPhone } from '../../core/utils/validators';
+import { isValidPhone, isValidEmail } from '../../core/utils/validators';
 import { AuthService } from '@core/services/auth.service';
 import { ApiAuthService } from '@core/services/api-auth.service';
 import { ApiUsuarioService } from '@core/services/api-usuario.service';
@@ -293,35 +293,85 @@ import {
                     }
                   </span>
                   @if (editMode) {
-                    <div class="relative">
-                      <div
-                        class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
-                      >
-                        <i class="fa-solid fa-user text-gray-400 text-xs"></i>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                      <div>
+                        <div class="relative">
+                          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fa-solid fa-user text-gray-400 text-xs"></i>
+                          </div>
+                          <input
+                            type="text"
+                            [(ngModel)]="editContactoNombres"
+                            (input)="onContactoNombreInput($event, 'nombres')"
+                            maxlength="120"
+                            autocomplete="given-name"
+                            [attr.aria-invalid]="!!contactoNombresError"
+                            placeholder="Nombres"
+                            class="w-full pl-9 border-2 rounded-xl bg-white dark:bg-[#0D1117] px-3 py-2.5 text-[14px] text-atu-text dark:text-[#E6EDF3] focus:outline-none focus:ring-4 focus:ring-atu-primary/10 transition-all shadow-sm"
+                            [ngClass]="
+                              contactoNombresError
+                                ? 'border-red-500 focus:border-red-500'
+                                : 'border-atu-border dark:border-[#30363D] focus:border-atu-primary dark:focus:border-[#00A3E0]'
+                            "
+                          />
+                        </div>
+                        @if (contactoNombresError) {
+                          <p class="mt-1.5 text-[11.5px] font-semibold text-red-600 dark:text-red-400">
+                            {{ contactoNombresError }}
+                          </p>
+                        }
                       </div>
-                      <input
-                        type="text"
-                        [(ngModel)]="editContactoNombre"
-                        (input)="onContactoNombreInput($event)"
-                        maxlength="120"
-                        autocomplete="name"
-                        [attr.aria-invalid]="!!contactoNombreError"
-                        placeholder="Nombres y Apellidos"
-                        class="w-full pl-9 border-2 rounded-xl bg-white dark:bg-[#0D1117] px-3 py-2.5 text-[14px] text-atu-text dark:text-[#E6EDF3] focus:outline-none focus:ring-4 focus:ring-atu-primary/10 transition-all shadow-sm"
-                        [ngClass]="
-                          contactoNombreError
-                            ? 'border-red-500 focus:border-red-500'
-                            : 'border-atu-border dark:border-[#30363D] focus:border-atu-primary dark:focus:border-[#00A3E0]'
-                        "
-                      />
+
+                      <div>
+                        <div class="relative">
+                          <input
+                            type="text"
+                            [(ngModel)]="editContactoApellidoPaterno"
+                            (input)="onContactoNombreInput($event, 'paterno')"
+                            maxlength="60"
+                            autocomplete="family-name"
+                            [attr.aria-invalid]="!!contactoApellidoPaternoError"
+                            placeholder="Apellido Paterno"
+                            class="w-full border-2 rounded-xl bg-white dark:bg-[#0D1117] px-3 py-2.5 text-[14px] text-atu-text dark:text-[#E6EDF3] focus:outline-none focus:ring-4 focus:ring-atu-primary/10 transition-all shadow-sm"
+                            [ngClass]="
+                              contactoApellidoPaternoError
+                                ? 'border-red-500 focus:border-red-500'
+                                : 'border-atu-border dark:border-[#30363D] focus:border-atu-primary dark:focus:border-[#00A3E0]'
+                            "
+                          />
+                        </div>
+                        @if (contactoApellidoPaternoError) {
+                          <p class="mt-1.5 text-[11.5px] font-semibold text-red-600 dark:text-red-400">
+                            {{ contactoApellidoPaternoError }}
+                          </p>
+                        }
+                      </div>
+
+                      <div>
+                        <div class="relative">
+                          <input
+                            type="text"
+                            [(ngModel)]="editContactoApellidoMaterno"
+                            (input)="onContactoNombreInput($event, 'materno')"
+                            maxlength="60"
+                            autocomplete="family-name"
+                            [attr.aria-invalid]="!!contactoApellidoMaternoError"
+                            placeholder="Apellido Materno"
+                            class="w-full border-2 rounded-xl bg-white dark:bg-[#0D1117] px-3 py-2.5 text-[14px] text-atu-text dark:text-[#E6EDF3] focus:outline-none focus:ring-4 focus:ring-atu-primary/10 transition-all shadow-sm"
+                            [ngClass]="
+                              contactoApellidoMaternoError
+                                ? 'border-red-500 focus:border-red-500'
+                                : 'border-atu-border dark:border-[#30363D] focus:border-atu-primary dark:focus:border-[#00A3E0]'
+                            "
+                          />
+                        </div>
+                        @if (contactoApellidoMaternoError) {
+                          <p class="mt-1.5 text-[11.5px] font-semibold text-red-600 dark:text-red-400">
+                            {{ contactoApellidoMaternoError }}
+                          </p>
+                        }
+                      </div>
                     </div>
-                    @if (contactoNombreError) {
-                      <p
-                        class="mt-1.5 text-[11.5px] font-semibold text-red-600 dark:text-red-400"
-                      >
-                        {{ contactoNombreError }}
-                      </p>
-                    }
                   } @else {
                     <strong
                       class="text-[15px] text-atu-text dark:text-[#E6EDF3] font-semibold flex items-center gap-2"
@@ -483,21 +533,50 @@ import {
                   }
                 </div>
 
-                <!-- Correo (NO EDITABLE) -->
+                <!-- Correo Electrónico -->
                 <div class="space-y-1.5">
                   <span
                     class="text-atu-text-3 dark:text-[#6E7681] font-semibold uppercase tracking-wider block text-[10.5px]"
                   >
                     Correo Electrónico
+                    @if (editMode) {
+                      <span class="text-red-600 dark:text-red-500 ml-0.5"
+                        >*</span
+                      >
+                    }
                   </span>
-                  <strong
-                    class="text-[15px] text-atu-text dark:text-[#E6EDF3] font-semibold flex items-center gap-2 break-all"
-                  >
-                    <i
-                      class="fa-regular fa-envelope text-atu-text-3 dark:text-[#8B949E]"
-                    ></i>
-                    {{ perfilTrans?.contacto?.correoElectronico || '—' }}
-                  </strong>
+                  @if (editMode) {
+                    <div class="relative">
+                      <input
+                        type="email"
+                        [(ngModel)]="editContactoCorreo"
+                        autocomplete="off"
+                        placeholder="ejemplo@correo.com"
+                        class="w-full border-2 rounded-xl bg-white dark:bg-[#0D1117] px-3 py-2.5 text-[14px] text-atu-text dark:text-[#E6EDF3] focus:outline-none focus:ring-4 focus:ring-atu-primary/10 transition-all shadow-sm"
+                        [ngClass]="
+                          contactoCorreoError
+                            ? 'border-red-500 focus:border-red-500'
+                            : 'border-atu-border dark:border-[#30363D] focus:border-atu-primary dark:focus:border-[#00A3E0]'
+                        "
+                      />
+                    </div>
+                    @if (contactoCorreoError) {
+                      <p
+                        class="mt-1.5 text-[11.5px] font-semibold text-red-600 dark:text-red-400"
+                      >
+                        {{ contactoCorreoError }}
+                      </p>
+                    }
+                  } @else {
+                    <strong
+                      class="text-[15px] text-atu-text dark:text-[#E6EDF3] font-semibold flex items-center gap-2 break-all"
+                    >
+                      <i
+                        class="fa-regular fa-envelope text-atu-text-3 dark:text-[#8B949E]"
+                      ></i>
+                      {{ perfilTrans?.contacto?.correoElectronico || '—' }}
+                    </strong>
+                  }
                 </div>
 
                 <!-- Documento de Cargo (del usuario actual si existe) -->
@@ -1053,10 +1132,13 @@ export class PerfilInfoComponent implements OnInit {
   editAlert: { message: string; type: 'error' | 'success' } | null = null;
 
   // Edit profile contact (New API)
-  editContactoNombre = '';
+  editContactoNombres = '';
+  editContactoApellidoPaterno = '';
+  editContactoApellidoMaterno = '';
   editContactoTipoDoc = '';
   editContactoNumDoc = '';
   editContactoTelefono = '';
+  editContactoCorreo = '';
 
   bancosList: BancoItemResponse[] = [];
   cuentaBancariaReal: CuentaBancariaTransportistaResponseData | null = null;
@@ -1176,12 +1258,17 @@ export class PerfilInfoComponent implements OnInit {
     this.editCargo = this.usuario?.cargo ?? '';
 
     // Bind contact edit fields
-    this.editContactoNombre =
-      this.perfilTrans?.contacto?.nombresApellidos ?? '';
+    this.editContactoNombres =
+      this.perfilTrans?.contacto?.nombres ?? '';
+    this.editContactoApellidoPaterno =
+      this.perfilTrans?.contacto?.apellidoPaterno ?? '';
+    this.editContactoApellidoMaterno =
+      this.perfilTrans?.contacto?.apellidoMaterno ?? '';
     this.editContactoTipoDoc =
       this.perfilTrans?.contacto?.tipoDocumento ?? 'DNI';
     this.editContactoNumDoc = this.perfilTrans?.contacto?.numeroDocumento ?? '';
     this.editContactoTelefono = this.perfilTrans?.contacto?.telefono ?? '';
+    this.editContactoCorreo = this.perfilTrans?.contacto?.correoElectronico ?? '';
 
     this.editAlert = null;
     this.editAttempted = false;
@@ -1215,15 +1302,25 @@ export class PerfilInfoComponent implements OnInit {
     }
   }
 
-  get contactoNombreError(): string {
-    const value = this.editContactoNombre.trim();
-    if (!value)
-      return this.editAttempted ? 'El nombre del contacto es obligatorio.' : '';
-    if (value.length < 3) return 'Ingrese al menos 3 caracteres.';
+  private validarNombreApellido(value: string, campo: string): string {
+    if (!value) return this.editAttempted ? `El ${campo} es obligatorio.` : '';
+    if (value.length < 2) return 'Ingrese al menos 2 caracteres.';
     if (!/^[\p{L}]+(?:[ '\-][\p{L}]+)*$/u.test(value)) {
       return 'Ingrese únicamente letras, espacios, apóstrofes o guiones.';
     }
     return '';
+  }
+
+  get contactoNombresError(): string {
+    return this.validarNombreApellido(this.editContactoNombres.trim(), 'nombre(s)');
+  }
+
+  get contactoApellidoPaternoError(): string {
+    return this.validarNombreApellido(this.editContactoApellidoPaterno.trim(), 'apellido paterno');
+  }
+
+  get contactoApellidoMaternoError(): string {
+    return this.validarNombreApellido(this.editContactoApellidoMaterno.trim(), 'apellido materno');
   }
 
   get contactoTelefonoError(): string {
@@ -1235,6 +1332,18 @@ export class PerfilInfoComponent implements OnInit {
     return isValidPhone(value)
       ? ''
       : 'Ingrese un celular válido: 9 dígitos y debe comenzar con 9.';
+  }
+
+  get contactoCorreoError(): string {
+    const value = this.editContactoCorreo.trim();
+    if (!value) {
+      return this.editAttempted
+        ? 'El correo electrónico del contacto es obligatorio.'
+        : '';
+    }
+    return isValidEmail(value)
+      ? ''
+      : 'Ingrese un correo electrónico válido.';
   }
 
   get contactoDocumentoError(): string {
@@ -1252,14 +1361,16 @@ export class PerfilInfoComponent implements OnInit {
       : this.contactoDocumentoHint;
   }
 
-  onContactoNombreInput(event: Event): void {
+  onContactoNombreInput(event: Event, field: 'nombres' | 'paterno' | 'materno'): void {
     const input = event.target as HTMLInputElement;
     const value = input.value
       .replace(/[^\p{L}\s'\-]/gu, '')
       .replace(/\s{2,}/g, ' ')
       .slice(0, 120);
     input.value = value;
-    this.editContactoNombre = value;
+    if (field === 'nombres') this.editContactoNombres = value;
+    else if (field === 'paterno') this.editContactoApellidoPaterno = value;
+    else if (field === 'materno') this.editContactoApellidoMaterno = value;
   }
 
   onContactoTelefonoInput(event: Event): void {
@@ -1486,19 +1597,23 @@ export class PerfilInfoComponent implements OnInit {
     this.editEmail = String(this.editEmail ?? '').trim();
     this.editTelefono = String(this.editTelefono ?? '').trim();
     this.editCargo = String(this.editCargo ?? '').trim();
-    this.editContactoNombre = String(this.editContactoNombre ?? '')
-      .trim()
-      .replace(/\s+/g, ' ');
+    this.editContactoNombres = String(this.editContactoNombres ?? '').trim().replace(/\s+/g, ' ');
+    this.editContactoApellidoPaterno = String(this.editContactoApellidoPaterno ?? '').trim().replace(/\s+/g, ' ');
+    this.editContactoApellidoMaterno = String(this.editContactoApellidoMaterno ?? '').trim().replace(/\s+/g, ' ');
     this.editContactoTipoDoc = String(this.editContactoTipoDoc ?? '').trim();
     this.editContactoNumDoc = String(this.editContactoNumDoc ?? '').trim();
     this.editContactoTelefono = String(this.editContactoTelefono ?? '').trim();
+    this.editContactoCorreo = String(this.editContactoCorreo ?? '').trim();
 
     // Validación de los campos editables de contacto antes de invocar el API.
     if (this.editMode) {
       const validationError =
-        this.contactoNombreError ||
+        this.contactoNombresError ||
+        this.contactoApellidoPaternoError ||
+        this.contactoApellidoMaternoError ||
         this.contactoDocumentoError ||
-        this.contactoTelefonoError;
+        this.contactoTelefonoError ||
+        this.contactoCorreoError;
       if (validationError) {
         this.editAlert = { message: validationError, type: 'error' };
         return;
@@ -1517,18 +1632,16 @@ export class PerfilInfoComponent implements OnInit {
       }
 
       this.isSaving = true;
-      const nombresContacto = this.separarNombresContacto(
-        this.editContactoNombre,
-      );
-
       this.apiComprobanteService
         .actualizarContacto({
           personaUuid,
-          ...nombresContacto,
-          razonSocial: this.perfilTrans.contacto.razonSocial,
+          nombres: this.editContactoNombres,
+          apellidoPaterno: this.editContactoApellidoPaterno,
+          apellidoMaterno: this.editContactoApellidoMaterno,
           tipoDocumentoId: this.tipoDocumentoId(this.editContactoTipoDoc),
           numeroDocumento: this.editContactoNumDoc,
           telefono: this.editContactoTelefono,
+          correo: this.editContactoCorreo,
         })
         .subscribe({
           next: (contacto) => {
@@ -1536,15 +1649,18 @@ export class PerfilInfoComponent implements OnInit {
             if (this.perfilTrans) {
               this.perfilTrans.contacto = {
                 ...this.perfilTrans.contacto,
-                ...nombresContacto,
+                nombres: this.editContactoNombres,
+                apellidoPaterno: this.editContactoApellidoPaterno,
+                apellidoMaterno: this.editContactoApellidoMaterno,
                 personaUuid: contacto.data.lista.personaUuid,
-                nombresApellidos: this.editContactoNombre,
+                nombresApellidos: `${this.editContactoNombres} ${this.editContactoApellidoPaterno} ${this.editContactoApellidoMaterno}`.trim(),
                 tipoDocumento: this.editContactoTipoDoc,
                 tipoDocumentoId: this.tipoDocumentoId(
                   this.editContactoTipoDoc,
                 ),
                 numeroDocumento: this.editContactoNumDoc,
                 telefono: this.editContactoTelefono,
+                correoElectronico: this.editContactoCorreo,
               };
             }
 
@@ -1662,24 +1778,6 @@ export class PerfilInfoComponent implements OnInit {
         PASAPORTE: 3,
       }[tipoDocumento] ?? 1
     );
-  }
-
-  private separarNombresContacto(nombresApellidos: string): {
-    nombres: string;
-    apellidoPaterno?: string;
-    apellidoMaterno?: string;
-  } {
-    const partes = nombresApellidos.trim().split(/\s+/);
-    if (partes.length === 1) return { nombres: partes[0] };
-    if (partes.length === 2) {
-      return { nombres: partes[0], apellidoPaterno: partes[1] };
-    }
-
-    return {
-      nombres: partes.slice(0, -2).join(' '),
-      apellidoPaterno: partes.at(-2),
-      apellidoMaterno: partes.at(-1),
-    };
   }
 
   onSavePassword(): void {

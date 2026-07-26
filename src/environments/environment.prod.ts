@@ -14,5 +14,6 @@ export const environment = {
   API_COMPROBANTE_MOCK: asBoolean(runtime.API_COMPROBANTE_MOCK, false),
   RECAPTCHA_SITE_KEY: runtime.RECAPTCHA_SITE_KEY,
   ENCRYPTION_PRIVATE_KEY: runtime.ENCRYPTION_PRIVATE_KEY || '',
+  ENCRYPTION_PUBLIC_KEY: runtime.ENCRYPTION_PUBLIC_KEY || '',
   appId: runtime.appId || 'APP_COMPROBANTE',
 } satisfies AppEnvironment;

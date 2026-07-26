@@ -4,6 +4,7 @@ import { Observable, of } from 'rxjs';
 import { delay, map } from 'rxjs/operators';
 import { environment } from '@env/environment';
 import { FieldDecryptionForgeService } from './field-decryption-forge.service';
+import { FieldEncryptionService } from './field-encryption.service';
 import {
   ActualizarContactoRequest,
   ActualizarContactoResponse,
@@ -36,6 +37,7 @@ import {
 export class ApiComprobanteService {
   private readonly http = inject(HttpClient);
   private readonly decryptionService = inject(FieldDecryptionForgeService);
+  private readonly encryptionService = inject(FieldEncryptionService);
   private readonly API_URL = environment.API_COMPROBANTE_URL;
 
   /**
@@ -51,11 +53,11 @@ export class ApiComprobanteService {
         map((res) => {
           const contacto = res.data?.lista?.contacto as
             | (PerfilTransportista['contacto'] & {
-                nombres?: string;
-                apellidoPaterno?: string;
-                apellidoMaterno?: string;
-                correo?: string;
-              })
+              nombres?: string;
+              apellidoPaterno?: string;
+              apellidoMaterno?: string;
+              correo?: string;
+            })
             | undefined;
 
           if (!contacto) return res;
@@ -109,16 +111,18 @@ export class ApiComprobanteService {
     }
   }
 
-  /**
-   * Actualiza los datos de contacto parcialmente editables.
-   * @param payload Nuevos datos de contacto
-   */
   actualizarContacto(
     payload: ActualizarContactoRequest,
   ): Observable<ActualizarContactoResponse> {
+    const encryptedPayload = {
+      ...payload,
+      numeroDocumento: this.encryptionService.encryptForRequest(payload.numeroDocumento) ?? undefined,
+      correo: this.encryptionService.encryptForRequest(payload.correo) ?? undefined,
+      telefono: this.encryptionService.encryptForRequest(payload.telefono) ?? undefined,
+    };
     return this.http.put<ActualizarContactoResponse>(
       `${this.API_URL}/perfil/contacto`,
-      payload,
+      encryptedPayload,
     );
   }
 
@@ -211,9 +215,15 @@ export class ApiComprobanteService {
   actualizarCuentaBancariaTransportista(
     payload: CuentaBancariaTransportistaRequest,
   ): Observable<CuentaBancariaTransportistaResponse> {
+    const encryptedPayload = {
+      ...payload,
+      cci: payload.cci
+        ? this.encryptionService.encryptForRequest(payload.cci)
+        : payload.cci,
+    };
     return this.http.put<CuentaBancariaTransportistaResponse>(
       `${this.API_URL}/transportistas/cuenta-bancaria`,
-      payload,
+      encryptedPayload,
     );
   }
 
@@ -318,7 +328,7 @@ export class ApiComprobanteService {
     formData.append('archivo', archivo);
 
     return this.http.post<ApiResponse<string>>(
-      `${this.API_URL}/comprobantes/granel`,
+      `${this.API_URL}/comprobantes/b`,
       formData,
       { params: { ruc } },
     );
@@ -344,7 +354,7 @@ export class ApiComprobanteService {
     request: NotaCreditoRequest,
   ): Observable<ApiResponse<any>> {
     return this.http.post<ApiResponse<any>>(
-      `${this.API_URL}/comprobantes/notas-credito`,
+      `${this.API_URL}/comprobantes/nota-credito`,
       request,
     );
   }

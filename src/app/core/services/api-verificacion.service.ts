@@ -1,115 +1,25 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import { Observable, delay, map, of, throwError } from 'rxjs';
+import { Observable, map, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 
 import { environment } from '@env/environment';
+import { FieldDecryptionForgeService } from './field-decryption-forge.service';
 import {
   DatosTransportista,
   DatosTransportistaResponse,
   VerificacionErrorResponse,
   VerificacionServiceError,
-  AutorizacionTransportista,
+  AutorizacionesData,
   AutorizacionesResponse,
   SemaforoCondicion,
   SemaforoResponse,
 } from '../models/verificacion.models';
 
-const MOCK_DATOS_TRANSPORTISTA: DatosTransportistaResponse = {
-  data: {
-    lista: {
-      id: 1,
-      razonSocial: 'Transportes Lima Sur S.A.C.',
-      ruc: '20512345678',
-      tipoEntidad: 'Persona jurídica',
-      estado: 'Habilitado',
-      totalAutorizaciones: 3,
-    },
-    respuesta: 'OK',
-    mensaje: 'Detalle de transportista obtenido correctamente',
-  },
-};
-
-const MOCK_AUTORIZACIONES: AutorizacionesResponse = {
-  data: {
-    lista: [
-      {
-        id: 1,
-        tipoTransporte: 'Transporte regular de personas',
-        estado: 'Vigente',
-        numeroResolucion: 'R.D. 0452-2024-ATU',
-        autoridad: 'ATU',
-        ambito: 'Lima Metropolitana',
-        fechaInicioVigencia: '2024-03-15',
-        fechaFinVigencia: '2029-03-14',
-      },
-      {
-        id: 2,
-        tipoTransporte: 'Transporte de trabajadores',
-        estado: 'Vigente',
-        numeroResolucion: 'R.D. 0871-2023-MPC',
-        autoridad: 'Municipalidad Provincial del Callao',
-        ambito: 'Callao',
-        fechaInicioVigencia: '2023-08-01',
-        fechaFinVigencia: '2027-07-31',
-      },
-      {
-        id: 3,
-        tipoTransporte: 'Transporte turístico',
-        estado: 'Vencida',
-        numeroResolucion: 'R.D. 1290-2022-MTC',
-        autoridad: 'MTC',
-        ambito: 'Nacional',
-        fechaInicioVigencia: '2022-01-10',
-        fechaFinVigencia: '2026-01-09',
-      },
-    ],
-    respuesta: 'OK',
-    mensaje: 'Se encontraron 3 autorizaciones',
-  },
-};
-
-const MOCK_SEMAFORO: SemaforoResponse = {
-  data: {
-    lista: [
-      {
-        codigo: 'RUC_ACTIVO',
-        nombre: 'RUC activo y habido',
-        estado: 'CUMPLE',
-        descripcion:
-          'Tu RUC figura en estado ACTIVO y con condición de domicilio HABIDO en SUNAT.',
-        icono: 'CHECK',
-        colorNombre: 'verde',
-        colorHex: '#16A34A',
-      },
-      {
-        codigo: 'AUTORIZACION_VIGENTE',
-        nombre: 'Autorización de transporte vigente',
-        estado: 'CUMPLE',
-        descripcion:
-          'La ATU registra tu autorización como vigente a la fecha de la solicitud.',
-        icono: 'CHECK',
-        colorNombre: 'verde',
-        colorHex: '#16A34A',
-      },
-      {
-        codigo: 'VEHICULOS_HABILITADOS',
-        nombre: 'Vehículos habilitados',
-        estado: 'REVISAR',
-        descripcion: 'Tienes 2 vehículo(s) observado(s): C4T-119, C4T-220.',
-        icono: 'WARNING',
-        colorNombre: 'amarillo',
-        colorHex: '#EAB308',
-      },
-    ],
-    respuesta: 'OK',
-    mensaje: 'Se encontraron 3 condiciones',
-  },
-};
-
 @Injectable({ providedIn: 'root' })
 export class ApiVerificacionService {
   private readonly http = inject(HttpClient);
+  private readonly decryptionService = inject(FieldDecryptionForgeService);
   private readonly baseUrl = environment.API_COMPROBANTE_URL.replace(/\/$/, '');
 
   obtenerDatosTransportista(ruc: string): Observable<DatosTransportista> {
@@ -128,12 +38,24 @@ export class ApiVerificacionService {
         params: { ruc },
       })
       .pipe(
-        map((response) => response.data.lista),
+        map((response) => {
+          const item = response.data.lista;
+          if (item) {
+            try {
+              if (item.razonSocial) item.razonSocial = this.decryptionService.decrypt(item.razonSocial) || '';
+              if (item.ruc) item.ruc = this.decryptionService.decrypt(item.ruc) || '';
+              if (item.tipoEntidad) item.tipoEntidad = this.decryptionService.decrypt(item.tipoEntidad) || '';
+            } catch (err) {
+              console.error('Error al desencriptar datos de transportista:', err);
+            }
+          }
+          return item;
+        }),
         catchError((error) => throwError(() => this.normalizarError(error))),
       );
   }
 
-  obtenerAutorizaciones(ruc: string): Observable<AutorizacionTransportista[]> {
+  obtenerAutorizaciones(ruc: string): Observable<AutorizacionesData> {
     if (!/^\d{11}$/.test(ruc)) {
       return throwError(
         (): VerificacionServiceError => ({
@@ -150,7 +72,23 @@ export class ApiVerificacionService {
         { params: { ruc } },
       )
       .pipe(
-        map((response) => response.data.lista),
+        map((response) => {
+          const data = response.data?.lista;
+          if (data && data.autorizaciones) {
+            data.autorizaciones.forEach(item => {
+              try {
+                if (item.tipoTransporte) item.tipoTransporte = this.decryptionService.decrypt(item.tipoTransporte) || '';
+                if (item.numeroResolucion) item.numeroResolucion = this.decryptionService.decrypt(item.numeroResolucion) || '';
+                if (item.autoridad) item.autoridad = this.decryptionService.decrypt(item.autoridad);
+                if (item.tipoEntidad) item.tipoEntidad = this.decryptionService.decrypt(item.tipoEntidad);
+                if (item.ambito) item.ambito = this.decryptionService.decrypt(item.ambito);
+              } catch (err) {
+                console.error('Error al desencriptar autorización:', err);
+              }
+            });
+          }
+          return data;
+        }),
         catchError((error) => throwError(() => this.normalizarError(error))),
       );
   }

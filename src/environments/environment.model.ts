@@ -8,5 +8,6 @@ export interface AppEnvironment {
   API_COMPROBANTE_MOCK: boolean;
   RECAPTCHA_SITE_KEY: string;
   ENCRYPTION_PRIVATE_KEY: string;
+  ENCRYPTION_PUBLIC_KEY: string;
   appId?: string;
 }
