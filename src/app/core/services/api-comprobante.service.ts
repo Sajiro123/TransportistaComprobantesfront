@@ -126,32 +126,6 @@ export class ApiComprobanteService {
     );
   }
 
-  /**
-   * Obtiene la cuenta bancaria donde el transportista recibirá el subsidio.
-   * GET /api_comprobante/perfil/cuenta-abono?ruc={ruc}
-   */
-  obtenerCuentaAbono(ruc: string): Observable<CuentaAbonoResponse> {
-    return this.http.get<CuentaAbonoResponse>(
-      `${this.API_URL}/perfil/cuenta-abono`,
-      { params: { ruc } },
-    );
-  }
-
-  /**
-   * Registra o actualiza la cuenta bancaria donde se recibirá el subsidio.
-   * PUT /api_comprobante/perfil/cuenta-abono?ruc={ruc}
-   */
-  guardarCuentaAbono(
-    ruc: string,
-    payload: GuardarCuentaAbonoRequest,
-  ): Observable<GuardarCuentaAbonoResponse> {
-    return this.http.put<GuardarCuentaAbonoResponse>(
-      `${this.API_URL}/perfil/cuenta-abono`,
-      payload,
-      { params: { ruc } },
-    );
-  }
-
   // ── Catálogos: Bancos ─────────────────────────────────────
   /**
    * GET /api_comprobante/catalogos/bancos

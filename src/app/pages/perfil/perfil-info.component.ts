@@ -1215,33 +1215,11 @@ export class PerfilInfoComponent implements OnInit {
         this.isLoadingCuentaAbono = false;
         this.cuentaAbonoLoaded = true;
       },
-      error: () => {
-        if (!ruc) {
-          this.isLoadingCuentaAbono = false;
-          this.cuentaAbonoLoaded = true;
-          this.cuentaAbono = null;
-          return;
-        }
-
-        this.apiComprobanteService.obtenerCuentaAbono(ruc).subscribe({
-          next: (res) => {
-            this.cuentaAbono = res.data.lista;
-            this.isLoadingCuentaAbono = false;
-            this.cuentaAbonoLoaded = true;
-
-            if (this.usuario) {
-              this.usuario.banco = this.cuentaAbono?.banco ?? '';
-              this.usuario.cci =
-                this.cuentaAbono?.codigoCuentaInterbancario ?? '';
-            }
-          },
-          error: (err) => {
-            this.isLoadingCuentaAbono = false;
-            this.cuentaAbonoLoaded = true;
-            this.cuentaAbono = null;
-            console.error('Error al cargar la cuenta de abono:', err);
-          },
-        });
+      error: (err) => {
+        this.isLoadingCuentaAbono = false;
+        this.cuentaAbonoLoaded = true;
+        this.cuentaAbono = null;
+        console.warn('El transportista no tiene cuenta de abono registrada o hubo un error.', err);
       },
     });
   }
