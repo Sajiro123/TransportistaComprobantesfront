@@ -15,6 +15,7 @@ export interface Usuario {
   segundoApellido?: string;
   tipoDocumento?: string;
   numDocumento?: string;
+  ruc?: string;
   departamento?: string;
   provincia?: string;
   distrito?: string;

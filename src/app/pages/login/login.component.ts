@@ -80,25 +80,19 @@ export class LoginComponent implements OnInit, OnDestroy {
     return 'Número de RUC';
   }
 
-  // get loginDocumentPlaceholder(): string {
-  //   return 'Ingrese su número de RUC';
-  // }
-
-  // get loginDocumentMaxLength(): number {
-  //   return 11;
-  // }
-
-  // get loginDocumentError(): string {
-  //   if (!this.loginDocumentTouched) return '';
-  //   if (!this.loginEmail) return 'Ingrese su número de RUC.';
-  //   return isValidRuc(this.loginEmail)
-  //     ? ''
-  //     : 'El RUC debe tener 11 dígitos y comenzar con 10, 15, 17 o 20.';
-  // }
+  get loginDocumentError(): string {
+    if (!this.loginDocumentTouched) return '';
+    if (!this.loginEmail) return 'Ingrese su número de RUC.';
+    return isValidRuc(this.loginEmail)
+      ? ''
+      : 'El RUC debe tener 11 dígitos y comenzar con 10, 15, 17 o 20.';
+  }
 
   onLoginDocumentInput(event: Event): void {
     const input = event.target as HTMLInputElement;
-    this.loginEmail = input.value;
+    const sanitizedValue = input.value.replace(/\D/g, '').slice(0, 11);
+    input.value = sanitizedValue;
+    this.loginEmail = sanitizedValue;
     this.loginDocumentTouched = true;
   }
 
@@ -114,6 +108,8 @@ export class LoginComponent implements OnInit, OnDestroy {
   registrationRucTouched = false;
   registrationValidating = false;
   registrationRucValidated = false;
+  registrationManualEntryAvailable = false;
+  registrationManualMode = false;
   registrationCompanyName = '';
   registrationRazonSocial = '';
   registrationContactName = '';
@@ -147,6 +143,14 @@ export class LoginComponent implements OnInit, OnDestroy {
       : '';
   }
 
+  get registrationRazonSocialError(): string {
+    return this.registrationSubmitted &&
+      this.registrationManualMode &&
+      !this.registrationRazonSocial.trim()
+      ? 'Ingrese la razón social del transportista.'
+      : '';
+  }
+
   get registrationEmailError(): string {
     if (!this.registrationSubmitted) return '';
     if (!this.registrationEmail.trim()) return 'Ingrese el correo electrónico.';
@@ -177,6 +181,11 @@ export class LoginComponent implements OnInit, OnDestroy {
   onRegistrationRucInput(): void {
     this.registrationRuc = this.registrationRuc.replace(/\D/g, '').slice(0, 11);
     this.registrationRucTouched = true;
+    this.registrationManualEntryAvailable = false;
+    this.registrationManualMode = false;
+    this.registrationRucValidated = false;
+    this.registrationCompanyName = '';
+    this.registrationRazonSocial = '';
     this.clearAlert();
   }
 
@@ -195,6 +204,8 @@ export class LoginComponent implements OnInit, OnDestroy {
             this.ngZone.run(() => {
               this.registrationValidating = false;
               if (res.elegible) {
+                this.registrationManualEntryAvailable = false;
+                this.registrationManualMode = false;
                 this.registrationRucValidated = true;
                 this.registrationCompanyName = res.razonSocial;
                 this.registrationRazonSocial = res.razonSocial;
@@ -209,6 +220,12 @@ export class LoginComponent implements OnInit, OnDestroy {
           error: (err: any) => {
             this.ngZone.run(() => {
               this.registrationValidating = false;
+              const code = err?.code || err?.error?.code || '';
+              this.registrationManualEntryAvailable =
+                code === 'RUC_002' ||
+                code === 'RUC_003' ||
+                code === 'NETWORK_ERROR' ||
+                code.startsWith('HTTP_5');
               const msg =
                 err?.error?.message ||
                 err?.error?.descripcion ||
@@ -233,6 +250,18 @@ export class LoginComponent implements OnInit, OnDestroy {
     }
   }
 
+  enableManualRegistration(): void {
+    if (!this.registrationManualEntryAvailable || this.registrationRucError) {
+      return;
+    }
+    this.registrationManualMode = true;
+    this.registrationRucValidated = true;
+    this.registrationCompanyName = 'Datos ingresados manualmente';
+    this.registrationRazonSocial = '';
+    this.registrationSubmitted = false;
+    this.clearAlert();
+  }
+
   changeRegistrationRuc(): void {
     if (this.registrationValidationTimeout) {
       clearTimeout(this.registrationValidationTimeout);
@@ -241,6 +270,8 @@ export class LoginComponent implements OnInit, OnDestroy {
     this.stopResendCooldown();
     this.registrationValidating = false;
     this.registrationRucValidated = false;
+    this.registrationManualEntryAvailable = false;
+    this.registrationManualMode = false;
     this.registrationRucTouched = false;
     this.registrationSubmitted = false;
     this.registrationRuc = '';
@@ -270,6 +301,7 @@ export class LoginComponent implements OnInit, OnDestroy {
     this.registrationSubmitted = true;
     if (
       this.registrationContactNameError ||
+      this.registrationRazonSocialError ||
       this.registrationEmailError ||
       this.registrationPhoneError ||
       this.registrationPasswordError
@@ -293,6 +325,7 @@ export class LoginComponent implements OnInit, OnDestroy {
         telefono: this.registrationPhone,
         clave: this.registrationPassword,
         razonSocial: this.registrationRazonSocial || undefined,
+        validacionManual: this.registrationManualMode,
         recaptchaToken: token,
       };
 
@@ -427,6 +460,7 @@ export class LoginComponent implements OnInit, OnDestroy {
         telefono: this.registrationPhone,
         clave: this.registrationPassword,
         razonSocial: this.registrationRazonSocial || undefined,
+        validacionManual: this.registrationManualMode,
         recaptchaToken: token,
       };
 
@@ -731,7 +765,7 @@ export class LoginComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.iniciarSlider();
-    if (this.apiAuthService.isLoggedIn() || this.authService.isLoggedIn()) {
+    if (this.apiAuthService.isLoggedIn()) {
       this.router.navigate(['/perfil']);
       return;
     }
@@ -817,10 +851,10 @@ export class LoginComponent implements OnInit, OnDestroy {
     const usuario = this.loginEmail.trim();
     const password = this.loginPassword;
 
-    // if (this.loginDocumentError) {
-    //   this.showAlert(this.loginDocumentError, 'error');
-    //   return;
-    // }
+    if (this.loginDocumentError) {
+      this.showAlert(this.loginDocumentError, 'error');
+      return;
+    }
 
     if (!password) {
       this.showAlert('Ingrese su contraseña.', 'error');
@@ -859,22 +893,8 @@ export class LoginComponent implements OnInit, OnDestroy {
   ): void {
     this.apiAuthService.login(usuario, password, recaptchaToken).subscribe({
       next: (res) => {
-        console.log('🔓 [LoginComponent] Respuesta de /api_iam/auth/login DESENCRIPTADA:', res.data);
-
-        // Si IAM retorna un DNI (ej: 8 dígitos) o sin RUC, asignamos temporalmente el RUC de desarrollo 20614776928
-        let ruc = res.data?.numeroDocumento;
-        if (!ruc || !/^\d{11}$/.test(ruc)) {
-          console.warn(
-            `[Login] El documento recibido ("${ruc}") no es un RUC de 11 dígitos. Asignando RUC mockup de desarrollo: "20614776928"`
-          );
-          ruc = '20614776928';
-          if (res.data) {
-            res.data.numeroDocumento = ruc;
-            res.data.tipoDocumento = 'RUC';
-          }
-        }
-
         this.apiAuthService.saveSession(res);
+        const ruc = res.data?.ruc;
 
         this.apiVehiculoService.obtenerCategorias().subscribe({
           next: (catRes) => {
@@ -900,7 +920,12 @@ export class LoginComponent implements OnInit, OnDestroy {
             console.error('Error al precargar estados vehiculares:', err),
         });
 
-        console.log(`[Login] Solicitando perfil de comprobantes para RUC: ${ruc}`);
+        if (!ruc || !/^\d{11}$/.test(ruc)) {
+          this.sessionService.startSession();
+          this.router.navigate(['/perfil']);
+          return;
+        }
+
         this.apiComprobanteService.obtenerPerfil(ruc).subscribe({
           next: (perfilRes) => {
             if (perfilRes && perfilRes.data && perfilRes.data.lista) {

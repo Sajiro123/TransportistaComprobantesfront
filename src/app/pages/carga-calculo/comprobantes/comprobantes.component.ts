@@ -155,8 +155,8 @@ export class ComprobantesComponent implements OnInit {
 
   ngOnInit() {
     const user = this.apiAuth.getUserFromSession();
-    if (user && user.numDocumento) {
-      this.rucTransportista = user.numDocumento;
+    if (user?.ruc) {
+      this.rucTransportista = user.ruc;
       this.cargarCatalogos();
       this.listarComprobantes();
     } else {

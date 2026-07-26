@@ -2,7 +2,6 @@ import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { isValidPhone } from '../../core/utils/validators';
-import { AuthService } from '@core/services/auth.service';
 import { ApiAuthService } from '@core/services/api-auth.service';
 import { ApiUsuarioService } from '@core/services/api-usuario.service';
 import { ApiComprobanteService } from '@core/services/api-comprobante.service';
@@ -1065,7 +1064,6 @@ export class PerfilInfoComponent implements OnInit {
   editNombreBeneficiario = '';
   editAttempted = false;
 
-  private readonly authService = inject(AuthService);
   private readonly apiAuthService = inject(ApiAuthService);
   private readonly apiUsuarioService = inject(ApiUsuarioService);
   private readonly apiComprobanteService = inject(ApiComprobanteService);
@@ -1089,13 +1087,15 @@ export class PerfilInfoComponent implements OnInit {
   }
 
   private resolveSession(): Usuario | null {
-    const local = this.authService.getSession();
-    if (local) return local;
     return this.apiAuthService.getUserFromSession();
   }
 
   cargarPerfilComprobante(): void {
-    const ruc = this.usuario?.numDocumento || '20512345678';
+    const ruc = this.usuario?.ruc;
+    if (!ruc) {
+      console.error('No se encontró el RUC del transportista en la sesión IAM.');
+      return;
+    }
     this.apiComprobanteService.obtenerPerfil(ruc).subscribe({
       next: (res) => {
         if (res.data?.lista) {
@@ -1109,11 +1109,9 @@ export class PerfilInfoComponent implements OnInit {
   }
 
   cargarCuentaAbono(): void {
-    const ruc = this.usuario?.numDocumento || '20512345678';
+    const ruc = this.usuario?.ruc;
     this.isLoadingCuentaAbono = true;
 
-    // 1. Intentar cargar con la API real de transportista si hay ID numérico o fallback
-    const transportistaId = 1; // ID técnico por defecto o asignado al usuario
     this.apiComprobanteService.obtenerCuentaBancariaTransportista().subscribe({
       next: (res) => {
         if (res.data?.lista) {
@@ -1135,7 +1133,13 @@ export class PerfilInfoComponent implements OnInit {
         this.cuentaAbonoLoaded = true;
       },
       error: () => {
-        // Fallback al endpoint legado si falla
+        if (!ruc) {
+          this.isLoadingCuentaAbono = false;
+          this.cuentaAbonoLoaded = true;
+          this.cuentaAbono = null;
+          return;
+        }
+
         this.apiComprobanteService.obtenerCuentaAbono(ruc).subscribe({
           next: (res) => {
             this.cuentaAbono = res.data.lista;
@@ -1594,12 +1598,12 @@ export class PerfilInfoComponent implements OnInit {
     }
 
     const apiSession = this.apiAuthService.getSession();
-    if (apiSession) {
+    const usuarioUuid = this.usuario.usuarioUuid;
+    if (apiSession && usuarioUuid) {
       this.isSaving = true;
       this.apiUsuarioService
         .actualizarCorreoTelefono({
-          usuarioUuid:
-            this.usuario.usuarioUuid || '00000000-0000-0000-0000-000000000000',
+          usuarioUuid,
           correo: this.editEmail,
           telefono: this.editTelefono,
           cargo: this.editCargo,
@@ -1633,24 +1637,10 @@ export class PerfilInfoComponent implements OnInit {
           },
         });
     } else {
-      const res = this.authService.updateProfile(this.usuario.email, {
-        email: this.editEmail,
-        telefono: this.editTelefono,
-      });
-      if (res.success) {
-        this.usuario = this.resolveSession();
-        this.editMode = false;
-        this.editAlert = {
-          message: 'Perfil actualizado correctamente.',
-          type: 'success',
-        };
-        setTimeout(() => (this.editAlert = null), 4000);
-      } else {
-        this.editAlert = {
-          message: res.error ?? 'Error al guardar.',
-          type: 'error',
-        };
-      }
+      this.editAlert = {
+        message: 'La sesión IAM no contiene un identificador de usuario válido.',
+        type: 'error',
+      };
     }
   }
 
@@ -1739,26 +1729,10 @@ export class PerfilInfoComponent implements OnInit {
           },
         });
     } else {
-      const res = this.authService.changePassword(
-        this.usuario.email,
-        this.passActual,
-        this.passNueva,
-      );
-      if (res.success) {
-        this.perfilAlert = {
-          message: 'Contraseña actualizada con éxito.',
-          type: 'success',
-        };
-        this.usuario = this.resolveSession();
-        this.passActual = '';
-        this.passNueva = '';
-        this.passConfirmar = '';
-      } else {
-        this.perfilAlert = {
-          message: res.error || 'Error al cambiar la contraseña.',
-          type: 'error',
-        };
-      }
+      this.perfilAlert = {
+        message: 'No existe una sesión IAM válida.',
+        type: 'error',
+      };
     }
   }
 }
