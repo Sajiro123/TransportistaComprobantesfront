@@ -1682,6 +1682,7 @@ export class PerfilInfoComponent implements OnInit {
             this.isSaving = false;
             this.editAlert = {
               message:
+                err?.error?.data?.lista?.descripcion ||
                 err?.error?.data?.mensaje ||
                 err?.error?.mensaje ||
                 err?.message ||
@@ -1748,7 +1749,13 @@ export class PerfilInfoComponent implements OnInit {
           error: (err) => {
             this.isSaving = false;
             this.editAlert = {
-              message: err?.error?.descripcion || 'Error al guardar.',
+              message:
+                err?.error?.data?.lista?.descripcion ||
+                err?.error?.data?.mensaje ||
+                err?.error?.descripcion ||
+                err?.error?.mensaje ||
+                err?.message ||
+                'Error al guardar.',
               type: 'error',
             };
           },
@@ -1818,9 +1825,10 @@ export class PerfilInfoComponent implements OnInit {
             this.isSavingPassword = false;
             this.perfilAlert = {
               message:
+                err?.error?.data?.lista?.descripcion ||
                 err?.error?.descripcion ||
                 err?.error?.data?.mensaje ||
-                err?.error?.message ||
+                err?.error?.mensaje ||
                 err?.message ||
                 'Error al actualizar la contraseña.',
               type: 'error',
