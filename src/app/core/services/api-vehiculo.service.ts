@@ -3,6 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 import { environment } from '@env/environment';
+import { ApiAuthService } from './api-auth.service';
 import {
   VehiculoDetalleResponse,
   RegistrarVehiculoRequest,
@@ -17,10 +18,16 @@ import {
 @Injectable({ providedIn: 'root' })
 export class ApiVehiculoService {
   private readonly http = inject(HttpClient);
+  private readonly authService = inject(ApiAuthService);
   private readonly apiUrl = environment.API_COMPROBANTE_URL;
 
   listarVehiculos(filtros: VehiculosFiltros): Observable<VehiculosResponse> {
     let params = new HttpParams();
+    const user = this.authService.getUserFromSession();
+    if (user && user.ruc) {
+      params = params.set('ruc', user.ruc);
+    }
+
     if (filtros.busqueda) params = params.set('busqueda', filtros.busqueda);
     if (filtros.categoria) params = params.set('categoria', filtros.categoria);
     if (filtros.estado) params = params.set('estado', filtros.estado);
