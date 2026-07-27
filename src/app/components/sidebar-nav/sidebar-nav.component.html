@@ -87,7 +87,7 @@
       }
     </div>
 
-    <!-- ══ PASO 2: Carga y cálculo ════════════════════════════════ -->
+    <!-- ══ PASO 2: Comprobantes ═══════════════════════════════════ -->
     <div class="sidebar-menu-item">
       <button type="button"
         class="group relative flex w-full items-center gap-3 py-2 text-left transition-all duration-200"
@@ -105,7 +105,7 @@
         <div class="sidebar-menu-text flex flex-1 flex-col overflow-hidden pb-2">
           <span class="text-[10px] font-bold uppercase tracking-wider text-[#00A3E0]/80">Paso 2</span>
           <span class="truncate text-[13.5px] font-bold text-white/90 leading-tight">
-            Carga y cálculo
+            Comprobantes
           </span>
           <span class="mt-0.5 text-[10.5px] font-medium text-white/50">
             Gestión de comprobantes
@@ -126,7 +126,7 @@
             <span class="inline-flex h-5 w-5 flex-none items-center justify-center rounded-full bg-white/[.07] text-[10px] font-extrabold text-white/40 transition-all duration-200"
               [class.bg-[#00A3E0]]="comprobantesLink.isActive"
               [class.text-white]="comprobantesLink.isActive">1</span>
-            <span class="flex-1">Comprobantes</span>
+            <span class="flex-1">Flujo A · Surtido directo</span>
             @if (comprobantesLink.isActive) {
               <i class="fa-solid fa-circle text-[5px] text-[#00A3E0] animate-pulse"></i>
             }
@@ -139,21 +139,8 @@
             <span class="inline-flex h-5 w-5 flex-none items-center justify-center rounded-full bg-white/[.07] text-[10px] font-extrabold text-white/40 transition-all duration-200"
               [class.bg-[#00A3E0]]="notasLink.isActive"
               [class.text-white]="notasLink.isActive">2</span>
-            <span class="flex-1">Notas de crédito</span>
+            <span class="flex-1">Flujo B · Consumidor directo</span>
             @if (notasLink.isActive) {
-              <i class="fa-solid fa-circle text-[5px] text-[#00A3E0] animate-pulse"></i>
-            }
-          </a>
-          <a routerLink="/carga-calculo/resumen"
-            routerLinkActive="!text-white !bg-[#00A3E0]/15 !border-[#00A3E0]/30"
-            #resumenLink="routerLinkActive"
-            class="group flex items-center gap-2.5 rounded-lg border border-transparent px-2.5 py-2 text-[12px] font-semibold text-white/40 transition-all duration-200 hover:bg-white/[.04] hover:text-white/70"
-            (click)="onNavigate()">
-            <span class="inline-flex h-5 w-5 flex-none items-center justify-center rounded-full bg-white/[.07] text-[10px] font-extrabold text-white/40 transition-all duration-200"
-              [class.bg-[#00A3E0]]="resumenLink.isActive"
-              [class.text-white]="resumenLink.isActive">3</span>
-            <span class="flex-1">Resumen</span>
-            @if (resumenLink.isActive) {
               <i class="fa-solid fa-circle text-[5px] text-[#00A3E0] animate-pulse"></i>
             }
           </a>

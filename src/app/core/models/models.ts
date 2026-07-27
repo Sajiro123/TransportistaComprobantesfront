@@ -339,13 +339,23 @@ export interface ComprobanteListResponse {
   serie: string;
   numero: string;
   fechaEmision: string;
+  mes?: string;
+  anio?: number;
   placa?: string;
+  rucDistribuidor: string;
+  razonSocialDistribuidor: string;
   nombreComercialDistribuidor: string;
+  direccionDistribuidor: string;
+  departamentoDistribuidor: string;
   distritoDistribuidor: string;
   provinciaDistribuidor: string;
+  ubigeoDepartamento?: string;
+  ubigeoProvincia?: string;
+  ubigeoDistrito?: string;
   tipoCombustibleCodigo: string;
   azufrePpm: number;
   galones: number;
+  costo?: number;
   tieneNotaCreditoActiva: boolean;
 }
 

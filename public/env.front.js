@@ -7,6 +7,9 @@
 
   // window.__env.API_COMPROBANTE_URL = 'https://apidev.atu.gob.pe/api-subsidio/api_comprobante';
   window.__env.API_COMPROBANTE_URL = 'http://localhost:8083/api_comprobante';
+  // Temporal: usar datos locales hasta que finalicen los endpoints de Flujo A y B.
+  // Cambiar a false para volver a consumir directamente API_COMPROBANTE_URL.
+  window.__env.API_COMPROBANTE_MOCK = true;
 
   // Google reCAPTCHA v3 Site Key
   window.__env.RECAPTCHA_SITE_KEY = '6Ldu6FUrAAAAADnOURKYc9E_uUbGBRC35_ntvznt';

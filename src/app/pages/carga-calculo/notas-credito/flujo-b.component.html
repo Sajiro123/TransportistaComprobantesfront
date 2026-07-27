@@ -1,0 +1,458 @@
+<div class="flujo-b-page animate-entry">
+  <div class="mb-5 grid gap-4 md:grid-cols-2">
+    <div
+      class="relative overflow-hidden rounded-lg border border-[var(--border)] bg-[var(--surface)] shadow-[var(--shadow)]">
+      <div class="absolute inset-y-0 left-0 w-1 bg-[var(--warn)]"></div>
+      <div class="flex items-center gap-3.5 px-4 py-3.5">
+        <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--warn-bg)]">
+          <i class="fa-regular fa-clock text-sm text-[var(--warn)]"></i>
+        </div>
+        <div class="flex flex-col">
+          <span class="text-[10.5px] font-bold uppercase tracking-wider text-[var(--text-3)]">Plazo de compra</span>
+          <span class="text-[13px] font-bold text-[var(--text)]">29/05/2026 – 28/07/2026</span>
+        </div>
+        <div class="ml-auto">
+          <span
+            class="inline-block rounded-md border border-[var(--warn)]/20 bg-[var(--warn-bg)] px-2.5 py-1 text-[11px] font-bold tracking-wide text-[var(--warn)]">
+            Quedan 7 días
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <div
+      class="relative overflow-hidden rounded-lg border border-[var(--border)] bg-[var(--surface)] shadow-[var(--shadow)]">
+      <div class="absolute inset-y-0 left-0 w-1 bg-[var(--primary)]"></div>
+      <div class="flex items-center gap-3.5 px-4 py-3.5">
+        <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--primary-soft)]">
+          <i class="fa-solid fa-circle-info text-sm text-[var(--primary)]"></i>
+        </div>
+        <div class="text-[12.5px] leading-relaxed text-[var(--text-2)]">
+          El beneficiario es el
+          <strong class="font-bold text-[var(--text)]">transportista titular</strong>
+          de la autorización, no el dueño del vehículo.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <header class="flow-header">
+    <div class="flow-eyebrow">
+      <span>Sección 2 · Comprobantes</span>
+      <small>Hoja 2 de 2</small>
+    </div>
+    <h1>Flujo B · Consumidor directo</h1>
+    <p>Compras a granel al distribuidor mayorista, sin placa en el comprobante.</p>
+  </header>
+
+  <section class="guidance-card">
+    <div class="guidance-copy">
+      <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
+      <p>
+        Registra tus facturas de compra a granel <b>sin placa</b> — el comprobante lo emite tu distribuidor mayorista.
+        Cada comprobante se valida en <b>SUNAT</b> (que exista) y en <b>Osinergmin</b> (mayorista inscrito,
+        B5/B20 ≤50 ppm). Si una factura tiene una nota de crédito activa, queda <b>inhabilitada</b>.
+      </p>
+    </div>
+
+    <div class="role-grid">
+      <article>
+        <span>Vende y emite el comprobante</span>
+        <strong>Distribuidor mayorista</strong>
+        <p>Su RUC debe estar inscrito y vigente en Osinergmin. El proveedor <b>nunca</b> registra por ti.</p>
+      </article>
+      <article class="role-card--primary">
+        <span>Compra y registra (tú)</span>
+        <strong>Transportista · consumidor directo</strong>
+        <p>Figuras como <b>adquirente</b> con tu RUC <code>{{ rucTransportista }}</code>, no como emisor, y el comprobante <b>no lleva placa</b>.</p>
+      </article>
+    </div>
+
+    <p class="guidance-footer">
+      Abasteces desde tu tanque propio, así que <b>no se declara el volumen que recibió cada vehículo</b>: el
+      reconocimiento se hace por proporción de flota (prorrateo Qa/Ta). En consumidor directo <b>no se aplica tope por
+      vehículo</b> y el monto queda <b>sujeto a validación posterior de la ATU</b>.
+    </p>
+  </section>
+
+  <div class="view-label">¿Qué vas a registrar?</div>
+  <nav class="view-switcher" aria-label="Contenido de consumidor directo">
+    <button type="button" [class.view-option--active]="vistaActiva === 'compras'" (click)="vistaActiva = 'compras'">
+      <strong>Comprobantes de compra</strong>
+      <span>Facturas del mayorista · {{ comprasGranel.length }} registradas</span>
+    </button>
+    <button type="button" [class.view-option--active]="vistaActiva === 'placas'" (click)="vistaActiva = 'placas'">
+      <strong>Relación de placas</strong>
+      <span>Flota abastecida · Qa {{ cantidadSubsidiables }} de Ta {{ vehiculos.length }}</span>
+    </button>
+  </nav>
+
+  @if (vistaActiva === 'compras') {
+    <section>
+      <div class="section-heading">
+        <h2>Compras al distribuidor mayorista</h2>
+        <span class="count-badge">{{ comprasGranel.length }}</span>
+        <button type="button" class="primary-button" (click)="abrirRegistroCompra()">
+          <i class="fa-solid fa-plus"></i> Registrar compra a granel
+        </button>
+      </div>
+
+      <div class="table-card">
+        <p-table
+          [value]="comprasGranel"
+          dataKey="comprobanteUuid"
+          styleClass="flujo-b-table p-datatable-sm"
+          [paginator]="comprasGranel.length > 5"
+          [rows]="5"
+          [rowsPerPageOptions]="[5, 10, 25]"
+          [showCurrentPageReport]="true"
+          currentPageReportTemplate="Mostrando {first}–{last} de {totalRecords} registros"
+          paginatorDropdownAppendTo="body"
+          [scrollable]="true"
+          [tableStyle]="{'min-width': '940px'}">
+
+          <ng-template pTemplate="header">
+            <tr>
+              <th style="width: 15%">Comprobante</th>
+              <th style="width: 11%">Emisión</th>
+              <th style="width: 21%">RUC del mayorista</th>
+              <th style="width: 14%">Combustible · volumen</th>
+              <th style="width: 12%">Volumen total</th>
+              <th style="width: 14%">Estado</th>
+              <th style="width: 13%; text-align: right">Acciones</th>
+            </tr>
+          </ng-template>
+
+          <ng-template pTemplate="body" let-item>
+            <tr>
+              <td>
+                <b class="mono">{{ item.serie }}-{{ item.numero }}</b>
+                <small>Factura</small>
+              </td>
+              <td class="mono">{{ fechaVisible(item.fechaEmision) }}</td>
+              <td>
+                <b class="mono">{{ item.rucDistribuidor || '—' }}</b>
+                <small [class.provider-ok]="proveedorConforme(item)" [class.provider-bad]="!proveedorConforme(item)">
+                  {{ proveedorConforme(item) ? 'Inscrito en Osinergmin' : 'Revisar inscripción en Osinergmin' }}
+                </small>
+              </td>
+              <td>
+                <div class="fuel-volume">
+                  <span>{{ item.tipoCombustibleCodigo }}</span>
+                  <b class="mono">{{ item.galones | number:'1.2-2' }} gal</b>
+                </div>
+              </td>
+              <td><b class="mono">{{ item.galones | number:'1.2-2' }} gal</b></td>
+              <td>
+                <span class="status-badge"
+                  [class.status-badge--ok]="item.estadoComprobanteCodigo === 'CONFORME'"
+                  [class.status-badge--pending]="item.estadoComprobanteCodigo === 'PENDIENTE'"
+                  [class.status-badge--warning]="item.estadoComprobanteCodigo === 'OBSERVADO'"
+                  [class.status-badge--bad]="item.estadoComprobanteCodigo === 'INHABILITADO' || item.tieneNotaCreditoActiva">
+                  <i class="fa-solid"
+                    [class.fa-check]="item.estadoComprobanteCodigo === 'CONFORME'"
+                    [class.fa-clock]="item.estadoComprobanteCodigo === 'PENDIENTE'"
+                    [class.fa-exclamation]="item.estadoComprobanteCodigo === 'OBSERVADO'"
+                    [class.fa-ban]="item.estadoComprobanteCodigo === 'INHABILITADO' || item.tieneNotaCreditoActiva"></i>
+                  {{ item.tieneNotaCreditoActiva ? 'Inhabilitado por N/C' : item.estadoComprobanteNombre }}
+                </span>
+              </td>
+              <td>
+                <div class="row-actions">
+                  <button type="button" class="credit-button" [disabled]="item.tieneNotaCreditoActiva"
+                    (click)="abrirNotaCredito(item)"
+                    [title]="item.tieneNotaCreditoActiva ? 'El comprobante ya tiene una N/C activa' : 'Agregar N/C'">
+                    <i class="fa-solid fa-pen"></i>
+                    {{ item.tieneNotaCreditoActiva ? 'N/C activa' : 'Agregar N/C' }}
+                  </button>
+                  <button type="button" class="delete-button" title="Retirar comprobante"
+                    (click)="retirar(item)" aria-label="Retirar comprobante">
+                    <i class="fa-solid fa-trash"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+            <tr class="validation-row">
+              <td colspan="7">
+                <div class="validation-message"
+                  [class.validation-message--ok]="item.estadoComprobanteCodigo === 'CONFORME'"
+                  [class.validation-message--pending]="item.estadoComprobanteCodigo === 'PENDIENTE'"
+                  [class.validation-message--warning]="item.estadoComprobanteCodigo === 'OBSERVADO'"
+                  [class.validation-message--bad]="item.estadoComprobanteCodigo === 'INHABILITADO' || item.tieneNotaCreditoActiva">
+                  {{ mensajeValidacion(item) }}
+                </div>
+              </td>
+            </tr>
+          </ng-template>
+
+          <ng-template pTemplate="emptymessage">
+            <tr>
+              <td colspan="7" class="empty-state">
+                <i class="fa-solid fa-file-invoice"></i>
+                <b>{{ cargando ? 'Cargando compras…' : 'Aún no hay compras a granel registradas' }}</b>
+                <span>Usa “Registrar compra a granel” para agregar la primera factura.</span>
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+    </section>
+  } @else {
+    <section class="fleet-section">
+      <div class="fleet-section-heading">
+        <h2>Relación de placas de tu flota</h2>
+        <label class="fleet-excel-button">
+          <input type="file" accept=".xlsx,.xls" (change)="seleccionarExcelPlacas($event)" />
+          <i class="fa-solid fa-arrow-up-from-bracket"></i>
+          Cargar Excel de placas
+        </label>
+      </div>
+
+      <p class="fleet-description">
+        Registra las placas que abasteces desde tu tanque: su categoría, el tipo de combustible y el volumen (m³).
+        Marca las que <b>entran al subsidio</b> (Qa) sobre el total de placas registradas (Ta).
+      </p>
+
+      <label class="fleet-search">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input [(ngModel)]="busquedaFlota" type="search" autocomplete="off"
+          placeholder="Buscar por placa o categoría…" />
+      </label>
+
+      @if (nombreExcelPlacas) {
+        <div class="fleet-file-ok">
+          <i class="fa-solid fa-file-excel"></i>
+          Datos cargados desde <b>{{ nombreExcelPlacas }}</b>
+        </div>
+      }
+      @if (excelPlacasError) {
+        <div class="fleet-file-error">
+          <i class="fa-solid fa-circle-exclamation"></i>{{ excelPlacasError }}
+        </div>
+      }
+
+      <div class="fleet-table-card">
+        <div class="fleet-table-scroll">
+          <div class="fleet-table">
+            <div class="fleet-table-row fleet-table-header">
+              <div>Placa</div>
+              <div>Categoría</div>
+              <div>Combustible</div>
+              <div>Volumen (m³)</div>
+              <div>Entra al subsidio (Qa)</div>
+            </div>
+            @for (fila of placasFlotaFiltradas; track fila.vehiculoUuid) {
+              <div class="fleet-table-row">
+                <strong class="mono">{{ fila.placa }}</strong>
+                <span>{{ fila.categoria }}</span>
+                <select [(ngModel)]="fila.combustible" aria-label="Combustible de {{ fila.placa }}">
+                  @for (tipo of tiposCombustible; track tipo.codigo) {
+                    <option [value]="tipo.codigo">{{ tipo.nombre }}</option>
+                  }
+                </select>
+                <input [(ngModel)]="fila.volumen" type="number" inputmode="decimal" min="0.01" step="0.01"
+                  class="mono" placeholder="0.00" aria-label="Volumen de {{ fila.placa }}" />
+                <label class="fleet-subsidy-check">
+                  <input [(ngModel)]="fila.subsidiable" type="checkbox" />
+                  <span>{{ fila.subsidiable ? 'Sí' : 'No' }}</span>
+                </label>
+              </div>
+            } @empty {
+              <div class="fleet-empty">
+                {{ placasFlota.length ? 'No se encontraron placas coincidentes.' : 'No hay vehículos asociados al transportista.' }}
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+
+      <article class="fleet-summary">
+        <h3>{{ registroFlotaCompleto ? 'Registro completo' : 'Registro pendiente de completar' }}</h3>
+        <div class="fleet-summary-metrics">
+          <div>
+            <span>Volumen conforme</span>
+            <strong class="mono">{{ volumenConformeFlota | number:'1.2-2' }} m³</strong>
+          </div>
+          <div>
+            <span>Ta · placas registradas</span>
+            <strong class="mono">{{ placasFlota.length }}</strong>
+          </div>
+          <div>
+            <span>Qa · entran al subsidio</span>
+            <strong class="mono fleet-summary-qa">{{ cantidadSubsidiables }}</strong>
+          </div>
+        </div>
+        <p>
+          Estos datos quedan registrados como parte de tu expediente.
+          <b>El monto del subsidio será determinado por la ATU tras la validación de tu expediente.</b>
+        </p>
+      </article>
+    </section>
+  }
+</div>
+
+@if (mostrarCompra) {
+  <div class="modal-overlay" role="presentation" (click)="cerrarRegistroCompra()">
+    <section class="flow-modal bulk-purchase-modal" role="dialog" aria-modal="true" aria-labelledby="bulk-purchase-title"
+      (click)="$event.stopPropagation()">
+      <header>
+        <div>
+          <h2 id="bulk-purchase-title">Registrar compra a granel</h2>
+          <p>Factura emitida por el distribuidor mayorista, sin placa.</p>
+        </div>
+        <button type="button" (click)="cerrarRegistroCompra()" aria-label="Cerrar"><i class="fa-solid fa-xmark"></i></button>
+      </header>
+
+      <form class="bulk-purchase-form" (ngSubmit)="registrarCompra()">
+        <div class="bulk-invoice-grid">
+          <label>
+            <span>Serie</span>
+            <input name="serie" [(ngModel)]="compra.serie" class="mono uppercase" maxlength="4"
+              placeholder="F050" />
+          </label>
+          <label>
+            <span>Número *</span>
+            <input name="numero" [(ngModel)]="compra.numero" class="mono" maxlength="8"
+              inputmode="numeric" placeholder="0000210" />
+          </label>
+          <label>
+            <span>Fecha de emisión</span>
+            <input name="fecha" [(ngModel)]="compra.fechaEmision" type="date" class="mono" />
+          </label>
+        </div>
+
+        <label class="bulk-ruc-field">
+          <span>RUC del proveedor mayorista *</span>
+          <input name="ruc" [(ngModel)]="compra.rucDistribuidor" class="mono" maxlength="11"
+            inputmode="numeric" placeholder="20xxxxxxxxx" />
+        </label>
+        <p class="bulk-field-help">
+          Ingresa el RUC del distribuidor mayorista para verificarlo en Osinergmin.
+        </p>
+
+        <section class="bulk-fuels">
+          <label class="bulk-fuels-title">
+            Combustible del comprobante
+            <span>(marca los que incluye y registra el volumen de cada uno por separado)</span>
+          </label>
+          <div class="bulk-fuel-list">
+            @for (combustible of combustiblesCompra; track combustible.codigo) {
+              <div class="bulk-fuel-row" [class.bulk-fuel-row--active]="combustible.seleccionado">
+                <label>
+                  <input [name]="'combustible-' + combustible.codigo" type="checkbox"
+                    [ngModel]="combustible.seleccionado"
+                    (ngModelChange)="cambiarCombustibleCompra(combustible, $event)" />
+                  <span>{{ combustible.nombre }} (Azufre ≤ {{ combustible.ppmMaximo }} ppm)</span>
+                </label>
+                <div>
+                  <span>Volumen (m³)</span>
+                  <input [name]="'volumen-' + combustible.codigo" [(ngModel)]="combustible.volumen"
+                    type="number" inputmode="decimal" min="0.01" step="0.01" class="mono" placeholder="0.00"
+                    [disabled]="!combustible.seleccionado" />
+                </div>
+              </div>
+            }
+          </div>
+          <div class="bulk-volume-total">
+            <span>Volumen total del comprobante:</span>
+            <strong class="mono">{{ volumenTotalCompra | number:'1.2-2' }} m³</strong>
+          </div>
+        </section>
+
+        <section class="bulk-credit-note">
+          <div class="bulk-credit-question">
+            <span>¿Tiene Nota de Crédito?</span>
+            <div>
+              <button type="button" [class.bulk-choice--active]="!compra.tieneNotaCredito"
+                (click)="cambiarNotaCreditoCompra(false)">No</button>
+              <button type="button" [class.bulk-choice--active]="compra.tieneNotaCredito"
+                (click)="cambiarNotaCreditoCompra(true)">Sí</button>
+            </div>
+          </div>
+
+          @if (compra.tieneNotaCredito) {
+            <div class="bulk-credit-grid">
+              <label>
+                <span>Serie de la N/C</span>
+                <input name="serieNotaCredito" [(ngModel)]="compra.serieNotaCredito"
+                  maxlength="4" class="mono uppercase" placeholder="NC01" />
+              </label>
+              <label>
+                <span>Número de la N/C</span>
+                <input name="numeroNotaCredito" [(ngModel)]="compra.numeroNotaCredito"
+                  maxlength="8" inputmode="numeric" class="mono" placeholder="0000004" />
+              </label>
+            </div>
+            <label class="bulk-dashed-upload">
+              <input type="file" accept="application/pdf,image/jpeg,image/png"
+                (change)="seleccionarArchivoNotaCompra($event)" />
+              <i class="fa-solid fa-arrow-up-from-bracket"></i>
+              {{ archivoNotaCompra ? archivoNotaCompra.name : 'Adjuntar la nota de crédito (PDF o imagen)' }}
+            </label>
+          }
+        </section>
+
+        <!-- <label class="bulk-dashed-upload bulk-invoice-upload">
+          <input type="file" accept="application/pdf,image/jpeg,image/png" (change)="seleccionarArchivo($event)" />
+          <i class="fa-solid fa-file-arrow-up"></i>
+          {{ archivoCompra ? archivoCompra.name : 'Adjuntar comprobante de compra (PDF o imagen)' }}
+        </label> -->
+
+        @if (compraError) {
+          <div class="form-error"><i class="fa-solid fa-circle-exclamation"></i>{{ compraError }}</div>
+        }
+
+        <footer class="bulk-form-actions">
+          <button type="button" class="secondary-button" (click)="cerrarRegistroCompra()">Cancelar</button>
+          <button type="submit" class="primary-button" [disabled]="guardandoCompra">
+            {{ guardandoCompra ? 'Registrando…' : 'Validar y registrar' }}
+          </button>
+        </footer>
+      </form>
+    </section>
+  </div>
+}
+
+@if (comprobanteNota; as comprobante) {
+  <div class="modal-overlay" role="presentation" (click)="cerrarNotaCredito()">
+    <section class="flow-modal flow-modal--compact" role="dialog" aria-modal="true" aria-labelledby="credit-note-title"
+      (click)="$event.stopPropagation()">
+      <header>
+        <div>
+          <h2 id="credit-note-title">Agregar nota de crédito</h2>
+          <p>Factura {{ comprobante.serie }}-{{ comprobante.numero }}</p>
+        </div>
+        <button type="button" (click)="cerrarNotaCredito()" aria-label="Cerrar"><i class="fa-solid fa-xmark"></i></button>
+      </header>
+
+      <form (ngSubmit)="registrarNota()">
+        <div class="form-grid">
+          <label><span>Serie N/C *</span><input name="serieNc" [(ngModel)]="nota.serie" class="mono uppercase" maxlength="4" /></label>
+          <label><span>Número N/C *</span><input name="numeroNc" [(ngModel)]="nota.numero" class="mono" maxlength="8" inputmode="numeric" /></label>
+          <label><span>Fecha de emisión *</span><input name="fechaNc" [(ngModel)]="nota.fechaEmision" type="date" /></label>
+          <label><span>Alcance *</span>
+            <select name="alcance" [(ngModel)]="nota.alcance">
+              <option value="TOTAL">Total</option>
+              <option value="PARCIAL">Parcial</option>
+            </select>
+          </label>
+          @if (nota.alcance === 'PARCIAL') {
+            <label><span>Galones afectados *</span><input name="galonesNc" [(ngModel)]="nota.galonesAfectados" type="number" min="0.01" step="0.01" /></label>
+          }
+          <label class="form-grid--wide"><span>Motivo *</span><textarea name="motivoNc" [(ngModel)]="nota.motivo" rows="3"></textarea></label>
+        </div>
+
+        @if (notaError) {
+          <div class="form-error"><i class="fa-solid fa-circle-exclamation"></i>{{ notaError }}</div>
+        }
+
+        <footer>
+          <button type="button" class="secondary-button" (click)="cerrarNotaCredito()">Cancelar</button>
+          <button type="submit" class="primary-button" [disabled]="guardandoNota">
+            {{ guardandoNota ? 'Registrando…' : 'Registrar nota' }}
+          </button>
+        </footer>
+      </form>
+    </section>
+  </div>
+}

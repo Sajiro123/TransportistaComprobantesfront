@@ -1,68 +1,63 @@
 <div class="comprobantes-page">
   <div class="mb-5 grid gap-4 md:grid-cols-2">
-    <!-- Alerta de Plazo -->
     <div
-      class="relative overflow-hidden rounded-lg bg-white border border-[#DCE4EC] shadow-[0_1px_3px_rgba(16,36,52,0.05)]">
-      <div class="absolute left-0 top-0 bottom-0 w-1 bg-[var(--warn)]"></div>
+      class="relative overflow-hidden rounded-lg border border-[var(--border)] bg-[var(--surface)] shadow-[var(--shadow)]">
+      <div class="absolute inset-y-0 left-0 w-1 bg-[var(--warn)]"></div>
       <div class="flex items-center gap-3.5 px-4 py-3.5">
         <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--warn-bg)]">
-          <i class="fa-regular fa-clock text-[var(--warn)] text-sm"></i>
+          <i class="fa-regular fa-clock text-sm text-[var(--warn)]"></i>
         </div>
         <div class="flex flex-col">
-          <span class="text-[10.5px] font-bold text-[var(--text-3)] uppercase tracking-wider">Plazo de compra</span>
+          <span class="text-[10.5px] font-bold uppercase tracking-wider text-[var(--text-3)]">Plazo de compra</span>
           <span class="text-[13px] font-bold text-[var(--text)]">29/05/2026 – 28/07/2026</span>
         </div>
         <div class="ml-auto">
           <span
-            class="inline-block rounded-md bg-[var(--warn-bg)] px-2.5 py-1 text-[11px] font-bold tracking-wide text-[var(--warn)] border border-[var(--warn)]/20">
+            class="inline-block rounded-md border border-[var(--warn)]/20 bg-[var(--warn-bg)] px-2.5 py-1 text-[11px] font-bold tracking-wide text-[var(--warn)]">
             Quedan 7 días
           </span>
         </div>
       </div>
     </div>
 
-    <!-- Alerta de Información -->
     <div
-      class="relative overflow-hidden rounded-lg bg-white border border-[#DCE4EC] shadow-[0_1px_3px_rgba(16,36,52,0.05)]">
-      <div class="absolute left-0 top-0 bottom-0 w-1 bg-[var(--primary-mid)]"></div>
+      class="relative overflow-hidden rounded-lg border border-[var(--border)] bg-[var(--surface)] shadow-[var(--shadow)]">
+      <div class="absolute inset-y-0 left-0 w-1 bg-[var(--primary)]"></div>
       <div class="flex items-center gap-3.5 px-4 py-3.5">
         <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--primary-soft)]">
-          <i class="fa-solid fa-circle-info text-[var(--primary-mid)] text-sm"></i>
+          <i class="fa-solid fa-circle-info text-sm text-[var(--primary)]"></i>
         </div>
         <div class="text-[12.5px] leading-relaxed text-[var(--text-2)]">
-          El beneficiario es el <strong class="text-[var(--text)] font-bold">transportista titular</strong> de la
-          autorización, no el dueño del vehículo.
+          El beneficiario es el
+          <strong class="font-bold text-[var(--text)]">transportista titular</strong>
+          de la autorización, no el dueño del vehículo.
         </div>
       </div>
     </div>
   </div>
 
   <section class="animate-entry">
-    <header class="mb-3.5">
+    <header class="flow-header">
       <div class="flex flex-wrap items-center gap-2">
         <span
-          class="rounded-md bg-[var(--primary)] px-2.5 py-[3px] text-[10.5px] font-extrabold uppercase tracking-wide text-[var(--primary-contrast)]">Sección
-          2 · Carga y cálculo</span>
-        <span class="text-[10.5px] font-bold uppercase tracking-wide text-[var(--text-3)]">Hoja 1 de 3</span>
+          class="rounded-md bg-[var(--primary)] px-2.5 py-[3px] text-[10.5px] font-extrabold uppercase tracking-wide text-[var(--primary-contrast)]">
+          Sección 2 · Comprobantes
+        </span>
+        <span class="text-[10.5px] font-bold uppercase tracking-wide text-[var(--text-3)]">Hoja 1 de 2</span>
       </div>
-      <h1 class="mt-1 text-2xl font-extrabold text-[var(--text)]">Comprobantes</h1>
-      <p class="mt-1.5 text-[13.5px] text-[var(--text-3)]">Regístralos en la forma que corresponda — puedes cargar
-        varios en cada una.</p>
+      <h1 class="mt-1 text-2xl font-extrabold text-[var(--text)]">Flujo A · Surtido directo</h1>
+      <p class="mt-1.5 text-[13.5px] text-[var(--text-3)]">Facturas de compra en grifo, con placa del vehículo.</p>
     </header>
 
-    <div class="mb-4 flex gap-1.5 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] p-1">
-      <button type="button" class="tab-button" [class.tab-button--active]="forma === 'A'" (click)="forma = 'A'">Forma A
-        · Surtido directo</button>
-      <button type="button" class="tab-button" [class.tab-button--active]="forma === 'B'" (click)="forma = 'B'">Forma B
-        · Consumidor directo</button>
-    </div>
-
-    @if (forma === 'A') {
-    <div class="mb-3.5 flex flex-wrap items-end justify-between gap-3.5">
-      <p class="min-w-[240px] flex-1 max-w-[620px] text-[13.5px] leading-relaxed text-[var(--text-2)]">
-        Registra tus facturas de compra <b>con placa</b> — una por una o varias por Excel. Cada comprobante se valida en
-        SUNAT y Osinergmin. Si una factura tiene una nota de crédito activa, queda <b>inhabilitada</b>.
-      </p>
+    <div class="flow-intro-row">
+      <div class="flow-guidance">
+        <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
+        <p>
+          Registra tus facturas de compra <b>con placa</b> — una por una, asociando el comprobante a una o varias placas.
+          Cada comprobante se valida en <b>SUNAT</b> (que exista) y en <b>Osinergmin</b> (grifo inscrito, B5/B20 ≤50 ppm).
+          Si una factura tiene una nota de crédito activa, queda <b>inhabilitada</b>.
+        </p>
+      </div>
       <div class="flex flex-wrap gap-2.5">
         <button type="button" class="action-button action-button--primary" (click)="abrirRegistro()">
           <i class="fa-solid fa-plus"></i> Agregar comprobante
@@ -70,13 +65,17 @@
       </div>
     </div>
 
-    <div class="mb-3 flex items-center gap-2 px-0.5">
+    <div class="flow-metrics">
       <span class="text-[11.5px] font-bold uppercase tracking-wide text-[var(--text-3)]">Comprobantes registrados</span>
       <span class="rounded-full bg-[var(--surface-3)] px-2.5 py-0.5 text-xs font-extrabold text-[var(--text-2)]">{{
         comprobantes.length }}</span>
+      <span class="text-[11.5px] font-bold uppercase tracking-wide text-[var(--text-3)]">Placas asociadas</span>
+      <span class="rounded-full bg-[var(--primary-soft)] px-2.5 py-0.5 text-xs font-extrabold text-[var(--primary)]">
+        {{ cantidadPlacasAsociadas }}
+      </span>
     </div>
 
-    <div class="mb-4 flex flex-wrap items-center gap-3 bg-[var(--surface)] border border-[var(--border)] rounded-2xl p-2 shadow-sm">
+    <div class="flow-filters">
       <div class="relative min-w-[240px] flex-1">
         <span class="pointer-events-none absolute left-3.5 top-1/2 z-10 flex -translate-y-1/2 text-[var(--text-3)]">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
@@ -86,7 +85,8 @@
           </svg>
         </span>
         <input [(ngModel)]="busqueda" (ngModelChange)="listarComprobantes()" type="search"
-          placeholder="Buscar por placa, combustible, factura o grifo…" class="filter-control search-control w-full pl-10" />
+          placeholder="Buscar por comprobante, RUC del grifo, placa o categoría…"
+          class="filter-control search-control w-full pl-10" />
       </div>
       <div class="min-w-[190px]">
         <select [(ngModel)]="estadoFiltro" (ngModelChange)="listarComprobantes()"
@@ -104,55 +104,66 @@
         [paginator]="true" [rows]="5" [rowsPerPageOptions]="[5, 10, 25]" [showCurrentPageReport]="true"
         currentPageReportTemplate="Mostrando {first}–{last} de {totalRecords} registros"
         paginatorDropdownAppendTo="body" [alwaysShowPaginator]="true" [scrollable]="true" scrollHeight="480px"
-        [tableStyle]="{'min-width': '1250px'}">
+        [tableStyle]="{'min-width': '1040px'}">
 
         <ng-template pTemplate="header">
           <tr>
-            <th pSortableColumn="numero" style="width: 15%; min-width: 180px">
+            <th pSortableColumn="numero" style="width: 15%; min-width: 150px">
               <span class="sortable-heading">Comprobante <p-sortIcon field="numero" /></span>
             </th>
-            <th pSortableColumn="placa" style="width: 15%; min-width: 180px">
-              <span class="sortable-heading">Placa <p-sortIcon field="placa" /></span>
+            <th pSortableColumn="fechaEmision" style="width: 11%; min-width: 110px">
+              <span class="sortable-heading">Emisión <p-sortIcon field="fechaEmision" /></span>
             </th>
-            <th pSortableColumn="nombreComercialDistribuidor" style="width: 28%; min-width: 290px">
-              <span class="sortable-heading">Grifo · ubicación <p-sortIcon field="nombreComercialDistribuidor" /></span>
+            <th pSortableColumn="rucDistribuidor" style="width: 21%; min-width: 210px">
+              <span class="sortable-heading">RUC del grifo · ubigeo <p-sortIcon field="rucDistribuidor" /></span>
             </th>
-            <th pSortableColumn="tipoCombustibleCodigo" style="width: 13%; min-width: 145px">
-              <span class="sortable-heading">Combustible <p-sortIcon field="tipoCombustibleCodigo" /></span>
+            <th pSortableColumn="placa" style="width: 11%; min-width: 105px">
+              <span class="sortable-heading">Placas <p-sortIcon field="placa" /></span>
             </th>
-            <th pSortableColumn="galones" style="width: 10%; min-width: 120px">
-              <span class="sortable-heading">Galones <p-sortIcon field="galones" /></span>
+            <th pSortableColumn="galones" style="width: 12%; min-width: 125px">
+              <span class="sortable-heading">Volumen total <p-sortIcon field="galones" /></span>
             </th>
-            <th pSortableColumn="estadoComprobanteNombre" style="width: 14%; min-width: 175px">
+            <th pSortableColumn="estadoComprobanteNombre" style="width: 17%; min-width: 165px">
               <span class="sortable-heading">Estado <p-sortIcon field="estadoComprobanteNombre" /></span>
             </th>
-            <th style="width: 5%; min-width: 110px; text-align: right">Acciones</th>
+            <th style="width: 13%; min-width: 150px; text-align: right">Acciones</th>
           </tr>
         </ng-template>
 
         <ng-template pTemplate="body" let-item>
           <tr>
-            <td><b class="mono">{{ item.serie }}-{{ item.numero }}</b><small>{{ item.fechaEmision }}</small></td>
-            <td><b class="mono text-[13.5px]">{{ item.placa || 'GRANEL' }}</b></td>
-            <td><b>{{ item.nombreComercialDistribuidor }}</b><small>{{ item.distritoDistribuidor }}, {{
-                item.provinciaDistribuidor }}</small></td>
-            <td><span class="fuel-badge">{{ item.tipoCombustibleCodigo }}</span> <small class="mono inline">{{
-                item.azufrePpm }} ppm</small></td>
-            <td class="mono">{{ item.galones | number:'1.2-2' }}</td>
             <td>
-              <span class="status-badge" [style.backgroundColor]="item.colorHex + '20'" [style.color]="item.colorHex"
+              <b class="mono">{{ item.serie }}-{{ item.numero }}</b>
+              <small>Factura</small>
+            </td>
+            <td class="mono">{{ fechaVisible(item.fechaEmision) }}</td>
+            <td>
+              <b class="mono">{{ item.rucDistribuidor || '—' }}</b>
+              <small>{{ ubicacionDistribuidor(item) }}</small>
+            </td>
+            <td><span class="plate-count">{{ etiquetaPlacas(item.placa) }}</span></td>
+            <td><b class="mono">{{ item.galones | number:'1.2-2' }} gal</b></td>
+            <td>
+              <span class="status-badge"
                 [class.status-badge--ok]="item.estadoComprobanteCodigo === 'CONFORME'"
                 [class.status-badge--pending]="item.estadoComprobanteCodigo === 'PENDIENTE'"
-                [class.status-badge--bad]="item.estadoComprobanteCodigo === 'OBSERVADO' || item.estadoComprobanteCodigo === 'INHABILITADO'">
+                [class.status-badge--warning]="item.estadoComprobanteCodigo === 'OBSERVADO'"
+                [class.status-badge--bad]="item.estadoComprobanteCodigo === 'INHABILITADO' || item.tieneNotaCreditoActiva">
                 <i class="fa-solid" [class.fa-check]="item.estadoComprobanteCodigo === 'CONFORME'"
                   [class.fa-clock]="item.estadoComprobanteCodigo === 'PENDIENTE'"
-                  [class.fa-ban]="item.estadoComprobanteCodigo === 'INHABILITADO'"
+                  [class.fa-ban]="item.estadoComprobanteCodigo === 'INHABILITADO' || item.tieneNotaCreditoActiva"
                   [class.fa-exclamation]="item.estadoComprobanteCodigo === 'OBSERVADO'"></i>
                 {{ item.estadoComprobanteNombre }}
               </span>
             </td>
             <td>
               <div class="flex justify-end gap-1.5">
+                <button type="button" class="detail-button" title="Ver detalle"
+                  [attr.aria-expanded]="detalleAbierto(item.comprobanteUuid)"
+                  (click)="alternarDetalle(item.comprobanteUuid)">
+                  <i class="fa-solid fa-caret-right" [class.rotate-90]="detalleAbierto(item.comprobanteUuid)"></i>
+                  Detalle
+                </button>
                 <button type="button" class="icon-button" title="Editar" aria-label="Editar comprobante"
                   (click)="abrirEditor(item)"><i class="fa-solid fa-pen"></i></button>
                 <button type="button" class="icon-button icon-button--danger" title="Retirar"
@@ -161,6 +172,19 @@
               </div>
             </td>
           </tr>
+          @if (detalleAbierto(item.comprobanteUuid)) {
+          <tr class="validation-row">
+            <td colspan="7">
+              <div class="validation-message"
+                [class.validation-message--ok]="item.estadoComprobanteCodigo === 'CONFORME'"
+                [class.validation-message--pending]="item.estadoComprobanteCodigo === 'PENDIENTE'"
+                [class.validation-message--bad]="item.estadoComprobanteCodigo === 'INHABILITADO' || item.tieneNotaCreditoActiva"
+                [class.validation-message--warning]="item.estadoComprobanteCodigo === 'OBSERVADO'">
+                {{ mensajeValidacion(item) }}
+              </div>
+            </td>
+          </tr>
+          }
         </ng-template>
 
         <ng-template pTemplate="emptymessage">
@@ -174,6 +198,9 @@
       </p-table>
     </div>
 
+    <!-- Se conserva la implementación anterior fuera de la vista para no afectar
+         los modelos y operaciones compartidos mientras cada flujo tiene su propia ruta. -->
+    @if (false) {
     <div class="mt-6 mb-3 flex flex-wrap items-center justify-between gap-3">
       <div class="flex items-center gap-2">
         <span class="text-[12px] font-extrabold uppercase tracking-wider text-[var(--text-3)]">
@@ -248,7 +275,7 @@
         }
       </div>
     </div>
-    } @else {
+    } @else if (false) {
     <div class="forma-b-content">
       <p class="mb-3.5 text-sm leading-relaxed text-[var(--text-2)]">
         Tú, el transportista, registras tus compras al mayorista (sin placa) y, por separado, qué vehículos abastece ese
@@ -387,6 +414,344 @@
 
 @if (editor; as model) {
 <div class="atu-modal-overlay z-[100]" role="presentation" (click)="cerrarEditor()">
+  <section class="editor-modal" role="dialog" aria-modal="true" aria-labelledby="new-editor-title"
+    (click)="$event.stopPropagation()">
+    <header class="editor-modal__header">
+      <div>
+        <h2 id="new-editor-title">{{ editorModo === 'crear' ? 'Registrar comprobante' : 'Editar comprobante' }}</h2>
+        <p>Se valida en SUNAT (que exista) y Osinergmin (grifo inscrito)</p>
+      </div>
+      <button type="button" class="editor-modal__close" aria-label="Cerrar modal" (click)="cerrarEditor()">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </header>
+
+    <div class="editor-modal__body">
+      @if (editorModo === 'crear') {
+        <div class="editor-section-title">1 · Comprobante (archivo)</div>
+        <label for="receipt-file-new" class="receipt-upload" [class.receipt-upload--dragging]="isFileDragging"
+          [class.receipt-upload--error]="!!archivoError || (editorSubmitted && !archivoSeleccionado)"
+          (dragover)="onFileDragOver($event)" (dragleave)="onFileDragLeave($event)" (drop)="onFileDrop($event)">
+          <input id="receipt-file-new" type="file" (change)="onFileSelected($event)"
+            accept="application/pdf,image/jpeg,image/png" class="receipt-upload__input" />
+          <span class="receipt-upload__icon"><i class="fa-solid fa-arrow-up-from-bracket"></i></span>
+          <strong>Arrastra el comprobante o haz clic para seleccionar</strong>
+          <small>PDF o imagen JPG/PNG · máx. 5 MB</small>
+        </label>
+
+        @if (archivoSeleccionado) {
+          <div class="receipt-file">
+            <i class="fa-solid fa-file-circle-check"></i>
+            <span>
+              <strong>{{ archivoSeleccionado.name }}</strong>
+              <small>{{ archivoSeleccionado.size / 1048576 | number:'1.2-2' }} MB</small>
+            </span>
+            <button type="button" aria-label="Quitar archivo" (click)="quitarArchivo()">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+          </div>
+        }
+        @if (archivoError) {
+          <div class="receipt-upload-error"><i class="fa-solid fa-circle-exclamation"></i>{{ archivoError }}</div>
+        }
+
+        <p class="editor-help">
+          El archivo es tu respaldo. El sistema verificará que la factura exista en SUNAT y que el grifo esté inscrito
+          en Osinergmin.
+        </p>
+
+        <div class="editor-choice-card">
+          <span>¿Tiene Nota de Crédito?</span>
+          <div class="segmented-control">
+            <button type="button" [class.segmented-control--active]="!tieneNotaCredito"
+              (click)="cambiarTieneNotaCredito(false)">No</button>
+            <button type="button" [class.segmented-control--active]="tieneNotaCredito"
+              (click)="cambiarTieneNotaCredito(true)">Sí</button>
+          </div>
+          @if (tieneNotaCredito) {
+            <div class="credit-note-upload">
+              <label class="credit-note-upload__button">
+                <input type="file" accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png"
+                  (change)="onNotaCreditoFileSelected($event)" />
+                Cargar la Nota de Crédito (PDF o imagen)
+              </label>
+              @if (archivoNotaCredito) {
+                <div class="credit-note-upload__file">
+                  <i class="fa-solid fa-file-circle-check"></i>
+                  <span>{{ archivoNotaCredito.name }}</span>
+                  <button type="button" title="Quitar archivo" aria-label="Quitar Nota de Crédito"
+                    (click)="quitarArchivoNotaCredito()">
+                    <i class="fa-solid fa-xmark"></i>
+                  </button>
+                </div>
+              }
+              @if (archivoNotaCreditoError) {
+                <div class="receipt-upload-error">
+                  <i class="fa-solid fa-circle-exclamation"></i>{{ archivoNotaCreditoError }}
+                </div>
+              }
+              <p>
+                La Nota de Crédito y la factura electrónica se registran en un
+                <strong>mismo PDF de respaldo</strong>. Mientras la N/C esté vigente, la factura queda
+                <strong>inhabilitada</strong>.
+              </p>
+            </div>
+          }
+        </div>
+      }
+
+      <div class="editor-section-title">{{ editorModo === 'crear' ? 2 : 1 }} · Factura</div>
+      <div class="editor-grid editor-grid--invoice-new">
+        <label class="editor-field">
+          <span>Serie *</span>
+          <input [(ngModel)]="model.serie" (input)="onEditorInvoiceSeriesInput($event)" maxlength="4"
+            class="mono uppercase" placeholder="F001"
+            [class.editor-field--invalid]="editorSubmitted && !isEditorInvoiceSeriesValid" />
+          <small [class.editor-field-error]="editorSubmitted && !isEditorInvoiceSeriesValid"
+            [class.editor-field-hint]="!editorSubmitted || isEditorInvoiceSeriesValid">Formato F001.</small>
+        </label>
+        <label class="editor-field">
+          <span>Número *</span>
+          <input [(ngModel)]="model.numero" (input)="onEditorInvoiceNumberInput($event)" maxlength="8"
+            inputmode="numeric" class="mono" placeholder="0001234"
+            [class.editor-field--invalid]="editorSubmitted && !isEditorInvoiceNumberValid" />
+          <small [class.editor-field-error]="editorSubmitted && !isEditorInvoiceNumberValid"
+            [class.editor-field-hint]="!editorSubmitted || isEditorInvoiceNumberValid">Entre 1 y 8 dígitos.</small>
+        </label>
+      </div>
+
+      <div class="inline-choice">
+        <span>Fecha del comprobante</span>
+        <div class="segmented-control">
+          <button type="button" [class.segmented-control--active]="fechaComprobanteModo === 'EMISION'"
+            (click)="cambiarModoFecha('EMISION')">Fecha de emisión</button>
+          <button type="button" [class.segmented-control--active]="fechaComprobanteModo === 'PERIODO'"
+            (click)="cambiarModoFecha('PERIODO')">Periodo</button>
+        </div>
+      </div>
+
+      @if (fechaComprobanteModo === 'EMISION') {
+        <label class="editor-field editor-date-field">
+          <span>Fecha de emisión *</span>
+          <input [(ngModel)]="model.emision" (change)="onEditorEmissionChange()" type="date" class="mono"
+            [max]="todayDate" [class.editor-field--invalid]="editorSubmitted && !isEditorEmissionValid" />
+          <small [class.editor-field-error]="editorSubmitted && !isEditorEmissionValid"
+            [class.editor-field-hint]="!editorSubmitted || isEditorEmissionValid">
+            Usa la fecha de emisión que figura en la factura; no puede ser posterior a hoy.
+          </small>
+        </label>
+      } @else {
+        <div class="period-range">
+          <label class="editor-field">
+            <span>Desde *</span>
+            <input [(ngModel)]="periodoDesde" (change)="onPeriodoRangoChange()" type="date" class="mono"
+              [max]="periodoHasta || todayDate"
+              [class.editor-field--invalid]="editorSubmitted && !isEditorPeriodValid" />
+          </label>
+          <label class="editor-field">
+            <span>Hasta *</span>
+            <input [(ngModel)]="periodoHasta" (change)="onPeriodoRangoChange()" type="date" class="mono"
+              [min]="periodoDesde" [max]="todayDate"
+              [class.editor-field--invalid]="editorSubmitted && !isEditorPeriodValid" />
+          </label>
+        </div>
+        <p class="editor-help period-range-help"
+          [class.editor-field-error]="editorSubmitted && !isEditorPeriodValid">
+          Usa periodo cuando el comprobante cubre un rango de días de consumo.
+        </p>
+      }
+
+      <div class="editor-section-title">{{ editorModo === 'crear' ? 3 : 2 }} · Grifo</div>
+      <label class="editor-field editor-ruc-field">
+        <span>RUC del grifo *</span>
+        <input [(ngModel)]="model.rucGrifo" (input)="onEditorStationRucInput($event)" maxlength="11"
+          inputmode="numeric" class="mono" placeholder="20xxxxxxxxx"
+          [class.editor-field--invalid]="editorSubmitted && !isEditorStationRucValid" />
+        <small [class.editor-field-error]="editorSubmitted && !isEditorStationRucValid"
+          [class.editor-field-hint]="!editorSubmitted || isEditorStationRucValid">Ingresa un RUC válido de 11 dígitos.</small>
+      </label>
+
+      <div class="editor-grid editor-grid--location">
+        <label class="editor-field">
+          <span>Departamento</span>
+          <select [(ngModel)]="model.departamento" (ngModelChange)="onEditorDepartamentoChange()">
+            <option value="">—</option>
+            @for (departamento of departamentosDisponibles; track departamento) {
+              <option [value]="departamento">{{ departamento }}</option>
+            }
+          </select>
+        </label>
+        <label class="editor-field">
+          <span>Provincia</span>
+          <select [(ngModel)]="model.provincia" (ngModelChange)="onEditorProvinciaChange()"
+            [disabled]="!model.departamento">
+            <option value="">—</option>
+            @for (provincia of provinciasDisponibles; track provincia) {
+              <option [value]="provincia">{{ provincia }}</option>
+            }
+          </select>
+        </label>
+        <label class="editor-field">
+          <span>Distrito</span>
+          <select [(ngModel)]="model.distrito" (ngModelChange)="onEditorDistritoChange()"
+            [disabled]="!model.provincia">
+            <option value="">—</option>
+            @for (distrito of distritosDisponibles; track distrito) {
+              <option [value]="distrito">{{ distrito }}</option>
+            }
+          </select>
+        </label>
+      </div>
+
+      <label class="editor-field editor-field--full">
+        <span>Dirección del grifo</span>
+        <select [(ngModel)]="model.direccion" (ngModelChange)="onEditorDireccionChange()"
+          [disabled]="!model.departamento || !model.provincia || !model.distrito">
+          <option value="">
+            {{ model.departamento && model.provincia && model.distrito
+              ? 'Selecciona una dirección…'
+              : 'Elige departamento, provincia y distrito primero' }}
+          </option>
+          @for (distribuidor of direccionesDisponibles; track distribuidor.distribuidorUuid) {
+            <option [value]="distribuidor.direccion">{{ distribuidor.direccion }}</option>
+          }
+        </select>
+        <small class="editor-field-hint">
+          Las direcciones se filtran según el departamento, provincia y distrito seleccionados.
+        </small>
+      </label>
+
+      <div class="vehicle-section-heading">
+        <div class="editor-section-title">{{ editorModo === 'crear' ? 4 : 3 }} · Vehículos y combustible *</div>
+        <span>{{ cantidadPlacasEditor }} placa(s) · {{ volumenTotalEditor | number:'1.2-2' }} m³</span>
+      </div>
+
+      <div class="segmented-control vehicle-mode">
+        <button type="button" [class.segmented-control--active]="seleccionPlacasModo === 'UNA'"
+          (click)="cambiarModoPlacas('UNA')">Una placa</button>
+        <button type="button" [class.segmented-control--active]="seleccionPlacasModo === 'CONJUNTO'"
+          (click)="cambiarModoPlacas('CONJUNTO')">Conjunto de placas</button>
+      </div>
+
+      @if (seleccionPlacasModo === 'UNA') {
+        <p class="editor-help">
+          Un comprobante para un solo vehículo: elige su placa, el tipo de combustible y el volumen. La categoría la
+          asigna el sistema.
+        </p>
+        <div class="editor-grid editor-grid--vehicle-single">
+          <label class="editor-field">
+            <span>Placa *</span>
+            <p-select [(ngModel)]="model.placa" [options]="vehiculosFiltradosPorPlaca"
+              optionLabel="placa" optionValue="placa" [filter]="true" filterBy="placa"
+              filterPlaceholder="Digite al menos 3 caracteres" emptyMessage="Digite al menos 3 caracteres"
+              emptyFilterMessage="No se encontraron placas coincidentes" placeholder="Selecciona la placa…"
+              styleClass="plate-filter-select mono" panelStyleClass="plate-filter-panel"
+              appendTo="body" [resetFilterOnHide]="true"
+              (onShow)="reiniciarFiltroPlaca()" (onFilter)="onFiltroPlacaSelect($event)"
+              (ngModelChange)="onPlacaSeleccionada($event)">
+            </p-select>
+            <small class="editor-field-hint">Abre el selector y busca desde el tercer carácter.</small>
+          </label>
+          <label class="editor-field">
+            <span>Categoría</span>
+            <div class="readonly-value">{{ categoriaVehiculoSeleccionado }}</div>
+          </label>
+          <label class="editor-field">
+            <span>Combustible *</span>
+            <select [(ngModel)]="model.combustible">
+              @for (tipo of tiposCombustible; track tipo.codigo) {
+                <option [value]="tipo.codigo">{{ tipo.nombre }} (≤ {{ tipo.ppmMaximo }} ppm)</option>
+              }
+            </select>
+          </label>
+          <label class="editor-field">
+            <span>Volumen (m³) *</span>
+            <input [(ngModel)]="model.galones" type="number" min="0.01" step="0.01" class="mono" placeholder="0.00" />
+          </label>
+        </div>
+      } @else {
+        <p class="editor-help">
+          Un mismo comprobante repartido entre varias placas: indica por cada una su combustible y su volumen, o
+          cárgalas desde tu Excel.
+        </p>
+        <div class="plate-toolbar">
+          <button type="button" class="plate-toolbar__primary" (click)="agregarFilaPlaca()">
+            <i class="fa-solid fa-plus"></i> Agregar placa
+          </button>
+          <label class="plate-toolbar__secondary">
+            <input type="file" accept=".xlsx,.xls" (change)="onExcelPlacasSelected($event)" />
+            <i class="fa-solid fa-arrow-up-from-bracket"></i> Cargar Excel de placas
+          </label>
+        </div>
+        @if (excelPlacasError) {
+          <div class="receipt-upload-error plate-excel-error">
+            <i class="fa-solid fa-circle-exclamation"></i>{{ excelPlacasError }}
+          </div>
+        }
+        <div class="plate-table">
+          <div class="plate-table__scroll">
+            <div class="plate-table__content">
+              <div class="plate-table__row plate-table__header">
+                <div>Placa</div>
+                <div>Categoría</div>
+                <div>Comb.</div>
+                <div>Volumen (m³)</div>
+                <div></div>
+              </div>
+              @for (fila of filasPlacas; track fila.id) {
+                <div class="plate-table__row">
+                  <select [(ngModel)]="fila.placa" class="mono"
+                    [class.editor-field--invalid]="editorSubmitted && (!fila.placa || placaUsadaEnOtraFila(fila.placa, fila.id))">
+                    <option value="">Placa…</option>
+                    @for (vehiculo of vehiculos; track vehiculo.vehiculoUuid) {
+                      <option [value]="vehiculo.placa"
+                        [disabled]="placaUsadaEnOtraFila(vehiculo.placa, fila.id)">
+                        {{ vehiculo.placa }}
+                      </option>
+                    }
+                  </select>
+                  <div class="plate-table__category">{{ categoriaFila(fila) }}</div>
+                  <select [(ngModel)]="fila.combustible"
+                    [class.editor-field--invalid]="editorSubmitted && !fila.combustible">
+                    @for (tipo of tiposCombustible; track tipo.codigo) {
+                      <option [value]="tipo.codigo">{{ tipo.codigo }} (≤ {{ tipo.ppmMaximo }} ppm)</option>
+                    }
+                  </select>
+                  <input [(ngModel)]="fila.volumen" type="number" inputmode="decimal" min="0.01" step="0.01"
+                    class="mono" placeholder="0.00"
+                    [class.editor-field--invalid]="editorSubmitted && (!fila.volumen || fila.volumen <= 0)" />
+                  <button type="button" class="plate-table__remove" title="Quitar"
+                    (click)="quitarFilaPlaca(fila.id)">×</button>
+                </div>
+              } @empty {
+                <div class="plate-table__empty">Agrega placas una por una o cárgalas desde tu Excel.</div>
+              }
+            </div>
+          </div>
+          <div class="plate-table__total">
+            <span>Total del comprobante:</span>
+            <strong class="mono">{{ volumenTotalEditor | number:'1.2-2' }} m³</strong>
+          </div>
+        </div>
+      }
+
+      @if (editorError) {
+        <div class="editor-error" role="alert"><i class="fa-solid fa-circle-exclamation"></i>{{ editorError }}</div>
+      }
+    </div>
+
+    <footer class="editor-modal__footer">
+      <button type="button" class="editor-cancel" (click)="cerrarEditor()">Cancelar</button>
+      <button type="button" class="editor-save" (click)="guardarEditor()">
+        {{ editorModo === 'crear' ? 'Validar y registrar' : 'Guardar cambios' }}
+      </button>
+    </footer>
+  </section>
+</div>
+}
+
+@if (editor; as model) {
+<div class="atu-modal-overlay z-[100]" style="display: none" aria-hidden="true" role="presentation">
   <section class="editor-modal" role="dialog" aria-modal="true" aria-labelledby="editor-title"
     (click)="$event.stopPropagation()">
     <header class="editor-modal__header">

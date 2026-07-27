@@ -3,6 +3,8 @@ import { Component, HostListener, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { TableModule } from 'primeng/table';
 import { DatePickerModule } from 'primeng/datepicker';
+import { SelectModule } from 'primeng/select';
+import * as XLSX from 'xlsx';
 import { isValidRuc } from '../../../core/utils/validators';
 import { ApiComprobanteService } from '../../../core/services/api-comprobante.service';
 import { ApiAuthService } from '../../../core/services/api-auth.service';
@@ -21,6 +23,15 @@ import Swal from 'sweetalert2';
 type EstadoFiltro = 'todos' | 'val' | 'pend' | 'obs';
 
 type Forma = 'A' | 'B';
+type FechaComprobanteModo = 'EMISION' | 'PERIODO';
+type SeleccionPlacasModo = 'UNA' | 'CONJUNTO';
+
+interface FilaPlacaEditor {
+  id: number;
+  placa: string;
+  combustible: string;
+  volumen: number | null;
+}
 
 interface Comprobante {
   id: number;
@@ -93,7 +104,7 @@ interface ComprobanteEditor {
 @Component({
   selector: 'app-comprobantes',
   standalone: true,
-  imports: [CommonModule, FormsModule, TableModule, DatePickerModule],
+  imports: [CommonModule, FormsModule, TableModule, DatePickerModule, SelectModule],
   templateUrl: './comprobantes.component.html',
   styleUrl: './comprobantes.component.scss',
 })
@@ -127,6 +138,21 @@ export class ComprobantesComponent implements OnInit {
   archivoError = '';
   isFileDragging = false;
   placaBusqueda = '';
+  readonly detallesAbiertos = new Set<string>();
+  readonly legacyEditorTemplateEnabled = false;
+  tieneNotaCredito = false;
+  archivoNotaCredito: File | null = null;
+  archivoNotaCreditoError = '';
+  fechaComprobanteModo: FechaComprobanteModo = 'EMISION';
+  periodoComprobante = '';
+  periodoDesde = '';
+  periodoHasta = '';
+  seleccionPlacasModo: SeleccionPlacasModo = 'UNA';
+  placasConjunto: string[] = [];
+  volumenPorPlaca: Record<string, number> = {};
+  filasPlacas: FilaPlacaEditor[] = [];
+  excelPlacasError = '';
+  private siguienteFilaPlacaId = 1;
 
   comprobantePendienteEliminar: ComprobanteListResponse | null = null;
 
@@ -239,6 +265,15 @@ export class ComprobantesComponent implements OnInit {
     const termino = this.busqueda.trim().toLocaleLowerCase('es');
 
     return this.comprobantes.filter((c) => {
+      const coincideFlujo =
+        this.forma === 'A'
+          ? ['FORMA_A', 'A', 'SURTIDO_DIRECTO'].includes(
+              c.tipoComprobanteCodigo,
+            )
+          : ['FORMA_B', 'B', 'CONSUMIDOR_DIRECTO'].includes(
+              c.tipoComprobanteCodigo,
+            );
+      if (!coincideFlujo) return false;
       const coincideEstado =
         this.estadoFiltro === 'todos' ||
         c.estadoComprobanteCodigo === this.estadoFiltro;
@@ -246,10 +281,15 @@ export class ComprobantesComponent implements OnInit {
       if (!termino) return true;
 
       const contenido = [
+        c.serie,
         c.numero,
         c.placa,
+        c.rucDistribuidor,
+        c.razonSocialDistribuidor,
         c.nombreComercialDistribuidor,
         c.distritoDistribuidor,
+        c.provinciaDistribuidor,
+        c.departamentoDistribuidor,
         c.tipoCombustibleCodigo,
       ]
         .join(' ')
@@ -257,6 +297,76 @@ export class ComprobantesComponent implements OnInit {
 
       return contenido.includes(termino);
     });
+  }
+
+  get cantidadPlacasAsociadas(): number {
+    const placas = this.comprobantesFiltrados.flatMap((item) =>
+      (item.placa || '')
+        .split(',')
+        .map((placa) => placa.trim().toLocaleUpperCase('es'))
+        .filter(Boolean),
+    );
+    return new Set(placas).size;
+  }
+
+  etiquetaPlacas(placas?: string): string {
+    const cantidad = (placas || '')
+      .split(',')
+      .map((placa) => placa.trim())
+      .filter(Boolean).length;
+    return `${cantidad} ${cantidad === 1 ? 'placa' : 'placas'}`;
+  }
+
+  ubicacionDistribuidor(item: ComprobanteListResponse): string {
+    return [
+      item.distritoDistribuidor,
+      item.provinciaDistribuidor,
+      item.departamentoDistribuidor,
+    ]
+      .filter(Boolean)
+      .join(' · ') || 'Ubicación no disponible';
+  }
+
+  fechaVisible(fecha: string): string {
+    if (!fecha) return '—';
+    if (/^\d{4}-\d{2}-\d{2}$/.test(fecha)) {
+      const [anio, mes, dia] = fecha.split('-');
+      return `${dia}/${mes}/${anio}`;
+    }
+    return fecha;
+  }
+
+  detalleAbierto(comprobanteUuid: string): boolean {
+    return this.detallesAbiertos.has(comprobanteUuid);
+  }
+
+  alternarDetalle(comprobanteUuid: string): void {
+    if (this.detallesAbiertos.has(comprobanteUuid)) {
+      this.detallesAbiertos.delete(comprobanteUuid);
+      return;
+    }
+    this.detallesAbiertos.add(comprobanteUuid);
+  }
+
+  mensajeValidacion(item: ComprobanteListResponse): string {
+    if (item.tieneNotaCreditoActiva) {
+      return 'Esta factura tiene una nota de crédito activa que la corrige o anula. Mientras la nota de crédito esté vigente, la factura queda inhabilitada y sus galones no se consideran.';
+    }
+
+    switch (item.estadoComprobanteCodigo) {
+      case 'CONFORME':
+        return 'El comprobante existe en SUNAT y el grifo está inscrito en Osinergmin. Sus galones se reconocen para el subsidio.';
+      case 'PENDIENTE':
+        return 'El comprobante está en proceso de validación con SUNAT y Osinergmin.';
+      case 'OBSERVADO':
+        return Number(item.azufrePpm) > 50
+          ? `El combustible declarado supera 50 ppm de azufre (${item.azufrePpm} ppm). Solo se subsidia diésel B5/B20 con azufre ≤50 ppm.`
+          : 'El comprobante presenta observaciones. Revisa sus datos y la información del establecimiento emisor.';
+      case 'INHABILITADO':
+        return 'El comprobante está inhabilitado y sus galones no se consideran para el subsidio.';
+      default:
+        return 'Consulta el estado del comprobante y sus validaciones antes de continuar.';
+    }
   }
 
   // --- Helpers UI Form B ---
@@ -333,24 +443,57 @@ export class ComprobantesComponent implements OnInit {
     this.archivoError = '';
   }
 
-  private validarArchivo(file: File): void {
-    const allowedTypes = ['application/pdf', 'image/jpeg', 'image/png'];
-    const maxSize = 5 * 1024 * 1024;
+  cambiarTieneNotaCredito(valor: boolean): void {
+    this.tieneNotaCredito = valor;
+    if (!valor) {
+      this.archivoNotaCredito = null;
+      this.archivoNotaCreditoError = '';
+    }
+  }
 
-    if (!allowedTypes.includes(file.type)) {
-      this.archivoSeleccionado = null;
-      this.archivoError = 'Selecciona un archivo PDF o una imagen JPG/PNG.';
+  onNotaCreditoFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const archivo = input.files?.[0] || null;
+    input.value = '';
+    if (!archivo) return;
+
+    const error = this.validarTipoYTamanioArchivo(archivo);
+    if (error) {
+      this.archivoNotaCredito = null;
+      this.archivoNotaCreditoError = error;
       return;
     }
 
-    if (file.size > maxSize) {
+    this.archivoNotaCredito = archivo;
+    this.archivoNotaCreditoError = '';
+  }
+
+  quitarArchivoNotaCredito(): void {
+    this.archivoNotaCredito = null;
+    this.archivoNotaCreditoError = '';
+  }
+
+  private validarArchivo(file: File): void {
+    const error = this.validarTipoYTamanioArchivo(file);
+    if (error) {
       this.archivoSeleccionado = null;
-      this.archivoError = 'El comprobante no puede superar los 5 MB.';
+      this.archivoError = error;
       return;
     }
 
     this.archivoSeleccionado = file;
     this.archivoError = '';
+  }
+
+  private validarTipoYTamanioArchivo(file: File): string {
+    const allowedTypes = ['application/pdf', 'image/jpeg', 'image/png'];
+    if (!allowedTypes.includes(file.type)) {
+      return 'Selecciona un archivo PDF o una imagen JPG/PNG.';
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      return 'El archivo no puede superar los 5 MB.';
+    }
+    return '';
   }
 
   // --- Editor ---
@@ -360,6 +503,18 @@ export class ComprobantesComponent implements OnInit {
     this.placaBusqueda = '';
     this.archivoSeleccionado = null;
     this.archivoError = '';
+    this.tieneNotaCredito = false;
+    this.archivoNotaCredito = null;
+    this.archivoNotaCreditoError = '';
+    this.fechaComprobanteModo = 'EMISION';
+    this.periodoComprobante = '';
+    this.periodoDesde = '';
+    this.periodoHasta = '';
+    this.seleccionPlacasModo = 'UNA';
+    this.placasConjunto = [];
+    this.volumenPorPlaca = {};
+    this.filasPlacas = [];
+    this.excelPlacasError = '';
     const hoy = this.todayDate;
     this.editor = {
       uuid: '',
@@ -424,6 +579,18 @@ export class ComprobantesComponent implements OnInit {
           this.placaBusqueda = '';
           this.archivoSeleccionado = null;
           this.archivoError = '';
+          this.tieneNotaCredito = !!c.tieneNotaCreditoActiva;
+          this.archivoNotaCredito = null;
+          this.archivoNotaCreditoError = '';
+          this.fechaComprobanteModo = 'EMISION';
+          this.periodoComprobante = c.fechaEmision?.slice(0, 7) || '';
+          this.periodoDesde = c.fechaEmision || '';
+          this.periodoHasta = c.fechaEmision || '';
+          this.seleccionPlacasModo = 'UNA';
+          this.placasConjunto = [];
+          this.volumenPorPlaca = {};
+          this.filasPlacas = [];
+          this.excelPlacasError = '';
 
           let p = '';
           if (c.tipoComprobanteCodigo === 'FORMA_A') {
@@ -431,6 +598,7 @@ export class ComprobantesComponent implements OnInit {
               c.placa ||
               (c.detalle && c.detalle.length > 0 ? c.detalle[0].placa : '');
           }
+          this.placaBusqueda = p;
 
           this.editor = {
             uuid: c.comprobanteUuid,
@@ -474,15 +642,45 @@ export class ComprobantesComponent implements OnInit {
     this.editorSubmitted = false;
     this.archivoSeleccionado = null;
     this.archivoError = '';
+    this.placasConjunto = [];
+    this.volumenPorPlaca = {};
+    this.archivoNotaCredito = null;
+    this.archivoNotaCreditoError = '';
+    this.filasPlacas = [];
+    this.excelPlacasError = '';
   }
 
   get vehiculosFiltradosPorPlaca(): VehiculoAsociadoResponse[] {
     const search = this.placaBusqueda.trim().toLocaleUpperCase('es');
-    if (search.length < 3) return this.vehiculos;
+    if (search.length < 3) return [];
 
     return this.vehiculos.filter((vehiculo) =>
       vehiculo.placa.toLocaleUpperCase('es').includes(search),
     );
+  }
+
+  onPlacaBusquedaChange(valor: string): void {
+    this.placaBusqueda = (valor || '').toLocaleUpperCase('es').slice(0, 10);
+    if (!this.editor) return;
+    const coincidenciaExacta = this.vehiculos.find(
+      (vehiculo) =>
+        vehiculo.placa.toLocaleUpperCase('es') === this.placaBusqueda.trim(),
+    );
+    this.editor.placa = coincidenciaExacta?.placa || '';
+  }
+
+  onPlacaSeleccionada(placa: string): void {
+    if (placa) this.placaBusqueda = placa;
+  }
+
+  reiniciarFiltroPlaca(): void {
+    this.placaBusqueda = '';
+  }
+
+  onFiltroPlacaSelect(evento: { filter: string }): void {
+    this.placaBusqueda = (evento.filter || '')
+      .toLocaleUpperCase('es')
+      .slice(0, 10);
   }
 
   get editorDocumentoMaxLength(): number {
@@ -606,6 +804,283 @@ export class ComprobantesComponent implements OnInit {
     const value = input.value.replace(/\D/g, '').slice(0, 11);
     input.value = value;
     this.editor.rucGrifo = value;
+
+    const distribuidor = this.distribuidores.find((item) => item.ruc === value);
+    if (distribuidor) {
+      this.editor.razonSocial = distribuidor.razonSocial;
+      this.editor.departamento = distribuidor.departamento;
+      this.editor.provincia = distribuidor.provincia;
+      this.editor.distrito = distribuidor.distrito;
+      this.editor.direccion = distribuidor.direccion;
+    }
+  }
+
+  get departamentosDisponibles(): string[] {
+    return this.valoresUnicos(this.distribuidores.map((item) => item.departamento));
+  }
+
+  get provinciasDisponibles(): string[] {
+    if (!this.editor?.departamento) return [];
+    return this.valoresUnicos(
+      this.distribuidores
+        .filter((item) => item.departamento === this.editor.departamento)
+        .map((item) => item.provincia),
+    );
+  }
+
+  get distritosDisponibles(): string[] {
+    if (!this.editor?.departamento || !this.editor?.provincia) return [];
+    return this.valoresUnicos(
+      this.distribuidores
+        .filter(
+          (item) =>
+            item.departamento === this.editor.departamento &&
+            item.provincia === this.editor.provincia,
+        )
+        .map((item) => item.distrito),
+    );
+  }
+
+  get direccionesDisponibles(): DistribuidorResponse[] {
+    if (!this.editor?.departamento || !this.editor?.provincia || !this.editor?.distrito) {
+      return [];
+    }
+    return this.distribuidores.filter(
+      (item) =>
+        item.departamento === this.editor.departamento &&
+        item.provincia === this.editor.provincia &&
+        item.distrito === this.editor.distrito &&
+        (!this.editor.rucGrifo || item.ruc === this.editor.rucGrifo),
+    );
+  }
+
+  onEditorDepartamentoChange(): void {
+    if (!this.editor) return;
+    this.editor.provincia = '';
+    this.editor.distrito = '';
+    this.editor.direccion = '';
+  }
+
+  onEditorProvinciaChange(): void {
+    if (!this.editor) return;
+    this.editor.distrito = '';
+    this.editor.direccion = '';
+  }
+
+  onEditorDistritoChange(): void {
+    if (!this.editor) return;
+    this.editor.direccion = '';
+  }
+
+  onEditorDireccionChange(): void {
+    if (!this.editor) return;
+    const distribuidor = this.direccionesDisponibles.find(
+      (item) => item.direccion === this.editor.direccion,
+    );
+    if (distribuidor) {
+      this.editor.rucGrifo = distribuidor.ruc;
+      this.editor.razonSocial = distribuidor.razonSocial;
+    }
+  }
+
+  cambiarModoFecha(modo: FechaComprobanteModo): void {
+    this.fechaComprobanteModo = modo;
+    if (!this.editor) return;
+    if (modo === 'PERIODO') {
+      const fechaBase = this.editor.emision || this.todayDate;
+      this.periodoDesde ||= fechaBase;
+      this.periodoHasta ||= fechaBase;
+      this.onPeriodoRangoChange();
+    }
+  }
+
+  onPeriodoRangoChange(): void {
+    if (!this.editor || !this.esFechaIsoValida(this.periodoDesde)) return;
+    this.editor.emision = this.periodoDesde;
+    this.editor.mes = this.mesDesdeFecha(this.editor.emision);
+    this.editor.anio = Number(this.periodoDesde.slice(0, 4));
+  }
+
+  cambiarModoPlacas(modo: SeleccionPlacasModo): void {
+    if (!this.editor) return;
+    this.seleccionPlacasModo = modo;
+    this.editor.placa = '';
+    this.placasConjunto = [];
+    this.volumenPorPlaca = {};
+    this.filasPlacas = [];
+    this.excelPlacasError = '';
+    if (modo === 'CONJUNTO') {
+      this.agregarFilaPlaca();
+    }
+  }
+
+  agregarFilaPlaca(): void {
+    this.filasPlacas = [
+      ...this.filasPlacas,
+      {
+        id: this.siguienteFilaPlacaId++,
+        placa: '',
+        combustible: this.editor?.combustible || this.tiposCombustible[0]?.codigo || '',
+        volumen: null,
+      },
+    ];
+  }
+
+  quitarFilaPlaca(id: number): void {
+    this.filasPlacas = this.filasPlacas.filter((fila) => fila.id !== id);
+    this.excelPlacasError = '';
+  }
+
+  categoriaFila(fila: FilaPlacaEditor): string {
+    if (!fila.placa) return '—';
+    return (
+      this.vehiculos.find((vehiculo) => vehiculo.placa === fila.placa)
+        ?.categoriaCodigo || '—'
+    );
+  }
+
+  placaUsadaEnOtraFila(placa: string, filaId: number): boolean {
+    return this.filasPlacas.some(
+      (fila) => fila.id !== filaId && fila.placa === placa,
+    );
+  }
+
+  async onExcelPlacasSelected(event: Event): Promise<void> {
+    const input = event.target as HTMLInputElement;
+    const archivo = input.files?.[0] || null;
+    input.value = '';
+    this.excelPlacasError = '';
+    if (!archivo) return;
+
+    if (!/\.(xlsx|xls)$/i.test(archivo.name)) {
+      this.excelPlacasError = 'Selecciona un archivo Excel con extensión .xlsx o .xls.';
+      return;
+    }
+    if (archivo.size > 5 * 1024 * 1024) {
+      this.excelPlacasError = 'El archivo Excel no puede superar los 5 MB.';
+      return;
+    }
+
+    try {
+      const libro = XLSX.read(await archivo.arrayBuffer(), { type: 'array' });
+      const hoja = libro.Sheets[libro.SheetNames[0]];
+      const registros = XLSX.utils.sheet_to_json<Record<string, unknown>>(hoja, {
+        defval: '',
+      });
+      if (!registros.length) {
+        this.excelPlacasError = 'El Excel no contiene filas para importar.';
+        return;
+      }
+
+      const filas: FilaPlacaEditor[] = registros.map((registro, indice) => {
+        const normalizado = Object.entries(registro).reduce<Record<string, unknown>>(
+          (resultado, [clave, valor]) => {
+            resultado[this.normalizarEncabezadoExcel(clave)] = valor;
+            return resultado;
+          },
+          {},
+        );
+        const placa = String(normalizado['placa'] || '').trim().toUpperCase();
+        const combustibleTexto = String(
+          normalizado['combustible'] || normalizado['comb'] || '',
+        ).trim();
+        const volumenTexto =
+          normalizado['volumenm3'] ?? normalizado['volumen'] ?? '';
+        const volumen = Number(String(volumenTexto).replace(',', '.'));
+        const combustible =
+          this.tiposCombustible.find(
+            (tipo) =>
+              tipo.codigo.toLowerCase() === combustibleTexto.toLowerCase() ||
+              tipo.nombre.toLowerCase() === combustibleTexto.toLowerCase(),
+          )?.codigo || '';
+        if (!placa || !this.vehiculos.some((vehiculo) => vehiculo.placa === placa)) {
+          throw new Error(`Fila ${indice + 2}: la placa no está asociada al transportista.`);
+        }
+        if (!combustible) {
+          throw new Error(`Fila ${indice + 2}: el combustible no es válido.`);
+        }
+        if (!Number.isFinite(volumen) || volumen <= 0) {
+          throw new Error(`Fila ${indice + 2}: el volumen debe ser mayor a cero.`);
+        }
+        return {
+          id: this.siguienteFilaPlacaId++,
+          placa,
+          combustible,
+          volumen,
+        };
+      });
+
+      if (new Set(filas.map((fila) => fila.placa)).size !== filas.length) {
+        this.excelPlacasError = 'El Excel contiene placas duplicadas.';
+        return;
+      }
+      this.filasPlacas = filas;
+    } catch (error) {
+      this.excelPlacasError =
+        error instanceof Error
+          ? error.message
+          : 'No se pudo leer el archivo Excel.';
+    }
+  }
+
+  private normalizarEncabezadoExcel(valor: string): string {
+    return valor
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase()
+      .replace(/[^a-z0-9]/g, '');
+  }
+
+  get categoriaVehiculoSeleccionado(): string {
+    if (!this.editor?.placa) return '—';
+    return (
+      this.vehiculos.find((vehiculo) => vehiculo.placa === this.editor.placa)
+        ?.categoriaCodigo || '—'
+    );
+  }
+
+  get cantidadPlacasEditor(): number {
+    return this.seleccionPlacasModo === 'UNA'
+      ? Number(!!this.editor?.placa)
+      : this.filasPlacas.filter((fila) => !!fila.placa).length;
+  }
+
+  get volumenTotalEditor(): number {
+    if (this.seleccionPlacasModo === 'UNA') {
+      return Number(this.editor?.galones || 0);
+    }
+    return this.filasPlacas.reduce(
+      (total, fila) => total + Number(fila.volumen || 0),
+      0,
+    );
+  }
+
+  get isEditorPeriodValid(): boolean {
+    if (this.fechaComprobanteModo !== 'PERIODO') return true;
+    return (
+      this.esFechaIsoValida(this.periodoDesde) &&
+      this.esFechaIsoValida(this.periodoHasta) &&
+      this.periodoDesde <= this.periodoHasta &&
+      this.periodoHasta <= this.todayDate
+    );
+  }
+
+  private esFechaIsoValida(fecha: string): boolean {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(fecha)) return false;
+    const [anio, mes, dia] = fecha.split('-').map(Number);
+    const fechaUtc = new Date(Date.UTC(anio, mes - 1, dia));
+    return (
+      fechaUtc.getUTCFullYear() === anio &&
+      fechaUtc.getUTCMonth() === mes - 1 &&
+      fechaUtc.getUTCDate() === dia
+    );
+  }
+
+  get isEditorFuelValid(): boolean {
+    if (!this.editor) return false;
+    return this.tiposCombustible.some(
+      (item) => item.codigo === this.editor.combustible,
+    );
   }
 
   guardarEditor(): void {
@@ -613,6 +1088,136 @@ export class ComprobantesComponent implements OnInit {
     this.editorSubmitted = true;
 
     const modelo = this.editor;
+    if (this.editorModo === 'crear' && !this.archivoSeleccionado) {
+      this.editorError = 'Debes adjuntar el archivo del comprobante en PDF, JPG o PNG.';
+      return;
+    }
+    if (
+      this.editorModo === 'crear' &&
+      this.tieneNotaCredito &&
+      !this.archivoNotaCredito
+    ) {
+      this.editorError =
+        'Debes cargar el PDF o imagen de respaldo que contiene la Nota de Crédito y la factura.';
+      return;
+    }
+    if (!this.isEditorInvoiceSeriesValid) {
+      this.editorError = 'La serie debe tener el formato F001.';
+      return;
+    }
+    if (!this.isEditorInvoiceNumberValid) {
+      this.editorError = 'El número de factura debe contener entre 1 y 8 dígitos.';
+      return;
+    }
+    if (!this.isEditorEmissionValid || !this.isEditorPeriodValid) {
+      this.editorError =
+        this.fechaComprobanteModo === 'PERIODO'
+          ? 'Ingresa un periodo válido: ambas fechas son obligatorias, Desde no puede superar Hasta y el rango no puede terminar después de hoy.'
+          : 'Ingresa una fecha válida que no sea posterior al actual.';
+      return;
+    }
+    if (!this.isEditorStationRucValid) {
+      this.editorError = 'El RUC del grifo debe ser válido y contener 11 dígitos.';
+      return;
+    }
+
+    const ubicacion = [
+      modelo.departamento,
+      modelo.provincia,
+      modelo.distrito,
+      modelo.direccion,
+    ];
+    if (ubicacion.some(Boolean) && !ubicacion.every(Boolean)) {
+      this.editorError =
+        'Completa departamento, provincia, distrito y dirección del grifo.';
+      return;
+    }
+    if (this.seleccionPlacasModo === 'UNA' && !modelo.placa) {
+      this.editorError = 'Selecciona la placa del vehículo.';
+      return;
+    }
+    if (this.seleccionPlacasModo === 'UNA' && Number(modelo.galones) <= 0) {
+      this.editorError = 'El volumen debe ser mayor a cero.';
+      return;
+    }
+    if (this.seleccionPlacasModo === 'CONJUNTO') {
+      if (!this.filasPlacas.length || this.filasPlacas.some((fila) => !fila.placa)) {
+        this.editorError = 'Selecciona una placa en cada fila del conjunto.';
+        return;
+      }
+      const placas = this.filasPlacas.map((fila) => fila.placa);
+      if (new Set(placas).size !== placas.length) {
+        this.editorError = 'No puedes agregar la misma placa más de una vez.';
+        return;
+      }
+      if (
+        this.filasPlacas.some(
+          (fila) =>
+            !this.vehiculos.some((vehiculo) => vehiculo.placa === fila.placa),
+        )
+      ) {
+        this.editorError =
+          'Una o más placas no están asociadas al transportista.';
+        return;
+      }
+      if (
+        this.filasPlacas.some(
+          (fila) => !fila.combustible || Number(fila.volumen) <= 0,
+        )
+      ) {
+        this.editorError =
+          'Selecciona el combustible y asigna un volumen mayor a cero en cada placa.';
+        return;
+      }
+      const combustibles = new Set(
+        this.filasPlacas.map((fila) => fila.combustible),
+      );
+      if (combustibles.size > 1) {
+        this.editorError =
+          'El servicio actual registra un solo combustible por comprobante. Todas las placas deben usar el mismo combustible.';
+        return;
+      }
+      modelo.combustible = this.filasPlacas[0].combustible;
+    }
+    if (!this.isEditorFuelValid) {
+      this.editorError = 'Selecciona un combustible válido.';
+      return;
+    }
+
+    const placasRequest: ComprobantePlacaRequest[] =
+      this.seleccionPlacasModo === 'UNA'
+        ? this.vehiculos
+            .filter((vehiculo) => vehiculo.placa === modelo.placa)
+            .map((vehiculo) => ({
+              vehiculoUuid: vehiculo.vehiculoUuid,
+              galonesAsignados: Number(modelo.galones),
+            }))
+        : this.filasPlacas.reduce<ComprobantePlacaRequest[]>(
+            (resultado, fila) => {
+              const vehiculo = this.vehiculos.find(
+                (item) => item.placa === fila.placa,
+              );
+              if (vehiculo) {
+                resultado.push({
+                  vehiculoUuid: vehiculo.vehiculoUuid,
+                  galonesAsignados: Number(fila.volumen),
+                });
+              }
+              return resultado;
+            },
+            [],
+          );
+
+    if (placasRequest.length !== this.cantidadPlacasEditor) {
+      this.editorError = 'Una o más placas seleccionadas no están asociadas al transportista.';
+      return;
+    }
+    modelo.placa =
+      this.seleccionPlacasModo === 'UNA'
+        ? modelo.placa
+        : this.filasPlacas[0].placa;
+    modelo.galones = this.volumenTotalEditor;
+
     if (
       !modelo.placa ||
       !modelo.numero.trim() ||
@@ -652,6 +1257,10 @@ export class ComprobantesComponent implements OnInit {
         this.editorError = 'Debes adjuntar el archivo del comprobante.';
         return;
       }
+      const archivoRespaldo =
+        this.tieneNotaCredito && this.archivoNotaCredito
+          ? this.archivoNotaCredito
+          : this.archivoSeleccionado;
 
       const req: ComprobanteRequest = {
         serie: modelo.serie,
@@ -666,25 +1275,17 @@ export class ComprobantesComponent implements OnInit {
         distribuidorProvincia: modelo.provincia,
         distribuidorDistrito: modelo.distrito,
         tipoCombustibleCodigo: modelo.combustible,
-        azufrePpm: Number(modelo.ppm),
         galones: Number(modelo.galones),
         costo: Number(modelo.costo || 0),
-        placas: [],
+        placas: placasRequest,
       };
 
       if (this.forma === 'A') {
-        const v = this.vehiculos.find((x) => x.placa === modelo.placa);
-        if (v)
-          req.placas.push({
-            vehiculoUuid: v.vehiculoUuid,
-            galonesAsignados: req.galones,
-          });
-
         this.apiComprobante
           .registrarComprobante(
             this.rucTransportista,
             req,
-            this.archivoSeleccionado!,
+            archivoRespaldo,
           )
           .subscribe({
             next: () => {
@@ -705,7 +1306,7 @@ export class ComprobantesComponent implements OnInit {
           .registrarComprobanteB(
             this.rucTransportista,
             reqB,
-            this.archivoSeleccionado!,
+            archivoRespaldo,
           )
           .subscribe({
             next: () => {
@@ -730,9 +1331,9 @@ export class ComprobantesComponent implements OnInit {
         anio: Number(modelo.anio),
         rucDistribuidor: modelo.rucGrifo,
         tipoCombustibleCodigo: modelo.combustible,
-        azufrePpm: Number(modelo.ppm),
         galones: Number(modelo.galones),
         costo: Number(modelo.costo || 0),
+        placas: placasRequest,
       };
 
       this.apiComprobante
@@ -760,6 +1361,12 @@ export class ComprobantesComponent implements OnInit {
       showCancelButton: true,
       confirmButtonText: 'Sí, eliminar',
       cancelButtonText: 'Cancelar',
+      buttonsStyling: false,
+      customClass: {
+        actions: 'atu-delete-confirmation-actions',
+        confirmButton: 'atu-delete-confirmation-submit',
+        cancelButton: 'atu-delete-confirmation-cancel',
+      },
     }).then((result) => {
       if (result.isConfirmed) {
         this.apiComprobante.eliminarComprobante(uuid).subscribe({
@@ -788,6 +1395,12 @@ export class ComprobantesComponent implements OnInit {
     if (this.editor) {
       this.cerrarEditor();
     }
+  }
+
+  private valoresUnicos(valores: Array<string | null | undefined>): string[] {
+    return [...new Set(valores.map((valor) => valor?.trim()).filter((valor): valor is string => !!valor))].sort(
+      (a, b) => a.localeCompare(b, 'es'),
+    );
   }
 
   private mesDesdeFecha(fecha: string): string {

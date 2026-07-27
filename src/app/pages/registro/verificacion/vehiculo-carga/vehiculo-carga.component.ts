@@ -54,6 +54,7 @@ interface VehicleFormModel extends Omit<
 })
 export class VehiculoCargaComponent implements OnInit, OnDestroy {
   readonly vehicleCreationAndEditingEnabled = false;
+  readonly vehicleDeletionEnabled = false;
   vehCount = 0;
   vehQ = '';
   vehCatF = '';
