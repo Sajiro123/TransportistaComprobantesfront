@@ -46,6 +46,14 @@ export class ApiVehiculoService {
   }
 
   /**
+   * Obtiene el listado de validaciones asociadas a un vehículo de fuente GORE.
+   * GET /api_comprobante/vehiculos/{vehiculoUuid}/validaciones
+   */
+  obtenerValidacionesVehiculo(vehiculoUuid: string): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/vehiculos/${vehiculoUuid}/validaciones`);
+  }
+
+  /**
    * Registra un vehículo y sus datos de propietario.
    * POST /api_comprobante/vehiculos
    */

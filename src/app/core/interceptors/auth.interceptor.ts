@@ -36,7 +36,7 @@ export const authInterceptor: HttpInterceptorFn = (
 ) => {
   const apiAuthService = inject(ApiAuthService);
   const sessionService = inject(SessionService);
-  const router         = inject(Router);
+  const router = inject(Router);
 
   const isLoginRequest = req.url.includes('/auth/login');
   const isRefreshRequest = req.url.includes('/auth/refresh');
@@ -51,13 +51,15 @@ export const authInterceptor: HttpInterceptorFn = (
 
   return next(authReq).pipe(
     catchError((err: HttpErrorResponse) => {
-      console.error('[AuthInterceptor] Error HTTP interceptado:', {
-        url: req.url,
-        method: req.method,
-        status: err.status,
-        statusText: err.statusText,
-        error: err.error,
-      });
+      if (err.status === 401 || err.status === 403) {
+        console.error('[AuthInterceptor] Error de Autenticación/Autorización interceptado:', {
+          url: req.url,
+          method: req.method,
+          status: err.status,
+          statusText: err.statusText,
+          error: err.error,
+        });
+      }
 
       const errMessage = err?.error?.message || err?.error?.descripcion || err?.message || '';
       const isTokenExpired =

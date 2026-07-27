@@ -68,18 +68,28 @@
               <i class="fa-solid fa-circle text-[5px] text-[#00A3E0] animate-pulse"></i>
             }
           </a>
-          <a routerLink="/validacion/vehiculos"
+          <a [routerLink]="semaforoAprobado ? '/validacion/vehiculos' : null"
             routerLinkActive="!text-white !bg-[#00A3E0]/15 !border-[#00A3E0]/30"
             #vehiculosLink="routerLinkActive"
-            class="group flex items-center gap-2.5 rounded-lg border border-transparent px-2.5 py-2 text-[12px] font-semibold text-white/55 transition-all duration-200 hover:bg-white/[.04] hover:text-white"
-            (click)="onNavigate()">
-            <span class="inline-flex h-5 w-5 flex-none items-center justify-center rounded-full text-[10px] font-extrabold transition-all duration-200"
-              [class.bg-[#00A3E0]]="vehiculosLink.isActive"
-              [class.text-white]="vehiculosLink.isActive"
-              [class.bg-white/10]="!vehiculosLink.isActive"
-              [class.text-white/60]="!vehiculosLink.isActive">2</span>
+            class="group flex items-center gap-2.5 rounded-lg border border-transparent px-2.5 py-2 text-[12px] font-semibold transition-all duration-200"
+            [ngClass]="semaforoAprobado ? 'text-white/55 hover:bg-white/[.04] hover:text-white' : 'text-white/40 cursor-not-allowed opacity-60'"
+            (click)="semaforoAprobado ? onNavigate() : $event.preventDefault()">
+            <span class="relative inline-flex h-5 w-5 flex-none items-center justify-center rounded-full text-[10px] font-extrabold transition-all duration-200"
+              [class.bg-[#00A3E0]]="vehiculosLink.isActive && semaforoAprobado"
+              [class.text-white]="vehiculosLink.isActive && semaforoAprobado"
+              [class.bg-white/10]="!vehiculosLink.isActive && semaforoAprobado"
+              [class.text-white/60]="!vehiculosLink.isActive && semaforoAprobado"
+              [class.bg-white/5]="!semaforoAprobado"
+              [class.text-white/30]="!semaforoAprobado">
+              2
+              @if (!semaforoAprobado) { 
+                <div class="absolute -bottom-1 -right-1 flex h-3 w-3 items-center justify-center rounded-full bg-black/60 backdrop-blur-sm border border-white/10">
+                  <i class="fa-solid fa-lock text-[6px] text-white/60"></i> 
+                </div>
+              }
+            </span>
             <span class="flex-1">Vehículos</span>
-            @if (vehiculosLink.isActive) {
+            @if (vehiculosLink.isActive && semaforoAprobado) {
               <i class="fa-solid fa-circle text-[5px] text-[#00A3E0] animate-pulse"></i>
             }
           </a>
@@ -88,23 +98,32 @@
     </div>
 
     <!-- ══ PASO 2: Carga y cálculo ════════════════════════════════ -->
-    <div class="sidebar-menu-item">
+    <div class="sidebar-menu-item" [ngClass]="{'bg-white/[.02] rounded-lg opacity-60': !semaforoAprobado}">
       <button type="button"
         class="group relative flex w-full items-center gap-3 py-2 text-left transition-all duration-200"
+        [ngClass]="{'cursor-not-allowed': !semaforoAprobado}"
         [attr.aria-expanded]="cargaOpen"
         aria-controls="carga-calculo-submenu"
         (click)="toggleCarga()">
 
         <div class="sidebar-step-indicator relative flex flex-col items-center self-stretch">
-          <div class="flex h-8 w-8 flex-none items-center justify-center rounded-full border-2 border-[#00A3E0] bg-[#00A3E0] text-[12px] font-extrabold text-white shadow-[0_0_10px_rgba(0,163,224,0.45)] transition-all duration-300 group-hover:bg-[#00A3E0]/80">
+          <div class="flex h-8 w-8 flex-none items-center justify-center rounded-full border-2 text-[12px] font-extrabold text-white transition-all duration-300"
+               [ngClass]="semaforoAprobado ? 'border-[#00A3E0] bg-[#00A3E0] shadow-[0_0_10px_rgba(0,163,224,0.45)] group-hover:bg-[#00A3E0]/80' : 'border-white/10 bg-white/5 text-white/40'">
             <i class="fa-solid fa-calculator text-[12px]"></i>
+            @if (!semaforoAprobado) { 
+              <div class="absolute -bottom-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-black/60 backdrop-blur-sm border border-white/10">
+                <i class="fa-solid fa-lock text-[8px] text-white/60"></i> 
+              </div>
+            }
           </div>
           <div class="mt-1 w-px flex-1 bg-white/15"></div>
         </div>
 
         <div class="sidebar-menu-text flex flex-1 flex-col overflow-hidden pb-2">
-          <span class="text-[10px] font-bold uppercase tracking-wider text-[#00A3E0]/80">Paso 2</span>
-          <span class="truncate text-[13.5px] font-bold text-white/90 leading-tight">
+          <span class="text-[10px] font-bold uppercase tracking-wider"
+                [ngClass]="semaforoAprobado ? 'text-[#00A3E0]/80' : 'text-white/40'">Paso 2</span>
+          <span class="truncate text-[13.5px] font-bold leading-tight"
+                [ngClass]="semaforoAprobado ? 'text-white/90' : 'text-white/50'">
             Carga y cálculo
           </span>
           <span class="mt-0.5 text-[10.5px] font-medium text-white/50">
@@ -162,23 +181,32 @@
     </div>
 
     <!-- ══ PASO 3: Envío ══════════════════════════════════════════ -->
-    <div class="sidebar-menu-item">
+    <div class="sidebar-menu-item" [ngClass]="{'bg-white/[.02] rounded-lg opacity-60': !semaforoAprobado}">
       <button type="button"
         class="group relative flex w-full items-center gap-3 py-2 text-left transition-all duration-200"
+        [ngClass]="{'cursor-not-allowed': !semaforoAprobado}"
         [attr.aria-expanded]="envioOpen"
         aria-controls="envio-submenu"
         (click)="toggleEnvio()">
 
         <div class="sidebar-step-indicator relative flex flex-col items-center self-stretch">
-          <div class="flex h-8 w-8 flex-none items-center justify-center rounded-full border-2 border-[#00A3E0] bg-[#00A3E0] text-[12px] font-extrabold text-white shadow-[0_0_10px_rgba(0,163,224,0.45)] transition-all duration-300 group-hover:bg-[#00A3E0]/80">
+          <div class="flex h-8 w-8 flex-none items-center justify-center rounded-full border-2 text-[12px] font-extrabold text-white transition-all duration-300"
+               [ngClass]="semaforoAprobado ? 'border-[#00A3E0] bg-[#00A3E0] shadow-[0_0_10px_rgba(0,163,224,0.45)] group-hover:bg-[#00A3E0]/80' : 'border-white/10 bg-white/5 text-white/40'">
             <i class="fa-solid fa-paper-plane text-[12px]"></i>
+            @if (!semaforoAprobado) { 
+              <div class="absolute -bottom-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-black/60 backdrop-blur-sm border border-white/10">
+                <i class="fa-solid fa-lock text-[8px] text-white/60"></i> 
+              </div>
+            }
           </div>
           <!-- Último paso: sin línea conectora -->
         </div>
 
         <div class="sidebar-menu-text flex flex-1 flex-col overflow-hidden">
-          <span class="text-[10px] font-bold uppercase tracking-wider text-[#00A3E0]/80">Paso 3</span>
-          <span class="truncate text-[13.5px] font-bold text-white/90 leading-tight">
+          <span class="text-[10px] font-bold uppercase tracking-wider"
+                [ngClass]="semaforoAprobado ? 'text-[#00A3E0]/80' : 'text-white/40'">Paso 3</span>
+          <span class="truncate text-[13.5px] font-bold leading-tight"
+                [ngClass]="semaforoAprobado ? 'text-white/90' : 'text-white/50'">
             Envío
           </span>
           <span class="mt-0.5 text-[10.5px] font-medium text-white/50">

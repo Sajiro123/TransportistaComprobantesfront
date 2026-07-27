@@ -176,10 +176,22 @@ export class ApiComprobanteService {
    */
   registrarCuentaBancariaTransportista(
     payload: CuentaBancariaTransportistaRequest,
+    archivo: File,
   ): Observable<CuentaBancariaTransportistaResponse> {
+    const encryptedPayload = {
+      ...payload,
+      cci: payload.cci ? this.encryptionService.encryptForRequest(payload.cci) : payload.cci,
+      dniBeneficiario: payload.dniBeneficiario ? this.encryptionService.encryptForRequest(payload.dniBeneficiario) : payload.dniBeneficiario,
+      nombreBeneficiario: payload.nombreBeneficiario ? this.encryptionService.encryptForRequest(payload.nombreBeneficiario) : payload.nombreBeneficiario,
+    };
+
+    const formData = new FormData();
+    formData.append('cuentaBancaria', JSON.stringify(encryptedPayload));
+    formData.append('archivo', archivo);
+
     return this.http.post<CuentaBancariaTransportistaResponse>(
       `${this.API_URL}/transportistas/cuenta-bancaria`,
-      payload,
+      formData,
     );
   }
 
@@ -188,16 +200,24 @@ export class ApiComprobanteService {
    */
   actualizarCuentaBancariaTransportista(
     payload: CuentaBancariaTransportistaRequest,
+    archivo?: File | null,
   ): Observable<CuentaBancariaTransportistaResponse> {
     const encryptedPayload = {
       ...payload,
-      cci: payload.cci
-        ? this.encryptionService.encryptForRequest(payload.cci)
-        : payload.cci,
+      cci: payload.cci ? this.encryptionService.encryptForRequest(payload.cci) : payload.cci,
+      dniBeneficiario: payload.dniBeneficiario ? this.encryptionService.encryptForRequest(payload.dniBeneficiario) : payload.dniBeneficiario,
+      nombreBeneficiario: payload.nombreBeneficiario ? this.encryptionService.encryptForRequest(payload.nombreBeneficiario) : payload.nombreBeneficiario,
     };
+
+    const formData = new FormData();
+    formData.append('cuentaBancaria', JSON.stringify(encryptedPayload));
+    if (archivo) {
+      formData.append('archivo', archivo);
+    }
+
     return this.http.put<CuentaBancariaTransportistaResponse>(
       `${this.API_URL}/transportistas/cuenta-bancaria`,
-      encryptedPayload,
+      formData,
     );
   }
 
@@ -208,6 +228,15 @@ export class ApiComprobanteService {
     return this.http.delete<{ data: { respuesta: string; mensaje: string } }>(
       `${this.API_URL}/transportistas/cuenta-bancaria`,
     );
+  }
+
+  /**
+   * GET /api_comprobante/archivos/{archivoUuid}/descargar
+   */
+  descargarArchivo(archivoUuid: string): Observable<Blob> {
+    return this.http.get(`${this.API_URL}/archivos/${archivoUuid}/descargar`, {
+      responseType: 'blob',
+    });
   }
 
   // ── Módulo de Comprobantes de Combustible ─────────────────

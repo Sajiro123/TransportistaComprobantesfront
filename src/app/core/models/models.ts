@@ -158,6 +158,7 @@ export interface ActualizarContactoResponse {
 export interface CuentaAbono {
   banco: string;
   codigoCuentaInterbancario: string;
+  nombreBancoOtro?: string;
 }
 
 export interface CuentaAbonoResponse {
@@ -171,6 +172,7 @@ export interface CuentaAbonoResponse {
 export interface GuardarCuentaAbonoRequest {
   banco: string;
   codigoCuentaInterbancario: string;
+  nombreBancoOtro?: string;
 }
 
 export interface GuardarCuentaAbonoResponse {
@@ -205,17 +207,26 @@ export interface CuentaBancariaTransportistaRequest {
   cci?: string | null;
   dniBeneficiario?: string | null;
   nombreBeneficiario?: string | null;
+  nombreBancoOtro?: string | null;
 }
 
 export interface CuentaBancariaTransportistaResponseData {
   uuidCuentaBancaria?: string;
   transportistaId?: number;
   uuidBanco?: string;
+  nombreBancoOtro?: string | null;
   tipoAbono?: string;
   cci?: string | null;
   dniBeneficiario?: string | null;
   nombreBeneficiario?: string | null;
   estado?: boolean;
+  archivo?: {
+    archivoUuid: string;
+    nombreOriginal: string;
+    tipoContenidoMime: string;
+    tamanioBytes: number;
+    descripcion: string;
+  } | null;
 }
 
 export interface CuentaBancariaTransportistaResponse {
@@ -261,6 +272,7 @@ export interface VehiculoTransportista {
   estadoRegistro?: string;
   estadoCarga?: string;
   fechaRegistro?: string;
+  fuente?: string | null;
 }
 
 export interface VehiculosFiltros {

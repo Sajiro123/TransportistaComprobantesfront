@@ -37,7 +37,9 @@ export class SessionService implements OnDestroy {
   /** Llama a este método justo después de un login exitoso. */
   startSession(): void {
     this.stopSession();
-    this.sessionEnd = Date.now() + SESSION_DURATION_MS;
+    const session = this.apiAuth.getSession();
+    const duration = session?.user?.expiresIn ?? SESSION_DURATION_MS;
+    this.sessionEnd = Date.now() + duration;
     this.warnShown = false;
     this._startTick();
   }
@@ -45,7 +47,9 @@ export class SessionService implements OnDestroy {
   /** Reinicia el timer (tras actividad del usuario, si se desea). */
   renewSession(): void {
     if (this.tickSub) {
-      this.sessionEnd = Date.now() + SESSION_DURATION_MS;
+      const session = this.apiAuth.getSession();
+      const duration = session?.user?.expiresIn ?? SESSION_DURATION_MS;
+      this.sessionEnd = Date.now() + duration;
       this.warnShown = false;
     }
   }
@@ -121,10 +125,13 @@ export class SessionService implements OnDestroy {
         this.apiAuth.refreshAccessToken().subscribe({
           next: () => {
             this.renewSession();
+            const session = this.apiAuth.getSession();
+            const duration = session?.user?.expiresIn ?? SESSION_DURATION_MS;
+            const minutes = Math.round(duration / 60000);
             Swal.fire({
               icon: 'success',
               title: 'Sesión extendida',
-              text: 'Su sesión se ha renovado por 15 minutos más.',
+              text: `Su sesión se ha renovado por ${minutes} minutos más.`,
               timer: 1800,
               showConfirmButton: false,
             });

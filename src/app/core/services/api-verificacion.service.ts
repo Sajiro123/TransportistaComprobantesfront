@@ -1,7 +1,7 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import { Observable, map, throwError } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { Observable, BehaviorSubject, map, throwError } from 'rxjs';
+import { catchError, tap } from 'rxjs/operators';
 
 import { environment } from '@env/environment';
 import { FieldDecryptionForgeService } from './field-decryption-forge.service';
@@ -80,7 +80,6 @@ export class ApiVerificacionService {
                 if (item.tipoTransporte) item.tipoTransporte = this.decryptionService.decrypt(item.tipoTransporte) || '';
                 if (item.numeroResolucion) item.numeroResolucion = this.decryptionService.decrypt(item.numeroResolucion) || '';
                 if (item.autoridad) item.autoridad = this.decryptionService.decrypt(item.autoridad);
-                if (item.tipoEntidad) item.tipoEntidad = this.decryptionService.decrypt(item.tipoEntidad);
                 if (item.ambito) item.ambito = this.decryptionService.decrypt(item.ambito);
               } catch (err) {
                 console.error('Error al desencriptar autorización:', err);
@@ -92,6 +91,8 @@ export class ApiVerificacionService {
         catchError((error) => throwError(() => this.normalizarError(error))),
       );
   }
+
+  public isSemaforoAprobado$ = new BehaviorSubject<boolean>(true);
 
   obtenerSemaforo(ruc: string): Observable<SemaforoCondicion[]> {
     if (!/^\d{11}$/.test(ruc)) {
@@ -110,6 +111,10 @@ export class ApiVerificacionService {
       })
       .pipe(
         map((response) => response.data.lista),
+        tap((lista: SemaforoCondicion[]) => {
+          const aprobado = lista && lista.length === 3 && lista.every(c => c.estado === 'CUMPLE');
+          this.isSemaforoAprobado$.next(aprobado);
+        }),
         catchError((error) => throwError(() => this.normalizarError(error))),
       );
   }
