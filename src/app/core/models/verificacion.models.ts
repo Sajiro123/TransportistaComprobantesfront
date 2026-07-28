@@ -5,6 +5,8 @@ export interface DatosTransportista {
   tipoEntidad: string;
   estado: string;
   totalAutorizaciones: number;
+  activoSunat: boolean;
+  habidoSunat: boolean;
 }
 
 export interface DatosTransportistaResponse {

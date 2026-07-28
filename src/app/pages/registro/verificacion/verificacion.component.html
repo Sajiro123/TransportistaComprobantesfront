@@ -82,10 +82,10 @@
       <div class="data-card">
         <div class="data-card__header data-card__header--flex">
           <span>DATOS DEL TRANSPORTISTA</span>
-          <span class="badge-api-conectada">
+          <!-- <span class="badge-api-conectada">
             <i class="fa-solid fa-tower-broadcast"></i>
             API CONECTADA
-          </span>
+          </span> -->
         </div>
 
         @if (cargandoDatos) {
@@ -112,7 +112,15 @@
             <div class="aut-top-left">
               <i class="fa-solid fa-building-user aut-icon"></i>
               <span class="aut-servicio">{{ getDatoVal('Razón social') }}</span>
-              <p-tag [value]="getDatoVal('Estado')" severity="success" styleClass="aut-badge" />
+              <p-tag [value]="getDatoVal('Estado')" severity="success" styleClass="aut-badge aut-badge-black-text" />
+              @if (transportista && transportista.activoSunat !== undefined) {
+              <p-tag [value]="transportista.activoSunat ? 'SUNAT ACTIVO' : 'SUNAT INACTIVO'"
+                [severity]="transportista.activoSunat ? 'info' : 'danger'" styleClass="aut-badge" />
+              }
+              @if (transportista && transportista.habidoSunat !== undefined) {
+              <p-tag [value]="transportista.habidoSunat ? 'HABIDO' : 'NO HABIDO '"
+                [severity]="transportista.habidoSunat ? 'info' : 'warn'" styleClass="aut-badge" />
+              }
             </div>
           </div>
 
@@ -169,6 +177,23 @@
         </div>
 
         <div class="autorizaciones-list">
+          @if (cargandoAutorizaciones) {
+          <div class="flex flex-col gap-4 p-4" aria-label="Cargando autorizaciones">
+            @for (item of [1, 2]; track item) {
+            <div class="animate-pulse rounded-xl border border-[var(--border)] bg-[var(--surface-2)] p-4 space-y-3">
+              <div class="flex justify-between items-center">
+                <div class="h-5 w-1/3 bg-[var(--surface-3)] rounded"></div>
+                <div class="h-5 w-1/4 bg-[var(--surface-3)] rounded"></div>
+              </div>
+              <div class="grid grid-cols-3 gap-4 pt-2 border-t border-[var(--border)]/40">
+                <div class="h-4 bg-[var(--surface-3)] rounded"></div>
+                <div class="h-4 bg-[var(--surface-3)] rounded"></div>
+                <div class="h-4 bg-[var(--surface-3)] rounded"></div>
+              </div>
+            </div>
+            }
+          </div>
+          } @else {
           @for (a of autorizaciones; track a.resolucion; let last = $last) {
           <div class="aut-card-item" [class.aut-card-item--border]="!last">
             <!-- Fila superior: Servicio + Badge + Resolución -->
@@ -176,7 +201,7 @@
               <div class="aut-top-left">
                 <i class="fa-solid fa-file-contract aut-icon"></i>
                 <span class="aut-servicio">{{ a.resolucion }}</span>
-                <p-tag [value]="a.estado" [severity]="a.badgeSeverity" styleClass="aut-badge" />
+                <p-tag [value]="a.estado" [severity]="a.badgeSeverity" styleClass="aut-badge aut-badge-black-text" />
               </div>
               <div class="aut-resolucion-chip">
                 <i class="fa-solid fa-hashtag"></i>
@@ -188,14 +213,14 @@
             <div class="aut-meta">
               <div class="aut-meta-group">
                 <span class="aut-label">Autoridad</span>
-                <span class="aut-val font-semibold">{{ a.autoridad }}</span>
+                <span class="aut-val font-semibold">{{ a.autoridad || 'MTC' }}</span>
               </div>
 
               <span class="aut-divider"></span>
 
               <div class="aut-meta-group">
                 <span class="aut-label">Ámbito</span>
-                <span class="aut-val">{{ a.ambito }}</span>
+                <span class="aut-val">{{ a.ambito || 'NACIONAL' }}</span>
               </div>
 
               <span class="aut-divider"></span>
@@ -207,6 +232,7 @@
             </div>
           </div>
           }
+          }
         </div>
 
         <div class="refresh-footer refresh-footer--plain"
@@ -217,9 +243,9 @@
           <span>Te quedan {{ actualizacionesAutorizacionesRestantes }} de 5 actualizaciones hoy</span>
           }
           <button type="button" class="refresh-button"
-            [disabled]="cargandoDatos || actualizacionesAutorizacionesRestantes === 0"
+            [disabled]="cargandoAutorizaciones || actualizacionesAutorizacionesRestantes === 0"
             (click)="actualizarSeccion('autorizaciones')">
-            <i class="fa-solid fa-rotate-right" [class.fa-spin]="cargandoDatos"></i>
+            <i class="fa-solid fa-rotate-right" [class.fa-spin]="cargandoAutorizaciones"></i>
             Actualizar datos
           </button>
         </div>
@@ -286,24 +312,6 @@
       </div>
       }
     </div>
-
-    <!-- Banner de error: sin autorización vigente ────────── -->
-    @if (sinAutVigente) {
-    <div class="banner-error">
-      <span class="banner-error__icon">!</span>
-      <div class="banner-error__body">
-        <div class="banner-error__title">No cuentas con autorizaciones de transporte vigentes</div>
-        <div class="banner-error__msg">
-          Para acceder al subsidio necesitas al menos una autorización
-          <strong>vigente</strong> ante la ATU u otra autoridad competente.
-          Regulariza tu autorización y vuelve a intentarlo.
-          No puedes continuar con la solicitud.
-        </div>
-      </div>
-    </div>
-    }
-
-
   </div>
 
 </div>

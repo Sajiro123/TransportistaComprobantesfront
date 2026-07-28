@@ -35,6 +35,8 @@ export interface LoginData {
   tipoDocumento?: string | null;
   tipoEntidad?: string | null;
   usuarioUuid?: string | null;
+  expiresIn?: number;
+  refreshExpiresIn?: number;
 }
 
 /** Campos cifrados cuando encryption.enabled=true en api_iam. */

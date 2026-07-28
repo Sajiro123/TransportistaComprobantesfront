@@ -15,6 +15,8 @@ import {
 export interface Vehiculo {
   id: string | number;
   cargaVehiculoUuid?: string;
+  vehiculoUuid?: string;
+  fuente?: string | null;
   placa: string;
   categoria: string;
   topeFmt: string;
@@ -247,16 +249,17 @@ export class VehiculoCargaComponent implements OnInit, OnDestroy {
         },
       });
   }
-
   private toViewModel(vehiculo: VehiculoTransportista): Vehiculo {
     const state = this.validationStyle(vehiculo?.estadoValidacion);
     const topeNum = Number(vehiculo?.topeGalones);
     const topeFmt = !isNaN(topeNum) ? topeNum.toFixed(2) : '0.00';
-    const uuid = vehiculo?.cargaVehiculoUuid || (vehiculo as any)?.vehiculoUuid || vehiculo?.id;
+    const uuid = vehiculo?.cargaVehiculoUuid || vehiculo?.id || '';
 
     return {
       id: uuid,
       cargaVehiculoUuid: uuid ? String(uuid) : '',
+      vehiculoUuid: vehiculo?.vehiculoUuid || undefined,
+      fuente: vehiculo?.fuente || null,
       placa: vehiculo?.placa ?? '',
       categoria: vehiculo?.categoria ?? '',
       topeFmt: topeFmt,
@@ -645,11 +648,43 @@ export class VehiculoCargaComponent implements OnInit, OnDestroy {
       return;
     }
 
-    // El detalle ya viene completo de listarVehiculos (valChips, propietario, etc.)
     veh.expanded = true;
-    veh.detailLoaded = true;
-    veh.detailLoading = false;
-    veh.detailError = '';
+
+    // Check if it's GORE and has vehiculoUuid
+    if (veh.fuente?.toUpperCase() === 'GORE' && veh.vehiculoUuid) {
+      veh.detailLoading = true;
+      veh.detailLoaded = false;
+      veh.detailError = '';
+
+      this.apiVehiculoService.obtenerValidacionesVehiculo(veh.vehiculoUuid).subscribe({
+        next: (res) => {
+          veh.detailLoading = false;
+          veh.detailLoaded = true;
+          const lista = res?.data?.lista || [];
+          veh.valChips = lista.map((val: any) => {
+            const validationState = this.validationStyle(val.estado);
+            return {
+              label: this.validationFieldLabel(val.campo),
+              bg: validationState.bg,
+              fg: validationState.fg,
+              glyph: validationState.glyph,
+              statusLabel: validationState.label,
+              entidad: val.entidadValidadora || '—',
+            };
+          });
+        },
+        error: (err) => {
+          console.error('[VehiculoCarga] Error al obtener validaciones de GORE:', err);
+          veh.detailLoading = false;
+          veh.detailError = 'No fue posible cargar las validaciones del vehículo.';
+        }
+      });
+    } else {
+      // For MTC or without uuid, the detail is already preloaded in valChips
+      veh.detailLoaded = true;
+      veh.detailLoading = false;
+      veh.detailError = '';
+    }
   }
 
   reintentarDetalle(veh: Vehiculo): void {

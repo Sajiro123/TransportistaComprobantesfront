@@ -3,448 +3,458 @@
   <div class="flex flex-wrap items-end justify-between gap-3.5 mb-4">
     <div class="min-w-0">
       <div class="flex items-center gap-2 flex-wrap mb-1">
-        <span class="text-[10.5px] font-extrabold tracking-wide text-[var(--primary-contrast)] bg-[var(--primary)] rounded-md px-2 py-0.5 uppercase">Validación</span>
+        <span
+          class="text-[10.5px] font-extrabold tracking-wide text-[var(--primary-contrast)] bg-[var(--primary)] rounded-md px-2 py-0.5 uppercase">Validación</span>
       </div>
       <h1 class="text-2xl font-extrabold m-0 mt-1 text-[var(--text)]">Mis vehículos</h1>
       <p class="text-[var(--text-3)] text-[13.5px] m-0 mt-1.5 max-w-[560px]">
-        Registra tus vehículos habilitados <b>uno por uno</b> o carga <b>varios</b> a la vez por Excel. La <b>categoría</b> define el tope de galones que el sistema valida contra el MTC.
+        Registra tus vehículos habilitados <b>uno por uno</b> o carga <b>varios</b> a la vez por Excel. La
+        <b>categoría</b> define el tope de galones que el sistema valida contra el MTC.
       </p>
     </div>
     @if (vehicleCreationAndEditingEnabled) {
-      <div class="flex gap-2.5 flex-wrap">
-        <button (click)="openVadd()" class="inline-flex items-center gap-2.5 bg-[var(--primary)] text-[var(--primary-contrast)] border-none rounded-xl px-6 py-3.5 text-[14.5px] font-bold cursor-pointer whitespace-nowrap shadow-[0_6px_16px_rgba(14,90,138,0.22)] hover:opacity-90 transition-opacity">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
-          Agregar vehículo
-        </button>
-      </div>
+    <div class="flex gap-2.5 flex-wrap">
+      <button (click)="openVadd()"
+        class="inline-flex items-center gap-2.5 bg-[var(--primary)] text-[var(--primary-contrast)] border-none rounded-xl px-6 py-3.5 text-[14.5px] font-bold cursor-pointer whitespace-nowrap shadow-[0_6px_16px_rgba(14,90,138,0.22)] hover:opacity-90 transition-opacity">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"
+          stroke-linecap="round">
+          <path d="M12 5v14M5 12h14" />
+        </svg>
+        Agregar vehículo
+      </button>
+    </div>
     }
   </div>
 
   <!-- Title LISTA -->
   <div class="flex items-center gap-2 mx-0.5 mb-3">
     <span class="text-[11.5px] font-bold text-[var(--text-3)] uppercase tracking-wide">Vehículos registrados</span>
-    <span class="bg-[var(--surface-3)] text-[var(--text-2)] rounded-full px-2.5 py-0.5 text-xs font-extrabold">{{ vehCount }}</span>
+    <span class="bg-[var(--surface-3)] text-[var(--text-2)] rounded-full px-2.5 py-0.5 text-xs font-extrabold">{{
+      vehCount }}</span>
   </div>
 
   @if (actionMessage) {
-    <div class="flex items-center gap-2.5 bg-[var(--ok-bg)] border border-[var(--ok)] text-[var(--ok)] rounded-xl py-3 px-4 mb-3.5 text-[12.5px] font-bold">
-      <i class="fa-solid fa-check"></i> {{ actionMessage }}
-    </div>
+  <div
+    class="flex items-center gap-2.5 bg-[var(--ok-bg)] border border-[var(--ok)] text-[var(--ok)] rounded-xl py-3 px-4 mb-3.5 text-[12.5px] font-bold">
+    <i class="fa-solid fa-check"></i> {{ actionMessage }}
+  </div>
   }
 
   @if (isLoading) {
-    <div class="flex items-center justify-center gap-3 py-11 px-5 text-[var(--primary)] bg-[var(--surface)] border border-[var(--border)] rounded-2xl">
-      <i class="fa-solid fa-spinner fa-spin"></i>
-      <span class="text-sm font-bold">Consultando vehículos…</span>
-    </div>
+  <div
+    class="flex items-center justify-center gap-3 py-11 px-5 text-[var(--primary)] bg-[var(--surface)] border border-[var(--border)] rounded-2xl">
+    <i class="fa-solid fa-spinner fa-spin"></i>
+    <span class="text-sm font-bold">Consultando vehículos…</span>
+  </div>
   } @else if (loadError) {
-    <div class="text-center py-8 px-5 bg-[var(--bad-bg)] border border-[var(--bad)] rounded-2xl">
-      <div class="font-bold text-[var(--bad)] text-sm">{{ loadError }}</div>
-      <button (click)="cargarVehiculos()" class="mt-3 bg-[var(--surface)] text-[var(--bad)] border border-[var(--bad)] rounded-lg py-2 px-3 text-[12.5px] font-bold cursor-pointer">
-        Volver a intentar
-      </button>
-    </div>
+  <div class="text-center py-8 px-5 bg-[var(--bad-bg)] border border-[var(--bad)] rounded-2xl">
+    <div class="font-bold text-[var(--bad)] text-sm">{{ loadError }}</div>
+    <button (click)="cargarVehiculos()"
+      class="mt-3 bg-[var(--surface)] text-[var(--bad)] border border-[var(--bad)] rounded-lg py-2 px-3 text-[12.5px] font-bold cursor-pointer">
+      Volver a intentar
+    </button>
+  </div>
   } @else {
-    <!-- Toolbar -->
-    <div class="flex flex-wrap gap-2.5 items-center mb-3.5">
-      <div class="relative flex-1 min-w-[200px]">
-        <span class="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-3)] flex">
-          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
-        </span>
-        <input type="text" [(ngModel)]="vehQ" (ngModelChange)="onSearchChange()" placeholder="Buscar por placa, TUC o autorización…" class="w-full bg-[var(--surface)] border border-[var(--border)] rounded-xl py-2.5 pl-9 pr-3 text-sm text-[var(--text)] outline-none focus:border-[var(--primary)] transition-colors">
+  <!-- Info banner -->
+  <div
+    class="flex flex-wrap gap-3 items-center justify-between bg-[var(--primary-soft)] border border-[var(--primary)] rounded-xl py-3 px-4 mb-3.5">
+    <div class="flex items-start gap-2.5 flex-1 min-w-[230px]">
+      <span class="flex-none mt-px text-[var(--primary)]">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10" />
+          <path d="M12 16v-4M12 8h.01" />
+        </svg>
+      </span>
+      <div class="text-[12.5px] text-[var(--text-2)] leading-tight">
+        La información que <b>confirmes</b> y que aún <b>no esté validada</b> continuará su validación con los datos
+        remitidos <b>oficialmente por las entidades al corte</b>. Cada dato se contrasta con una fuente distinta.
       </div>
-      <select [(ngModel)]="vehCatF" (ngModelChange)="onFiltersChange()" class="bg-[var(--surface)] border border-[var(--border)] rounded-xl py-2.5 px-3 text-[13.5px] text-[var(--text)] cursor-pointer font-semibold outline-none focus:border-[var(--primary)] transition-colors">
-        <option *ngFor="let o of vehCatOpts" [value]="o.value">{{ o.label }}</option>
-      </select>
-      <select [(ngModel)]="vehValF" (ngModelChange)="onFiltersChange()" class="bg-[var(--surface)] border border-[var(--border)] rounded-xl py-2.5 px-3 text-[13.5px] text-[var(--text)] cursor-pointer font-semibold outline-none focus:border-[var(--primary)] transition-colors">
-        <option *ngFor="let o of vehValOpts" [value]="o.value">{{ o.label }}</option>
-      </select>
     </div>
+    <button (click)="openValInfo()"
+      class="flex-none inline-flex items-center gap-2 bg-[var(--surface)] text-[var(--primary)] border border-[var(--primary)] rounded-lg py-2 px-3 text-[12.5px] font-bold cursor-pointer whitespace-nowrap hover:bg-[var(--primary-soft)] transition-colors">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10" />
+        <path d="M12 16v-4M12 8h.01" />
+      </svg>
+      ¿Quién valida cada dato?
+    </button>
+  </div>
 
-    <!-- Table Container -->
-    <div class="bg-[var(--surface)] border border-[var(--border)] rounded-2xl shadow-[var(--shadow)] overflow-hidden">
-      <p-table 
-        [value]="vehiclesView" 
-        dataKey="id" 
-        styleClass="vehiculos-table p-datatable-sm"
-        [paginator]="true"
-        [rows]="5"
-        [rowsPerPageOptions]="[5, 10, 25]"
-        [showCurrentPageReport]="true"
-        currentPageReportTemplate="Mostrando {first}–{last} de {totalRecords} registros"
-        paginatorDropdownAppendTo="body"
-        [alwaysShowPaginator]="true"
-        [scrollable]="true"
-        scrollHeight="480px"
-        [tableStyle]="{'min-width': '1000px'}">
-        
-        <ng-template pTemplate="header">
-          <tr>
-            <th colspan="2" class="table-group-header text-center">Vehículo</th>
-            <th class="table-group-header text-center">Autorización</th>
-            <th class="table-group-header text-center">TUC</th>
-            <th class="table-group-header text-center">Validación</th>
-            <th class="table-group-header"></th>
-          </tr>
-          <tr>
-            <th pSortableColumn="placa" style="width: 13%; min-width: 135px">
-              <span class="sortable-heading">Placa <p-sortIcon field="placa" /></span>
-            </th>
-            <th pSortableColumn="categoria" style="width: 18%; min-width: 170px">
-              <span class="sortable-heading">Categoría · tope <p-sortIcon field="categoria" /></span>
-            </th>
-            <th pSortableColumn="nHab" style="width: 25%; min-width: 235px">
-              <span class="sortable-heading">Número / entidad <p-sortIcon field="nHab" /></span>
-            </th>
-            <th pSortableColumn="tuc" style="width: 15%; min-width: 145px">
-              <span class="sortable-heading">Número de TUC <p-sortIcon field="tuc" /></span>
-            </th>
-            <th pSortableColumn="estadoLabel" style="width: 19%; min-width: 185px">
-              <span class="sortable-heading">Estado <p-sortIcon field="estadoLabel" /></span>
-            </th>
-            <th style="width: 10%; min-width: 125px; text-align: right">Acciones</th>
-          </tr>
-        </ng-template>
+  <!-- Toolbar -->
+  <div class="flex flex-wrap gap-2.5 items-center mb-3.5">
+    <div class="relative flex-1 min-w-[200px]">
+      <span class="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-3)] flex">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="7" />
+          <path d="M21 21l-4.3-4.3" />
+        </svg>
+      </span>
+      <input type="text" [(ngModel)]="vehQ" (ngModelChange)="onSearchChange()"
+        placeholder="Buscar por placa, TUC o autorización…"
+        class="w-full bg-[var(--surface)] border border-[var(--border)] rounded-xl py-2.5 pl-9 pr-3 text-sm text-[var(--text)] outline-none focus:border-[var(--primary)] transition-colors">
+    </div>
+    <select [(ngModel)]="vehCatF" (ngModelChange)="onFiltersChange()"
+      class="bg-[var(--surface)] border border-[var(--border)] rounded-xl py-2.5 px-3 text-[13.5px] text-[var(--text)] cursor-pointer font-semibold outline-none focus:border-[var(--primary)] transition-colors">
+      <option *ngFor="let o of vehCatOpts" [value]="o.value">{{ o.label }}</option>
+    </select>
+    <select [(ngModel)]="vehValF" (ngModelChange)="onFiltersChange()"
+      class="bg-[var(--surface)] border border-[var(--border)] rounded-xl py-2.5 px-3 text-[13.5px] text-[var(--text)] cursor-pointer font-semibold outline-none focus:border-[var(--primary)] transition-colors">
+      <option *ngFor="let o of vehValOpts" [value]="o.value">{{ o.label }}</option>
+    </select>
+  </div>
 
-        <ng-template pTemplate="body" let-v let-expanded="expanded">
-          <tr>
-            <td>
-              <div class="font-mono font-bold text-[14.5px] tracking-wide">{{ v.placa }}</div>
-            </td>
-            <td>
-              <span class="text-xs font-bold bg-[var(--surface-3)] px-2 py-0.5 rounded-md">{{ v.categoria }}</span> 
-              <span class="text-[11.5px] text-[var(--text-3)] font-mono ml-1">{{ v.topeFmt }} gal</span>
-            </td>
-            <td>
-              <div class="font-semibold font-mono text-[12.5px] whitespace-nowrap overflow-hidden text-ellipsis">{{ v.nHab }}</div>
-              <div class="text-[11px] text-[var(--text-3)] whitespace-nowrap overflow-hidden text-ellipsis">{{ v.autEntidad }}</div>
-            </td>
-            <td>
-              <div class="font-mono text-[12.5px] text-[var(--text-2)] whitespace-nowrap overflow-hidden text-ellipsis">{{ v.tuc }}</div>
-              @if (v.tucVencida) {
-                <div class="text-[10.5px] font-bold text-[var(--bad)] mt-0.5">TUC vencida</div>
-              }
-            </td>
-            <td>
-              <span class="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11.5px] font-bold"
-                    [style.background]="v.estadoBg" [style.color]="v.estadoColor">
-                <span class="text-[11px]">{{ v.estadoGlyph }}</span> {{ v.estadoLabel }}
-              </span>
-            </td>
-            <td style="text-align: right">
-              <div class="flex justify-end gap-1.5">
-                <button (click)="toggleRow(v)" title="Ver validación por dato" class="w-8 h-8 rounded-lg border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text-2)] cursor-pointer flex items-center justify-center hover:bg-gray-100 transition-colors">
-                  @if (v.detailLoading) {
-                    <i class="fa-solid fa-spinner fa-spin text-xs"></i>
-                  } @else {
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" [ngClass]="{'rotate-180': v.expanded}"><path d="M6 9l6 6 6-6"/></svg>
-                  }
-                </button>
-                @if (vehicleCreationAndEditingEnabled) {
-                  <button (click)="openVedit(v)" title="Editar" class="w-8 h-8 rounded-lg border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text-2)] cursor-pointer flex items-center justify-center hover:bg-gray-100 transition-colors">
-                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
-                  </button>
-                }
-                @if (vehicleDeletionEnabled) {
-                  <button (click)="openDeleteConfirmation(v)" title="Eliminar" class="w-8 h-8 rounded-lg border border-[var(--bad)] bg-[var(--bad-bg)] text-[var(--bad)] cursor-pointer flex items-center justify-center hover:opacity-80 transition-opacity">
-                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2m2 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg>
-                  </button>
-                }
-              </div>
-            </td>
+  <!-- Table Container -->
+  <div class="bg-[var(--surface)] border border-[var(--border)] rounded-2xl shadow-[var(--shadow)] overflow-hidden">
+    <p-table [value]="vehiclesView" dataKey="id" styleClass="vehiculos-table p-datatable-sm" [paginator]="true"
+      [rows]="5" [rowsPerPageOptions]="[5, 10, 25]" [showCurrentPageReport]="true"
+      currentPageReportTemplate="Mostrando {first}–{last} de {totalRecords} registros" paginatorDropdownAppendTo="body"
+      [alwaysShowPaginator]="true" [scrollable]="true" scrollHeight="480px" [tableStyle]="{'min-width': '1000px'}">
+
+      <ng-template pTemplate="header">
+        <tr>
+          <th colspan="2" class="table-group-header text-center">Vehículo</th>
+          <th class="table-group-header text-center">Autorización</th>
+          <th class="table-group-header text-center">TUC</th>
+          <th class="table-group-header text-center">Validación</th>
+        </tr>
+        <tr>
+          <th pSortableColumn="placa" style="width: 13%; min-width: 135px">
+            <span class="sortable-heading">Placa <p-sortIcon field="placa" /></span>
+          </th>
+          <th pSortableColumn="categoria" style="width: 18%; min-width: 170px">
+            <span class="sortable-heading">Categoría · tope <p-sortIcon field="categoria" /></span>
+          </th>
+          <th pSortableColumn="nHab" style="width: 25%; min-width: 235px">
+            <span class="sortable-heading">Número / entidad <p-sortIcon field="nHab" /></span>
+          </th>
+          <th pSortableColumn="tuc" style="width: 15%; min-width: 145px">
+            <span class="sortable-heading">Número de TUC <p-sortIcon field="tuc" /></span>
+          </th>
+          <th pSortableColumn="estadoLabel" style="width: 19%; min-width: 185px">
+            <span class="sortable-heading">Estado <p-sortIcon field="estadoLabel" /></span>
+          </th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-v let-expanded="expanded">
+        <tr>
+          <td>
+            <div class="font-mono font-bold text-[14.5px] tracking-wide">{{ v.placa }}</div>
+          </td>
+          <td>
+            <span class="text-xs font-bold bg-[var(--surface-3)] px-2 py-0.5 rounded-md">{{ v.categoria }}</span>
+            <span class="text-[11.5px] text-[var(--text-3)] font-mono ml-1">{{ v.topeFmt }} gal</span>
+          </td>
+          <td>
+            <div class="font-semibold font-mono text-[12.5px] whitespace-nowrap overflow-hidden text-ellipsis">{{ v.nHab
+              }}</div>
+            <div class="text-[11px] text-[var(--text-3)] whitespace-nowrap overflow-hidden text-ellipsis">{{
+              v.autEntidad }}</div>
+          </td>
+          <td>
+            <div class="font-mono text-[12.5px] text-[var(--text-2)] whitespace-nowrap overflow-hidden text-ellipsis">{{
+              v.tuc }}</div>
+            @if (v.tucVencida) {
+            <div class="text-[10.5px] font-bold text-[var(--bad)] mt-0.5">TUC vencida</div>
+            }
+          </td>
+          <td>
+            <span class="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11.5px] font-bold"
+              [style.background]="v.estadoBg" [style.color]="v.estadoColor">
+              <span class="text-[11px]">{{ v.estadoGlyph }}</span> {{ v.estadoLabel }}
+            </span>
           </tr>
-          
-          <!-- Expanded Row content (inline condition in the same tr or next tr) -->
-          @if (v.expanded) {
-            <tr class="expanded-row-content">
-              <td colspan="6">
-                <div class="px-5 py-3 bg-[var(--surface-2)]">
-                  @if (v.detailLoading) {
-                    <div class="flex items-center justify-center gap-2 py-5 text-[var(--primary)] text-[12.5px] font-bold">
-                      <i class="fa-solid fa-spinner fa-spin"></i> Consultando detalle del vehículo…
-                    </div>
-                  } @else if (v.detailError) {
-                    <div class="flex flex-wrap items-center justify-between gap-3 my-2 bg-[var(--bad-bg)] border border-[var(--bad)] rounded-xl py-3 px-4 text-[12.5px] text-[var(--bad)]">
-                      <span class="font-semibold">{{ v.detailError }}</span>
-                      <button (click)="reintentarDetalle(v)" class="bg-[var(--surface)] border border-[var(--bad)] rounded-lg py-1.5 px-3 font-bold cursor-pointer text-[var(--bad)]">Reintentar</button>
-                    </div>
-                  } @else {
-                  <div class="text-[10.5px] font-bold text-[var(--text-3)] uppercase tracking-wide mx-0.5 mt-2 mb-2.5">Validación por dato</div>
-                  <div class="grid grid-cols-[repeat(auto-fill,minmax(210px,1fr))] gap-2.5">
-                    @for (c of v.valChips; track c.label) {
-                      <div class="bg-[var(--surface)] border border-[var(--border)] rounded-xl py-2.5 px-3">
-                        <div class="flex items-center justify-between gap-2">
-                          <span class="text-[12.5px] font-bold">{{ c.label }}</span>
-                          <span class="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10.5px] font-extrabold"
-                                [style.background]="c.bg" [style.color]="c.fg">
-                            <span>{{ c.glyph }}</span>{{ c.statusLabel }}
-                          </span>
-                        </div>
-                        <div class="text-[11px] text-[var(--text-3)] mt-1">Valida con <b class="text-[var(--text-2)]">{{ c.entidad }}</b></div>
-                      </div>
-                    }
-                  </div>
-                  <div class="flex flex-wrap gap-y-3.5 gap-x-6 mt-3.5 pt-3 border-t border-dashed border-[var(--border)]">
-                    <div class="min-w-0">
-                      <div class="text-[10.5px] text-[var(--text-3)] uppercase tracking-wide">Propietario</div>
-                      <div class="text-[13px] font-semibold">{{ v.propNom }}</div>
-                      <div class="text-[11px] text-[var(--text-3)] font-mono">{{ v.propTipo }} {{ v.propDoc }}</div>
-                    </div>
-                  </div>
-                  @if (v.observed) {
-                    <div class="mt-3 bg-[var(--warn-bg)] border border-[var(--warn)] rounded-xl py-2.5 px-3.5 text-[12.5px] text-[var(--warn)] leading-snug">
-                      <b>Observado:</b> {{ v.motivo }}
-                    </div>
-                  }
-                  }
-                </div>
-              </td>
-            </tr>
-          }
-        </ng-template>
-        
-        <ng-template pTemplate="emptymessage">
-          <tr>
-            <td colspan="6">
-              <div class="flex flex-col items-center justify-center min-h-[250px] text-center text-[var(--text-3)]">
-                <div class="font-bold text-[var(--text-2)] text-sm">No existe información</div>
-                <div class="text-[13px] mt-1">
-                  @if (vehQ || vehCatF || vehValF) {
-                    Ningún vehículo coincide con los filtros aplicados.
-                  } @else {
-                    No se encontraron vehículos registrados.
-                  }
-                </div>
+      </ng-template>
+
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="5">
+            <div class="flex flex-col items-center justify-center min-h-[250px] text-center text-[var(--text-3)]">
+              <div class="font-bold text-[var(--text-2)] text-sm">No existe información</div>
+              <div class="text-[13px] mt-1">
                 @if (vehQ || vehCatF || vehValF) {
-                  <button (click)="limpiarFiltros()" class="mt-4 bg-[var(--surface)] text-[var(--primary)] border border-[var(--primary)] rounded-lg py-2 px-4 text-[12.5px] font-bold cursor-pointer hover:bg-[var(--primary-soft)] transition-colors">
-                    Limpiar filtros
-                  </button>
+                Ningún vehículo coincide con los filtros aplicados.
+                } @else {
+                No se encontraron vehículos registrados.
                 }
               </div>
-            </td>
-          </tr>
-        </ng-template>
-      </p-table>
-    </div>
+              @if (vehQ || vehCatF || vehValF) {
+              <button (click)="limpiarFiltros()"
+                class="mt-4 bg-[var(--surface)] text-[var(--primary)] border border-[var(--primary)] rounded-lg py-2 px-4 text-[12.5px] font-bold cursor-pointer hover:bg-[var(--primary-soft)] transition-colors">
+                Limpiar filtros
+              </button>
+              }
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
   }
 </div>
 
 @if (showVehicleModal) {
-  <div
-    class="fixed inset-0 z-[1000] flex items-center justify-center bg-black/55 backdrop-blur-[2px] p-4"
-    role="presentation"
-  >
-    <section
-      class="w-full max-w-[650px] max-h-[92vh] flex flex-col bg-[var(--surface)] border border-[var(--border)] rounded-[18px] shadow-2xl overflow-hidden"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="vehicle-modal-title"
-      (click)="$event.stopPropagation()"
-    >
-      <header class="flex items-center justify-between gap-3 px-5 sm:px-6 py-4 border-b border-[var(--border)]">
+<div class="fixed inset-0 z-[1000] flex items-center justify-center bg-black/55 backdrop-blur-[2px] p-4"
+  role="presentation">
+  <section
+    class="w-full max-w-[650px] max-h-[92vh] flex flex-col bg-[var(--surface)] border border-[var(--border)] rounded-[18px] shadow-2xl overflow-hidden"
+    role="dialog" aria-modal="true" aria-labelledby="vehicle-modal-title" (click)="$event.stopPropagation()">
+    <header class="flex items-center justify-between gap-3 px-5 sm:px-6 py-4 border-b border-[var(--border)]">
+      <div>
+        <h2 id="vehicle-modal-title" class="m-0 text-[17px] font-extrabold text-[var(--text)]">{{ isEditingVehicle ?
+          'Editar vehículo' : 'Agregar vehículo' }}</h2>
+        <p class="m-0 mt-1 text-xs text-[var(--text-3)]">{{ isEditingVehicle ? 'Los cambios volverán a pasar por el
+          proceso de validación.' : 'El sistema valida la placa y la TUC contra el MTC.' }}</p>
+      </div>
+      <button type="button" (click)="closeVehicleModal()" [disabled]="isCreatingVehicle" aria-label="Cerrar modal"
+        class="w-9 h-9 shrink-0 rounded-lg border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text-2)] cursor-pointer disabled:opacity-50">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </header>
+
+    <div class="flex-1 overflow-y-auto px-5 sm:px-6 py-5">
+      @if (vehicleFormError) {
+      <div
+        class="flex items-start gap-2.5 bg-[var(--bad-bg)] border border-[var(--bad)] text-[var(--bad)] rounded-xl py-3 px-4 mb-4 text-[12.5px] font-semibold">
+        <i class="fa-solid fa-triangle-exclamation mt-0.5"></i>
+        <span>{{ vehicleFormError }}</span>
+      </div>
+      }
+
+      @if (isFetchingVehicleDetail) {
+      <div class="flex flex-col items-center justify-center gap-3 py-16 text-[var(--primary)]">
+        <i class="fa-solid fa-spinner fa-spin text-3xl"></i>
+        <span class="text-sm font-bold text-[var(--text)]">Cargando datos del vehículo…</span>
+        <span class="text-xs text-[var(--text-3)] font-mono">Consultando datos oficiales</span>
+      </div>
+      } @else {
+      <div class="text-xs font-extrabold text-[var(--primary)] uppercase tracking-wide mb-3">1 · Datos del vehículo
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
         <div>
-          <h2 id="vehicle-modal-title" class="m-0 text-[17px] font-extrabold text-[var(--text)]">{{ isEditingVehicle ? 'Editar vehículo' : 'Agregar vehículo' }}</h2>
-          <p class="m-0 mt-1 text-xs text-[var(--text-3)]">{{ isEditingVehicle ? 'Los cambios volverán a pasar por el proceso de validación.' : 'El sistema valida la placa y la TUC contra el MTC.' }}</p>
+          <label for="vehicle-plate" class="block text-[12.5px] font-bold text-[var(--text-2)] mb-1.5">Placa <span
+              class="text-[var(--bad)]">*</span></label>
+          <input id="vehicle-plate" type="text" maxlength="7" autocomplete="off" [(ngModel)]="newVehicle.placa"
+            (input)="onVehiclePlateInput($event)" (keydown)="onVehiclePlateKeydown($event)" placeholder="D5R-330"
+            class="w-full bg-[var(--surface-2)] border rounded-xl px-3 py-2.5 text-sm text-[var(--text)] font-mono uppercase outline-none focus:border-[var(--primary)]"
+            [style.border-color]="vehicleFormSubmitted && !isValidPlate ? 'var(--bad)' : 'var(--border)'">
+          @if (vehicleFormSubmitted && !isValidPlate) { <p class="m-0 mt-1 text-[11px] font-semibold text-[var(--bad)]">
+            Formato requerido: ABC-123.</p> }
         </div>
-        <button type="button" (click)="closeVehicleModal()" [disabled]="isCreatingVehicle" aria-label="Cerrar modal" class="w-9 h-9 shrink-0 rounded-lg border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text-2)] cursor-pointer disabled:opacity-50">
-          <i class="fa-solid fa-xmark"></i>
-        </button>
-      </header>
-
-      <div class="flex-1 overflow-y-auto px-5 sm:px-6 py-5">
-        @if (vehicleFormError) {
-          <div class="flex items-start gap-2.5 bg-[var(--bad-bg)] border border-[var(--bad)] text-[var(--bad)] rounded-xl py-3 px-4 mb-4 text-[12.5px] font-semibold">
-            <i class="fa-solid fa-triangle-exclamation mt-0.5"></i>
-            <span>{{ vehicleFormError }}</span>
-          </div>
-        }
-
-        @if (isFetchingVehicleDetail) {
-          <div class="flex flex-col items-center justify-center gap-3 py-16 text-[var(--primary)]">
-            <i class="fa-solid fa-spinner fa-spin text-3xl"></i>
-            <span class="text-sm font-bold text-[var(--text)]">Cargando datos del vehículo…</span>
-            <span class="text-xs text-[var(--text-3)] font-mono">Consultando datos oficiales</span>
-          </div>
-        } @else {
-        <div class="text-xs font-extrabold text-[var(--primary)] uppercase tracking-wide mb-3">1 · Datos del vehículo</div>
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
-          <div>
-            <label for="vehicle-plate" class="block text-[12.5px] font-bold text-[var(--text-2)] mb-1.5">Placa <span class="text-[var(--bad)]">*</span></label>
-            <input id="vehicle-plate" type="text" maxlength="7" autocomplete="off" [(ngModel)]="newVehicle.placa" (input)="onVehiclePlateInput($event)" (keydown)="onVehiclePlateKeydown($event)" placeholder="D5R-330" class="w-full bg-[var(--surface-2)] border rounded-xl px-3 py-2.5 text-sm text-[var(--text)] font-mono uppercase outline-none focus:border-[var(--primary)]" [style.border-color]="vehicleFormSubmitted && !isValidPlate ? 'var(--bad)' : 'var(--border)'">
-            @if (vehicleFormSubmitted && !isValidPlate) { <p class="m-0 mt-1 text-[11px] font-semibold text-[var(--bad)]">Formato requerido: ABC-123.</p> }
-          </div>
-          <div>
-            <label for="vehicle-category" class="block text-[12.5px] font-bold text-[var(--text-2)] mb-1.5">Categoría <span class="text-[var(--bad)]">*</span></label>
-            <select id="vehicle-category" [(ngModel)]="newVehicle.categoria" class="w-full bg-[var(--surface-2)] border border-[var(--border)] rounded-xl px-3 py-2.5 text-sm text-[var(--text)] outline-none focus:border-[var(--primary)] cursor-pointer">
-              @for (category of vehCreateCatOpts; track category.value) { <option [value]="category.value">{{ category.label }}</option> }
-            </select>
-          </div>
-          <div>
-            <label for="vehicle-gallons" class="block text-[12.5px] font-bold text-[var(--text-2)] mb-1.5">Tope de galones <span class="text-[var(--bad)]">*</span></label>
-            <input id="vehicle-gallons" type="number" min="0.01" step="0.01" [(ngModel)]="newVehicle.topeGalones" placeholder="500.00" class="w-full bg-[var(--surface-2)] border border-[var(--border)] rounded-xl px-3 py-2.5 text-sm text-[var(--text)] font-mono outline-none focus:border-[var(--primary)]">
-            @if (vehicleFormSubmitted && !isValidGallons) { <p class="m-0 mt-1 text-[11px] font-semibold text-[var(--bad)]">Ingrese un valor mayor que cero.</p> }
-          </div>
-          <div>
-            <label for="vehicle-tuc" class="block text-[12.5px] font-bold text-[var(--text-2)] mb-1.5">Número de TUC <span class="text-[var(--bad)]">*</span></label>
-            <input id="vehicle-tuc" type="text" maxlength="8" [(ngModel)]="newVehicle.tuc" (input)="onVehicleCodeInput('tuc', $event)" placeholder="T-000000" class="w-full bg-[var(--surface-2)] border border-[var(--border)] rounded-xl px-3 py-2.5 text-sm text-[var(--text)] font-mono uppercase outline-none focus:border-[var(--primary)]">
-            @if (vehicleFormSubmitted && !isValidTuc) { <p class="m-0 mt-1 text-[11px] font-semibold text-[var(--bad)]">Formato requerido: T-000000.</p> }
-          </div>
-          <div class="sm:col-span-2">
-            <label for="vehicle-authorization" class="block text-[12.5px] font-bold text-[var(--text-2)] mb-1.5">Número de autorización <span class="text-[var(--bad)]">*</span></label>
-            <input id="vehicle-authorization" type="text" maxlength="14" [(ngModel)]="newVehicle.numeroAutorizacion" (input)="onVehicleCodeInput('numeroAutorizacion', $event)" placeholder="AUT-0000-00000" class="w-full bg-[var(--surface-2)] border border-[var(--border)] rounded-xl px-3 py-2.5 text-sm text-[var(--text)] font-mono uppercase outline-none focus:border-[var(--primary)]">
-            @if (vehicleFormSubmitted && !isValidAuthorization) { <p class="m-0 mt-1 text-[11px] font-semibold text-[var(--bad)]">Formato requerido: AUT-0000-00000.</p> }
-          </div>
+        <div>
+          <label for="vehicle-category" class="block text-[12.5px] font-bold text-[var(--text-2)] mb-1.5">Categoría
+            <span class="text-[var(--bad)]">*</span></label>
+          <select id="vehicle-category" [(ngModel)]="newVehicle.categoria"
+            class="w-full bg-[var(--surface-2)] border border-[var(--border)] rounded-xl px-3 py-2.5 text-sm text-[var(--text)] outline-none focus:border-[var(--primary)] cursor-pointer">
+            @for (category of vehCreateCatOpts; track category.value) { <option [value]="category.value">{{
+              category.label }}</option> }
+          </select>
         </div>
-
-        <div class="text-xs font-extrabold text-[var(--primary)] uppercase tracking-wide mb-3">2 · Datos del propietario</div>
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div>
-            <label for="owner-document-type" class="block text-[12.5px] font-bold text-[var(--text-2)] mb-1.5">Tipo de documento</label>
-            <select id="owner-document-type" [(ngModel)]="newVehicle.propietarioTipoDocumento" (ngModelChange)="onOwnerDocumentTypeChange()" class="w-full bg-[var(--surface-2)] border border-[var(--border)] rounded-xl px-3 py-2.5 text-sm text-[var(--text)] outline-none focus:border-[var(--primary)] cursor-pointer">
-              <option value="RUC">RUC</option><option value="DNI">DNI</option><option value="CE">Carné de Extranjería</option>
-            </select>
-          </div>
-          <div>
-            <label for="owner-document-number" class="block text-[12.5px] font-bold text-[var(--text-2)] mb-1.5">Número de documento <span class="text-[var(--bad)]">*</span></label>
-            <input id="owner-document-number" type="text" [attr.inputmode]="ownerDocumentInputMode" [attr.maxlength]="ownerDocumentMaxLength" [(ngModel)]="newVehicle.propietarioNumeroDocumento" (input)="onOwnerDocumentInput($event)" [placeholder]="ownerDocumentPlaceholder" class="w-full bg-[var(--surface-2)] border rounded-xl px-3 py-2.5 text-sm text-[var(--text)] font-mono uppercase outline-none focus:border-[var(--primary)]" [style.border-color]="vehicleFormSubmitted && !isValidOwnerDocument ? 'var(--bad)' : 'var(--border)'">
-            @if (vehicleFormSubmitted && !isValidOwnerDocument) {
-              <p class="m-0 mt-1 text-[11px] font-semibold text-[var(--bad)]">{{ ownerDocumentHint }}</p>
-            } @else {
-              <p class="m-0 mt-1 text-[10.5px] text-[var(--text-3)]">{{ ownerDocumentHint }}</p>
-            }
-          </div>
-          <div class="sm:col-span-2">
-            <label for="owner-name" class="block text-[12.5px] font-bold text-[var(--text-2)] mb-1.5">Nombre o razón social</label>
-            <input id="owner-name" type="text" maxlength="160" [(ngModel)]="newVehicle.propietarioNombre" placeholder="Transportes Lima Sur S.A.C." class="w-full bg-[var(--surface-2)] border border-[var(--border)] rounded-xl px-3 py-2.5 text-sm text-[var(--text)] outline-none focus:border-[var(--primary)]">
-          </div>
+        <div>
+          <label for="vehicle-gallons" class="block text-[12.5px] font-bold text-[var(--text-2)] mb-1.5">Tope de galones
+            <span class="text-[var(--bad)]">*</span></label>
+          <input id="vehicle-gallons" type="number" min="0.01" step="0.01" [(ngModel)]="newVehicle.topeGalones"
+            placeholder="500.00"
+            class="w-full bg-[var(--surface-2)] border border-[var(--border)] rounded-xl px-3 py-2.5 text-sm text-[var(--text)] font-mono outline-none focus:border-[var(--primary)]">
+          @if (vehicleFormSubmitted && !isValidGallons) { <p
+            class="m-0 mt-1 text-[11px] font-semibold text-[var(--bad)]">Ingrese un valor mayor que cero.</p> }
         </div>
-
-        <div class="mt-5 bg-[var(--surface-2)] dark:bg-[#16242F] border border-[var(--border-strong)] dark:border-[#3B5264] rounded-xl py-3 px-4 text-[12px] font-semibold text-[var(--text-2)] dark:text-[#C9D1D9] leading-relaxed">
-          Los conductores y sus licencias se registran posteriormente en el comprobante correspondiente.
+        <div>
+          <label for="vehicle-tuc" class="block text-[12.5px] font-bold text-[var(--text-2)] mb-1.5">Número de TUC <span
+              class="text-[var(--bad)]">*</span></label>
+          <input id="vehicle-tuc" type="text" maxlength="8" [(ngModel)]="newVehicle.tuc"
+            (input)="onVehicleCodeInput('tuc', $event)" placeholder="T-000000"
+            class="w-full bg-[var(--surface-2)] border border-[var(--border)] rounded-xl px-3 py-2.5 text-sm text-[var(--text)] font-mono uppercase outline-none focus:border-[var(--primary)]">
+          @if (vehicleFormSubmitted && !isValidTuc) { <p class="m-0 mt-1 text-[11px] font-semibold text-[var(--bad)]">
+            Formato requerido: T-000000.</p> }
         </div>
-        }
+        <div class="sm:col-span-2">
+          <label for="vehicle-authorization" class="block text-[12.5px] font-bold text-[var(--text-2)] mb-1.5">Número de
+            autorización <span class="text-[var(--bad)]">*</span></label>
+          <input id="vehicle-authorization" type="text" maxlength="14" [(ngModel)]="newVehicle.numeroAutorizacion"
+            (input)="onVehicleCodeInput('numeroAutorizacion', $event)" placeholder="AUT-0000-00000"
+            class="w-full bg-[var(--surface-2)] border border-[var(--border)] rounded-xl px-3 py-2.5 text-sm text-[var(--text)] font-mono uppercase outline-none focus:border-[var(--primary)]">
+          @if (vehicleFormSubmitted && !isValidAuthorization) { <p
+            class="m-0 mt-1 text-[11px] font-semibold text-[var(--bad)]">Formato requerido: AUT-0000-00000.</p> }
+        </div>
       </div>
 
-      <footer class="flex justify-end gap-2.5 px-5 sm:px-6 py-4 border-t border-[var(--border)] bg-[var(--surface)]">
-        <button type="button" (click)="closeVehicleModal()" [disabled]="isCreatingVehicle || isFetchingVehicleDetail" class="border border-[var(--border)] bg-[var(--surface)] text-[var(--text-2)] rounded-xl px-4 py-2.5 text-[13.5px] font-semibold cursor-pointer disabled:opacity-50">Cancelar</button>
-        <button type="button" (click)="guardarVehiculo()" [disabled]="isCreatingVehicle || isFetchingVehicleDetail" class="inline-flex items-center gap-2 bg-[var(--primary)] text-[var(--primary-contrast)] border-0 rounded-xl px-5 py-2.5 text-[13.5px] font-bold cursor-pointer disabled:opacity-60">
-          @if (isCreatingVehicle) {
-            <i class="fa-solid fa-spinner fa-spin"></i> {{ isEditingVehicle ? 'Guardando…' : 'Registrando…' }}
+      <div class="text-xs font-extrabold text-[var(--primary)] uppercase tracking-wide mb-3">2 · Datos del propietario
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label for="owner-document-type" class="block text-[12.5px] font-bold text-[var(--text-2)] mb-1.5">Tipo de
+            documento</label>
+          <select id="owner-document-type" [(ngModel)]="newVehicle.propietarioTipoDocumento"
+            (ngModelChange)="onOwnerDocumentTypeChange()"
+            class="w-full bg-[var(--surface-2)] border border-[var(--border)] rounded-xl px-3 py-2.5 text-sm text-[var(--text)] outline-none focus:border-[var(--primary)] cursor-pointer">
+            <option value="RUC">RUC</option>
+            <option value="DNI">DNI</option>
+            <option value="CE">Carné de Extranjería</option>
+          </select>
+        </div>
+        <div>
+          <label for="owner-document-number" class="block text-[12.5px] font-bold text-[var(--text-2)] mb-1.5">Número de
+            documento <span class="text-[var(--bad)]">*</span></label>
+          <input id="owner-document-number" type="text" [attr.inputmode]="ownerDocumentInputMode"
+            [attr.maxlength]="ownerDocumentMaxLength" [(ngModel)]="newVehicle.propietarioNumeroDocumento"
+            (input)="onOwnerDocumentInput($event)" [placeholder]="ownerDocumentPlaceholder"
+            class="w-full bg-[var(--surface-2)] border rounded-xl px-3 py-2.5 text-sm text-[var(--text)] font-mono uppercase outline-none focus:border-[var(--primary)]"
+            [style.border-color]="vehicleFormSubmitted && !isValidOwnerDocument ? 'var(--bad)' : 'var(--border)'">
+          @if (vehicleFormSubmitted && !isValidOwnerDocument) {
+          <p class="m-0 mt-1 text-[11px] font-semibold text-[var(--bad)]">{{ ownerDocumentHint }}</p>
           } @else {
-            <i class="fa-solid fa-check"></i> {{ isEditingVehicle ? 'Guardar cambios' : 'Validar y agregar' }}
+          <p class="m-0 mt-1 text-[10.5px] text-[var(--text-3)]">{{ ownerDocumentHint }}</p>
           }
-        </button>
-      </footer>
-    </section>
-  </div>
+        </div>
+        <div class="sm:col-span-2">
+          <label for="owner-name" class="block text-[12.5px] font-bold text-[var(--text-2)] mb-1.5">Nombre o razón
+            social</label>
+          <input id="owner-name" type="text" maxlength="160" [(ngModel)]="newVehicle.propietarioNombre"
+            placeholder="Transportes Lima Sur S.A.C."
+            class="w-full bg-[var(--surface-2)] border border-[var(--border)] rounded-xl px-3 py-2.5 text-sm text-[var(--text)] outline-none focus:border-[var(--primary)]">
+        </div>
+      </div>
+
+      <div
+        class="mt-5 bg-[var(--surface-2)] dark:bg-[#16242F] border border-[var(--border-strong)] dark:border-[#3B5264] rounded-xl py-3 px-4 text-[12px] font-semibold text-[var(--text-2)] dark:text-[#C9D1D9] leading-relaxed">
+        Los conductores y sus licencias se registran posteriormente en el comprobante correspondiente.
+      </div>
+      }
+    </div>
+
+    <footer class="flex justify-end gap-2.5 px-5 sm:px-6 py-4 border-t border-[var(--border)] bg-[var(--surface)]">
+      <button type="button" (click)="closeVehicleModal()" [disabled]="isCreatingVehicle || isFetchingVehicleDetail"
+        class="border border-[var(--border)] bg-[var(--surface)] text-[var(--text-2)] rounded-xl px-4 py-2.5 text-[13.5px] font-semibold cursor-pointer disabled:opacity-50">Cancelar</button>
+      <button type="button" (click)="guardarVehiculo()" [disabled]="isCreatingVehicle || isFetchingVehicleDetail"
+        class="inline-flex items-center gap-2 bg-[var(--primary)] text-[var(--primary-contrast)] border-0 rounded-xl px-5 py-2.5 text-[13.5px] font-bold cursor-pointer disabled:opacity-60">
+        @if (isCreatingVehicle) {
+        <i class="fa-solid fa-spinner fa-spin"></i> {{ isEditingVehicle ? 'Guardando…' : 'Registrando…' }}
+        } @else {
+        <i class="fa-solid fa-check"></i> {{ isEditingVehicle ? 'Guardar cambios' : 'Validar y agregar' }}
+        }
+      </button>
+    </footer>
+  </section>
+</div>
 }
 
 @if (vehiclePendingDelete) {
-  <div
-    class="fixed inset-0 z-[1010] flex items-center justify-center bg-black/55 backdrop-blur-[2px] p-4"
-    role="presentation"
-    (click)="closeDeleteConfirmation()"
-  >
-    <section
-      class="w-full max-w-[430px] bg-[var(--surface)] border border-[var(--border)] rounded-[18px] shadow-2xl overflow-hidden"
-      role="alertdialog"
-      aria-modal="true"
-      aria-labelledby="delete-vehicle-title"
-      (click)="$event.stopPropagation()"
-    >
-      <div class="px-6 pt-6 pb-5 text-center">
-        <div class="w-14 h-14 mx-auto mb-4 rounded-full bg-[var(--bad-bg)] border border-[var(--bad)] text-[var(--bad)] flex items-center justify-center text-xl">
-          <i class="fa-solid fa-trash-can"></i>
-        </div>
-        <h2 id="delete-vehicle-title" class="m-0 text-xl font-extrabold text-[var(--text)]">Eliminar vehículo</h2>
-        <p class="m-0 mt-2 text-[13.5px] leading-relaxed text-[var(--text-3)]">
-          ¿Estás seguro de que deseas eliminar el registro del vehículo
-          <strong class="text-[var(--text)] font-mono">{{ vehiclePendingDelete.placa }}</strong>?
-          Esta acción no se puede deshacer.
-        </p>
-
-        @if (deleteVehicleError) {
-          <div class="mt-4 bg-[var(--bad-bg)] border border-[var(--bad)] text-[var(--bad)] rounded-xl py-2.5 px-3 text-[12px] font-semibold text-left">
-            <i class="fa-solid fa-triangle-exclamation mr-1.5"></i>{{ deleteVehicleError }}
-          </div>
-        }
+<div class="fixed inset-0 z-[1010] flex items-center justify-center bg-black/55 backdrop-blur-[2px] p-4"
+  role="presentation" (click)="closeDeleteConfirmation()">
+  <section
+    class="w-full max-w-[430px] bg-[var(--surface)] border border-[var(--border)] rounded-[18px] shadow-2xl overflow-hidden"
+    role="alertdialog" aria-modal="true" aria-labelledby="delete-vehicle-title" (click)="$event.stopPropagation()">
+    <div class="px-6 pt-6 pb-5 text-center">
+      <div
+        class="w-14 h-14 mx-auto mb-4 rounded-full bg-[var(--bad-bg)] border border-[var(--bad)] text-[var(--bad)] flex items-center justify-center text-xl">
+        <i class="fa-solid fa-trash-can"></i>
       </div>
+      <h2 id="delete-vehicle-title" class="m-0 text-xl font-extrabold text-[var(--text)]">Eliminar vehículo</h2>
+      <p class="m-0 mt-2 text-[13.5px] leading-relaxed text-[var(--text-3)]">
+        ¿Estás seguro de que deseas eliminar el registro del vehículo
+        <strong class="text-[var(--text)] font-mono">{{ vehiclePendingDelete.placa }}</strong>?
+        Esta acción no se puede deshacer.
+      </p>
 
-      <footer class="flex justify-end gap-2.5 px-5 py-4 border-t border-[var(--border)] bg-[var(--surface-2)]">
-        <button type="button" (click)="closeDeleteConfirmation()" [disabled]="isDeletingVehicle" class="border border-[var(--border)] bg-[var(--surface)] text-[var(--text-2)] rounded-xl px-4 py-2.5 text-[13.5px] font-semibold cursor-pointer disabled:opacity-50">Cancelar</button>
-        <button type="button" (click)="eliminarVehiculo()" [disabled]="isDeletingVehicle" class="inline-flex items-center gap-2 border border-[var(--bad)] bg-[var(--bad)] text-white rounded-xl px-5 py-2.5 text-[13.5px] font-bold cursor-pointer disabled:opacity-60">
-          @if (isDeletingVehicle) { <i class="fa-solid fa-spinner fa-spin"></i> Eliminando… } @else { <i class="fa-solid fa-trash-can"></i> Eliminar }
-        </button>
-      </footer>
-    </section>
-  </div>
+      @if (deleteVehicleError) {
+      <div
+        class="mt-4 bg-[var(--bad-bg)] border border-[var(--bad)] text-[var(--bad)] rounded-xl py-2.5 px-3 text-[12px] font-semibold text-left">
+        <i class="fa-solid fa-triangle-exclamation mr-1.5"></i>{{ deleteVehicleError }}
+      </div>
+      }
+    </div>
+
+    <footer class="flex justify-end gap-2.5 px-5 py-4 border-t border-[var(--border)] bg-[var(--surface-2)]">
+      <button type="button" (click)="closeDeleteConfirmation()" [disabled]="isDeletingVehicle"
+        class="border border-[var(--border)] bg-[var(--surface)] text-[var(--text-2)] rounded-xl px-4 py-2.5 text-[13.5px] font-semibold cursor-pointer disabled:opacity-50">Cancelar</button>
+      <button type="button" (click)="eliminarVehiculo()" [disabled]="isDeletingVehicle"
+        class="inline-flex items-center gap-2 border border-[var(--bad)] bg-[var(--bad)] text-white rounded-xl px-5 py-2.5 text-[13.5px] font-bold cursor-pointer disabled:opacity-60">
+        @if (isDeletingVehicle) { <i class="fa-solid fa-spinner fa-spin"></i> Eliminando… } @else { <i
+          class="fa-solid fa-trash-can"></i> Eliminar }
+      </button>
+    </footer>
+  </section>
+</div>
 }
 
 @if (showValidationInfoModal) {
-  <div
-    class="fixed inset-0 z-[1020] flex items-center justify-center bg-black/55 backdrop-blur-[2px] p-4"
-    role="presentation"
-    (click)="closeValidationInfo()"
-  >
-    <section
-      class="w-full max-w-[560px] max-h-[90vh] flex flex-col bg-[var(--surface)] border border-[var(--border)] rounded-[18px] shadow-2xl overflow-hidden"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="validation-info-title"
-      (click)="$event.stopPropagation()"
-    >
-      <header class="flex items-start justify-between gap-3 px-5 sm:px-6 py-5 border-b border-[var(--border)]">
+<div class="fixed inset-0 z-[1020] flex items-center justify-center bg-black/55 backdrop-blur-[2px] p-4"
+  role="presentation" (click)="closeValidationInfo()">
+  <section
+    class="w-full max-w-[560px] max-h-[90vh] flex flex-col bg-[var(--surface)] border border-[var(--border)] rounded-[18px] shadow-2xl overflow-hidden"
+    role="dialog" aria-modal="true" aria-labelledby="validation-info-title" (click)="$event.stopPropagation()">
+    <header class="flex items-start justify-between gap-3 px-5 sm:px-6 py-5 border-b border-[var(--border)]">
+      <div>
+        <h2 id="validation-info-title" class="m-0 text-xl font-extrabold text-[var(--text)]">¿Quién valida cada dato?
+        </h2>
+        <p class="m-0 mt-1 text-[13px] text-[var(--text-3)]">Cada campo se contrasta con una fuente oficial</p>
+      </div>
+      <button type="button" (click)="closeValidationInfo()" aria-label="Cerrar modal"
+        class="w-9 h-9 shrink-0 rounded-lg border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text-2)] cursor-pointer hover:text-[var(--primary)]">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </header>
+
+    <div class="flex-1 overflow-y-auto px-5 sm:px-6 py-5 space-y-3">
+      <div class="flex items-start gap-3.5 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] p-4">
+        <div
+          class="w-10 h-10 shrink-0 rounded-xl bg-[var(--primary-soft)] text-[var(--primary)] flex items-center justify-center font-extrabold">
+          P</div>
         <div>
-          <h2 id="validation-info-title" class="m-0 text-xl font-extrabold text-[var(--text)]">¿Quién valida cada dato?</h2>
-          <p class="m-0 mt-1 text-[13px] text-[var(--text-3)]">Cada campo se contrasta con una fuente oficial</p>
-        </div>
-        <button type="button" (click)="closeValidationInfo()" aria-label="Cerrar modal" class="w-9 h-9 shrink-0 rounded-lg border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text-2)] cursor-pointer hover:text-[var(--primary)]">
-          <i class="fa-solid fa-xmark"></i>
-        </button>
-      </header>
-
-      <div class="flex-1 overflow-y-auto px-5 sm:px-6 py-5 space-y-3">
-        <div class="flex items-start gap-3.5 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] p-4">
-          <div class="w-10 h-10 shrink-0 rounded-xl bg-[var(--primary-soft)] text-[var(--primary)] flex items-center justify-center font-extrabold">P</div>
-          <div>
-            <h3 class="m-0 text-[13.5px] font-extrabold text-[var(--text)]">Placa y categoría / carrocería</h3>
-            <p class="m-0 mt-1 text-[12.5px] leading-relaxed text-[var(--text-3)]">Se validan con el MTC (registro vehicular y clasificación de carrocería).</p>
-          </div>
-        </div>
-
-        <div class="flex items-start gap-3.5 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] p-4">
-          <div class="w-10 h-10 shrink-0 rounded-xl bg-[var(--primary-soft)] text-[var(--primary)] flex items-center justify-center font-extrabold">T</div>
-          <div>
-            <h3 class="m-0 text-[13.5px] font-extrabold text-[var(--text)]">TUC</h3>
-            <p class="m-0 mt-1 text-[12.5px] leading-relaxed text-[var(--text-3)]">Se valida con el MTC (Tarjeta Única de Circulación vigente).</p>
-          </div>
-        </div>
-
-        <div class="flex items-start gap-3.5 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] p-4">
-          <div class="w-10 h-10 shrink-0 rounded-xl bg-[var(--primary-soft)] text-[var(--primary)] flex items-center justify-center font-extrabold">A</div>
-          <div>
-            <h3 class="m-0 text-[13.5px] font-extrabold text-[var(--text)]">Autorización</h3>
-            <p class="m-0 mt-1 text-[12.5px] leading-relaxed text-[var(--text-3)]">Se valida con la entidad que la remitió: Gobierno Regional, Municipalidad Provincial o MTC, según corresponda.</p>
-          </div>
-        </div>
-
-        <div class="flex items-start gap-3.5 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] p-4">
-          <div class="w-10 h-10 shrink-0 rounded-xl bg-[var(--primary-soft)] text-[var(--primary)] flex items-center justify-center font-extrabold">D</div>
-          <div>
-            <h3 class="m-0 text-[13.5px] font-extrabold text-[var(--text)]">Propietario y conductor</h3>
-            <p class="m-0 mt-1 text-[12.5px] leading-relaxed text-[var(--text-3)]">Datos de identidad y licencia se validan con SUNAT / RENIEC y con MTC – Licencias.</p>
-          </div>
-        </div>
-
-        <div class="flex items-start gap-2.5 rounded-xl border border-[var(--border)] bg-[var(--primary-soft)] px-4 py-3 text-[12px] leading-relaxed text-[var(--text-2)]">
-          <i class="fa-solid fa-circle-info mt-0.5 text-[var(--primary)]"></i>
-          <span>Los datos confirmados y aún no validados continúan su validación con la información remitida oficialmente por las entidades al corte.</span>
+          <h3 class="m-0 text-[13.5px] font-extrabold text-[var(--text)]">Placa y categoría / carrocería</h3>
+          <p class="m-0 mt-1 text-[12.5px] leading-relaxed text-[var(--text-3)]">Se validan con el MTC (registro
+            vehicular y clasificación de carrocería).</p>
         </div>
       </div>
 
-      <footer class="flex justify-end px-5 sm:px-6 py-4 border-t border-[var(--border)]">
-        <button type="button" (click)="closeValidationInfo()" class="bg-[var(--primary)] text-[var(--primary-contrast)] border-0 rounded-xl px-6 py-2.5 text-[13.5px] font-bold cursor-pointer hover:opacity-90">Entendido</button>
-      </footer>
-    </section>
-  </div>
+      <div class="flex items-start gap-3.5 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] p-4">
+        <div
+          class="w-10 h-10 shrink-0 rounded-xl bg-[var(--primary-soft)] text-[var(--primary)] flex items-center justify-center font-extrabold">
+          T</div>
+        <div>
+          <h3 class="m-0 text-[13.5px] font-extrabold text-[var(--text)]">TUC</h3>
+          <p class="m-0 mt-1 text-[12.5px] leading-relaxed text-[var(--text-3)]">Se valida con el MTC (Tarjeta Única de
+            Circulación vigente).</p>
+        </div>
+      </div>
+
+      <div class="flex items-start gap-3.5 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] p-4">
+        <div
+          class="w-10 h-10 shrink-0 rounded-xl bg-[var(--primary-soft)] text-[var(--primary)] flex items-center justify-center font-extrabold">
+          A</div>
+        <div>
+          <h3 class="m-0 text-[13.5px] font-extrabold text-[var(--text)]">Autorización</h3>
+          <p class="m-0 mt-1 text-[12.5px] leading-relaxed text-[var(--text-3)]">Se valida con la entidad que la
+            remitió: Gobierno Regional, Municipalidad Provincial o MTC, según corresponda.</p>
+        </div>
+      </div>
+
+      <div class="flex items-start gap-3.5 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] p-4">
+        <div
+          class="w-10 h-10 shrink-0 rounded-xl bg-[var(--primary-soft)] text-[var(--primary)] flex items-center justify-center font-extrabold">
+          D</div>
+        <div>
+          <h3 class="m-0 text-[13.5px] font-extrabold text-[var(--text)]">Propietario y conductor</h3>
+          <p class="m-0 mt-1 text-[12.5px] leading-relaxed text-[var(--text-3)]">Datos de identidad y licencia se
+            validan con SUNAT / RENIEC y con MTC – Licencias.</p>
+        </div>
+      </div>
+
+      <div
+        class="flex items-start gap-2.5 rounded-xl border border-[var(--border)] bg-[var(--primary-soft)] px-4 py-3 text-[12px] leading-relaxed text-[var(--text-2)]">
+        <i class="fa-solid fa-circle-info mt-0.5 text-[var(--primary)]"></i>
+        <span>Los datos confirmados y aún no validados continúan su validación con la información remitida oficialmente
+          por las entidades al corte.</span>
+      </div>
+    </div>
+
+    <footer class="flex justify-end px-5 sm:px-6 py-4 border-t border-[var(--border)]">
+      <button type="button" (click)="closeValidationInfo()"
+        class="bg-[var(--primary)] text-[var(--primary-contrast)] border-0 rounded-xl px-6 py-2.5 text-[13.5px] font-bold cursor-pointer hover:opacity-90">Entendido</button>
+    </footer>
+  </section>
+</div>
 }

@@ -53,13 +53,15 @@ export class VerificacionComponent implements OnInit {
   // ── Datos del transportista ─────────────────────────────────
   datosTransportista: DatoTransportista[] = [];
   cargandoDatos = false;
+  cargandoAutorizaciones = false;
   errorDatos = '';
   rucConsulta = '';
   actualizacionesDatosRestantes = 5;
   actualizacionesAutorizacionesRestantes = 5;
   actualizacionesVehiculosRestantes = 5;
   showValidationInfoModal = false;
-  private transportista: DatosTransportista | null = null;
+  transportista: DatosTransportista | null = null;
+  private originalSemaforoList: SemaforoCondicion[] = [];
 
   // ── Autorizaciones ──────────────────────────────────────────
   autorizaciones: Autorizacion[] = [];
@@ -107,6 +109,7 @@ export class VerificacionComponent implements OnInit {
     }
 
     this.cargandoDatos = true;
+    this.cargandoAutorizaciones = true;
     this.errorDatos = '';
 
     forkJoin({
@@ -123,7 +126,12 @@ export class VerificacionComponent implements OnInit {
         catchError(() => of([]))
       ),
     })
-      .pipe(finalize(() => (this.cargandoDatos = false)))
+      .pipe(
+        finalize(() => {
+          this.cargandoDatos = false;
+          this.cargandoAutorizaciones = false;
+        })
+      )
       .subscribe({
         next: ({ datos, autorizaciones, semaforo }) => {
           if (datos) this.aplicarDatosTransportista(datos);
@@ -134,7 +142,7 @@ export class VerificacionComponent implements OnInit {
   }
 
   actualizarSeccion(seccion: 'datos' | 'autorizaciones' | 'vehiculos'): void {
-    if (this.actualizacionesDisponibles(seccion) === 0 || this.cargandoDatos)
+    if (this.actualizacionesDisponibles(seccion) === 0 || this.cargandoDatos || this.cargandoAutorizaciones)
       return;
 
     const usuarioSesion = this.apiAuth.getUserFromSession();
@@ -147,9 +155,9 @@ export class VerificacionComponent implements OnInit {
       return;
     }
 
-    this.cargandoDatos = true;
     this.errorDatos = '';
     if (seccion === 'datos') {
+      this.cargandoDatos = true;
       this.apiVerificacion
         .obtenerDatosTransportista(this.rucConsulta)
         .pipe(finalize(() => (this.cargandoDatos = false)))
@@ -157,26 +165,29 @@ export class VerificacionComponent implements OnInit {
           next: (datos) => {
             this.aplicarDatosTransportista(datos);
             this.descontarActualizacion(seccion);
+            this.aplicarSemaforo(this.originalSemaforoList);
           },
           error: (error: VerificacionServiceError) => {
             this.errorDatos = error.descripcion || error.message;
           },
         });
     } else if (seccion === 'autorizaciones') {
+      this.cargandoAutorizaciones = true;
       this.apiVerificacion
         .obtenerAutorizaciones(this.rucConsulta)
-        .pipe(finalize(() => (this.cargandoDatos = false)))
+        .pipe(finalize(() => (this.cargandoAutorizaciones = false)))
         .subscribe({
           next: (datos) => {
             this.aplicarAutorizaciones(datos.autorizaciones);
             this.descontarActualizacion(seccion);
+            this.aplicarSemaforo(this.originalSemaforoList);
           },
           error: (error: VerificacionServiceError) => {
             this.errorDatos = error.descripcion || error.message;
           },
         });
     } else {
-      this.cargandoDatos = false; // Add remaining logic here later if needed
+      // Logic for vehicle updating if needed
     }
   }
 
@@ -263,7 +274,52 @@ export class VerificacionComponent implements OnInit {
   }
 
   private aplicarSemaforo(lista: SemaforoCondicion[]): void {
-    this.condiciones = lista.map((item) => {
+    this.originalSemaforoList = lista || [];
+
+    let finalLista = this.originalSemaforoList;
+    if (finalLista.length === 0) {
+      const rucCumple = this.transportista ? (this.transportista.activoSunat && this.transportista.habidoSunat) : false;
+      const autCumple = this.autorizaciones.length > 0 && !this.sinAutVigente;
+      const vehiculosCumple = rucCumple && autCumple;
+
+      finalLista = [
+        {
+          codigo: 'RUC',
+          nombre: 'RUC activo y habido',
+          estado: rucCumple ? 'CUMPLE' : 'NO_CUMPLE',
+          descripcion: rucCumple
+            ? 'El RUC del transportista se encuentra activo y habido en los registros de SUNAT.'
+            : 'El RUC del transportista debe estar activo y habido para continuar con la solicitud.',
+          icono: rucCumple ? 'CHECK' : 'ERROR',
+          colorNombre: rucCumple ? 'success' : 'danger',
+          colorHex: rucCumple ? '#15803d' : '#e53e3e'
+        },
+        {
+          codigo: 'AUTORIZACION',
+          nombre: 'Autorización de transporte vigente',
+          estado: autCumple ? 'CUMPLE' : 'NO_CUMPLE',
+          descripcion: autCumple
+            ? 'El transportista cuenta con al menos una autorización de transporte vigente.'
+            : 'El transportista no registra autorizaciones vigentes en las fuentes oficiales.',
+          icono: autCumple ? 'CHECK' : 'ERROR',
+          colorNombre: autCumple ? 'success' : 'danger',
+          colorHex: autCumple ? '#15803d' : '#e53e3e'
+        },
+        {
+          codigo: 'VEHICULOS',
+          nombre: 'Vehículos habilitados',
+          estado: vehiculosCumple ? 'REVISAR' : 'NO_CUMPLE',
+          descripcion: vehiculosCumple
+            ? 'Verifique los vehículos asociados en la sección inferior.'
+            : 'No es posible verificar los vehículos si el RUC o la autorización de transporte no cumplen.',
+          icono: vehiculosCumple ? 'WARNING' : 'ERROR',
+          colorNombre: vehiculosCumple ? 'warn' : 'danger',
+          colorHex: vehiculosCumple ? '#b45309' : '#e53e3e'
+        }
+      ];
+    }
+
+    this.condiciones = finalLista.map((item) => {
       let glyph = '✓';
       if (item.icono === 'WARNING') {
         glyph = '!';

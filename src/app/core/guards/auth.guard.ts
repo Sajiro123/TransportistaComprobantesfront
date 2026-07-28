@@ -9,6 +9,5 @@ export const authGuard: CanActivateFn = (_route, _state) => {
   // Solo una sesión emitida por IAM permite acceder a rutas protegidas.
   if (apiAuth.isLoggedIn()) return true;
 
-  router.navigate(['/login']);
-  return false;
+  return router.createUrlTree(['/login']);
 };

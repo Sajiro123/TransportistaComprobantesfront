@@ -657,331 +657,356 @@ import {
                       <i class="fa-solid fa-building-columns text-xs"></i>
                       Cambiar cuenta
                     </button>
-                  } @else {
-                    <button
-                      type="button"
-                      (click)="guardarEdicionCuenta()"
-                      [disabled]="isSavingCuenta"
-                      class="inline-flex items-center gap-2 bg-atu-primary text-white border border-atu-primary rounded-[9px] px-3 py-2 text-[12.5px] font-bold cursor-pointer disabled:opacity-60"
-                    >
-                      <i
-                        class="fa-solid"
-                        [ngClass]="
-                          isSavingCuenta
-                            ? 'fa-spinner fa-spin'
-                            : 'fa-floppy-disk'
-                        "
-                      ></i>
-                      {{ isSavingCuenta ? 'Guardando...' : 'Guardar cuenta' }}
-                    </button>
-                    <button
-                      type="button"
-                      (click)="cancelarEdicionCuenta()"
-                      [disabled]="isSavingCuenta"
-                      class="inline-flex items-center gap-2 bg-white dark:bg-[#161B22] text-atu-text-2 dark:text-[#8B949E] border border-atu-border dark:border-[#484F58] rounded-[9px] px-3 py-2 text-[12.5px] font-bold cursor-pointer disabled:opacity-60"
-                    >
-                      Cancelar
-                    </button>
                   }
                 </div>
               </div>
 
-              <div
-                class="p-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 gap-x-8 text-xs leading-normal"
-              >
-                <!-- Tipo de Abono -->
+              <div class="p-5 space-y-4 text-xs leading-normal">
                 @if (cuentaEditMode) {
-                  <div
-                    class="space-y-1.5 sm:col-span-2 lg:col-span-3 pb-2 border-b border-gray-100 dark:border-[#30363D]"
-                  >
-                    <span
-                      class="text-atu-text-3 dark:text-[#6E7681] font-semibold uppercase tracking-wider block text-[10.5px]"
-                    >
-                      Tipo de Abono
-                      <span class="text-red-600 dark:text-red-500 ml-0.5"
-                        >*</span
+                  <!-- Modalidad de cobro -->
+                  <div>
+                    <label class="block text-[12.5px] font-bold text-atu-text dark:text-[#E6EDF3] mb-2">
+                      Modalidad de cobro
+                    </label>
+                    <div class="flex flex-wrap gap-2.5 mb-4">
+                      <button
+                        type="button"
+                        (click)="setModoCobro(1)"
+                        class="flex-1 min-w-[200px] text-left p-3 rounded-xl border-2 transition-all cursor-pointer"
+                        [ngClass]="
+                          editTipoAbonoId === 1
+                            ? 'bg-atu-primary/10 border-atu-primary text-atu-primary dark:bg-[#00A3E0]/15 dark:border-[#00A3E0] dark:text-[#00A3E0]'
+                            : 'bg-white dark:bg-[#0D1117] border-atu-border dark:border-[#30363D] text-atu-text-2 dark:text-[#8B949E] hover:border-atu-primary/50'
+                        "
                       >
-                    </span>
-                    <div class="flex items-center gap-6 mt-1">
-                      <label
-                        class="inline-flex items-center gap-2 text-sm text-atu-text dark:text-[#E6EDF3] font-semibold cursor-pointer"
+                        <span class="block text-[13.5px] font-extrabold">Depósito bancario (CCI)</span>
+                        <span class="block text-[11.5px] font-semibold opacity-85 mt-0.5">Abono en tu cuenta</span>
+                      </button>
+                      <button
+                        type="button"
+                        (click)="setModoCobro(2)"
+                        class="flex-1 min-w-[200px] text-left p-3 rounded-xl border-2 transition-all cursor-pointer"
+                        [ngClass]="
+                          editTipoAbonoId === 2
+                            ? 'bg-atu-primary/10 border-atu-primary text-atu-primary dark:bg-[#00A3E0]/15 dark:border-[#00A3E0] dark:text-[#00A3E0]'
+                            : 'bg-white dark:bg-[#0D1117] border-atu-border dark:border-[#30363D] text-atu-text-2 dark:text-[#8B949E] hover:border-atu-primary/50'
+                        "
                       >
-                        <input
-                          type="radio"
-                          name="tipoAbono"
-                          [value]="1"
-                          [(ngModel)]="editTipoAbonoId"
-                          class="text-atu-primary focus:ring-atu-primary"
-                        />
-                        <span>CCI (Depósito Bancario)</span>
-                      </label>
-                      <label
-                        class="inline-flex items-center gap-2 text-sm text-atu-text dark:text-[#E6EDF3] font-semibold cursor-pointer"
-                      >
-                        <input
-                          type="radio"
-                          name="tipoAbono"
-                          [value]="2"
-                          [(ngModel)]="editTipoAbonoId"
-                          class="text-atu-primary focus:ring-atu-primary"
-                        />
-                        <span>OPE (Orden de Pago en Ventanilla)</span>
-                      </label>
+                        <span class="block text-[13.5px] font-extrabold">Orden de Pago (OPE)</span>
+                        <span class="block text-[11.5px] font-semibold opacity-85 mt-0.5">Cobro en ventanilla · solo persona natural</span>
+                      </button>
                     </div>
-                  </div>
-                }
 
-                <!-- Banco -->
-                <div class="space-y-1.5 sm:col-span-2 lg:col-span-3">
-                  <span
-                    class="text-atu-text-3 dark:text-[#6E7681] font-semibold uppercase tracking-wider block text-[10.5px]"
-                  >
-                    Banco
-                    @if (cuentaEditMode) {
-                      <span class="text-red-600 dark:text-red-500 ml-0.5"
-                        >*</span
-                      >
-                    }
-                  </span>
-                  @if (cuentaEditMode) {
-                    <div class="relative">
-                      <div
-                        class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
-                      >
-                        <i
-                          class="fa-solid fa-building-columns text-gray-400 text-xs"
-                        ></i>
-                      </div>
-                      <select
-                        [(ngModel)]="editBanco"
-                        [disabled]="bancosList.length === 0"
-                        class="w-full pl-9 border-2 border-atu-border dark:border-[#30363D] rounded-xl bg-white dark:bg-[#0D1117] px-3 py-2.5 text-[14px] text-atu-text dark:text-[#E6EDF3] focus:outline-none focus:border-atu-primary dark:focus:border-[#00A3E0] focus:ring-4 focus:ring-atu-primary/10 transition-all cursor-pointer shadow-sm appearance-none"
-                      >
-                        <option value="">Selecciona un banco…</option>
-                        @if (bancosList.length > 0) {
-                          @for (banco of bancosList; track banco.uuidBanco) {
-                            <option [value]="banco.uuidBanco">
-                              {{ banco.nombre }} ({{ banco.abreviatura }})
-                            </option>
-                          }
-                        } @else {
-                          <option value="" disabled>
-                            No hay bancos disponibles
-                          </option>
-                        }
-                      </select>
-                      <div
-                        class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none"
-                      >
-                        <i
-                          class="fa-solid fa-chevron-down text-gray-400 text-xs"
-                        ></i>
-                      </div>
-                    </div>
-                  } @else {
-                    <strong
-                      class="text-[15px] text-atu-text dark:text-[#E6EDF3] font-semibold flex items-center gap-2"
-                    >
-                      <div
-                        class="w-6 h-6 rounded-md bg-gray-100 dark:bg-[#21262D] flex items-center justify-center shrink-0"
-                      >
-                        <i
-                          class="fa-solid fa-building-columns text-gray-500 dark:text-[#8B949E] text-[10px]"
-                        ></i>
-                      </div>
-                      {{ cuentaAbono?.banco || '—' }}
-                    </strong>
-                  }
-                </div>
-
-                <!-- Datos de Abono: CCI vs OPE -->
-                @if (cuentaEditMode) {
-                  @if (editTipoAbonoId === 1) {
-                    <!-- CCI -->
-                    <div class="space-y-1.5 sm:col-span-2 lg:col-span-3">
-                      <span
-                        class="text-atu-text-3 dark:text-[#6E7681] font-semibold uppercase tracking-wider block text-[10.5px]"
-                      >
-                        Código de Cuenta Interbancario (CCI)
-                        <span class="text-red-600 dark:text-red-500 ml-0.5"
-                          >*</span
-                        >
-                      </span>
-                      <div class="relative">
-                        <div
-                          class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
-                        >
-                          <i
-                            class="fa-solid fa-money-check text-gray-400 text-xs"
-                          ></i>
+                    <!-- Modo CCI -->
+                    @if (editTipoAbonoId === 1) {
+                      <div class="space-y-4">
+                        <!-- Banco Select -->
+                        <div>
+                          <label class="block text-[12.5px] font-bold text-atu-text dark:text-[#E6EDF3] mb-1.5">
+                            Banco
+                          </label>
+                          <div class="relative">
+                            <select
+                              [(ngModel)]="editBanco"
+                              [disabled]="bancosList.length === 0"
+                              class="w-full border border-atu-border dark:border-[#30363D] rounded-xl bg-white dark:bg-[#0D1117] px-3 py-3 text-[14px] text-atu-text dark:text-[#E6EDF3] focus:outline-none focus:border-atu-primary dark:focus:border-[#00A3E0] focus:ring-4 focus:ring-atu-primary/10 transition-all cursor-pointer shadow-sm appearance-none"
+                            >
+                              <option value="">Selecciona un banco…</option>
+                              @for (banco of bancosList; track banco.uuidBanco) {
+                                <option [value]="banco.uuidBanco">
+                                  {{ banco.nombre }} ({{ banco.abreviatura }})
+                                </option>
+                              }
+                            </select>
+                            <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-gray-400">
+                              <i class="fa-solid fa-chevron-down text-xs"></i>
+                            </div>
+                          </div>
                         </div>
-                        <input
-                          type="text"
-                          inputmode="numeric"
-                          maxlength="20"
-                          [(ngModel)]="editCci"
-                          (input)="onCciInput($event)"
-                          placeholder="20 dígitos"
-                          class="w-full pl-9 border-2 border-atu-border dark:border-[#30363D] rounded-xl bg-white dark:bg-[#0D1117] px-3 py-2.5 text-[14px] text-atu-text dark:text-[#E6EDF3] focus:outline-none focus:border-atu-primary dark:focus:border-[#00A3E0] focus:ring-4 focus:ring-atu-primary/10 transition-all font-mono tracking-widest shadow-sm"
-                        />
+
+                        <!-- Banco Otro Input -->
+                        @if (editBanco == '6f8d7349-fabc-4ef7-af92-e3255f968719') {
+                          <div>
+                            <label class="block text-[12.5px] font-bold text-atu-text dark:text-[#E6EDF3] mb-1.5">
+                              Nombre de la entidad bancaria
+                            </label>
+                            <input
+                              type="text"
+                              [(ngModel)]="editBancoOtro"
+                              placeholder="Escribe el nombre de tu entidad"
+                              class="w-full border border-atu-border dark:border-[#30363D] rounded-xl bg-white dark:bg-[#0D1117] px-3 py-3 text-[14px] text-atu-text dark:text-[#E6EDF3] focus:outline-none focus:border-atu-primary dark:focus:border-[#00A3E0] shadow-sm"
+                            />
+                          </div>
+                        }
+
+                        <!-- CCI Input -->
+                        <div>
+                          <label class="block text-[12.5px] font-bold text-atu-text dark:text-[#E6EDF3] mb-1.5">
+                            Código de Cuenta Interbancario (CCI)
+                          </label>
+                          <input
+                            type="text"
+                            inputmode="numeric"
+                            maxlength="20"
+                            [(ngModel)]="editCci"
+                            (input)="onCciInput($event)"
+                            placeholder="20 dígitos"
+                            class="w-full border border-atu-border dark:border-[#30363D] rounded-xl bg-white dark:bg-[#0D1117] px-3 py-3 text-[14px] text-atu-text dark:text-[#E6EDF3] focus:outline-none focus:border-atu-primary dark:focus:border-[#00A3E0] font-mono tracking-wider shadow-sm"
+                          />
+                          @if (editCci && editCci.length !== 20) {
+                            <p class="mt-1.5 text-[11.5px] font-semibold text-red-600 dark:text-red-400">
+                              El CCI debe contener exactamente 20 dígitos.
+                            </p>
+                          }
+                        </div>
+
+                        <!-- Documento de la cuenta bancaria -->
+                        <div>
+                          <label class="block text-[12.5px] font-bold text-atu-text dark:text-[#E6EDF3] mb-1.5">
+                            Documento de la cuenta bancaria
+                          </label>
+                          <input
+                            type="file"
+                            #ctaDocFileInput
+                            (change)="onCtaDocFileSelected($event)"
+                            accept="image/*,.pdf"
+                            class="hidden"
+                          />
+                          @if (!editCtaDocFile && !editCtaDocName) {
+                            <button
+                              type="button"
+                              (click)="ctaDocFileInput.click()"
+                              class="w-full border-2 border-dashed border-atu-border dark:border-[#30363D] rounded-xl p-4 bg-atu-surface-2 dark:bg-[#161B22] text-atu-text-2 dark:text-[#8B949E] text-[12.5px] font-bold cursor-pointer hover:border-atu-primary hover:text-atu-primary transition-colors text-center"
+                            >
+                              <i class="fa-solid fa-cloud-arrow-up mr-2"></i>
+                              Cargar imagen o PDF del documento de la cuenta
+                            </button>
+                          } @else {
+                            <div class="flex items-center justify-between gap-3 p-3 rounded-xl bg-atu-surface-2 dark:bg-[#161B22] border border-atu-border dark:border-[#30363D]">
+                              <div class="flex items-center gap-2.5 min-w-0">
+                                <i class="fa-solid fa-file-lines text-atu-primary text-base shrink-0"></i>
+                                <span class="text-[12.5px] font-bold text-atu-text dark:text-[#E6EDF3] truncate">
+                                  {{ editCtaDocName }}
+                                </span>
+                              </div>
+                              <button
+                                type="button"
+                                (click)="removeCtaDocFile()"
+                                title="Quitar"
+                                class="shrink-0 w-7 h-7 rounded-lg border border-red-200 dark:border-red-900/50 bg-red-50 dark:bg-red-950/40 text-red-600 dark:text-red-400 text-sm font-bold flex items-center justify-center hover:bg-red-100 transition-colors"
+                              >
+                                ×
+                              </button>
+                            </div>
+                          }
+                          <p class="text-[11.5px] text-atu-text-3 dark:text-[#6E7681] mt-1.5 leading-relaxed">
+                            Adjunta el estado de cuenta, voucher o constancia donde figure el CCI a tu nombre.
+                          </p>
+                        </div>
                       </div>
-                      @if (editCci && editCci.length !== 20) {
-                        <p
-                          class="mt-1.5 text-[11.5px] font-semibold text-red-600 dark:text-red-400"
-                        >
-                          El CCI debe contener exactamente 20 dígitos.
-                        </p>
-                      }
+                    }
+
+                    <!-- Modo OPE -->
+                    @if (editTipoAbonoId === 2) {
+                      <div class="space-y-4">
+                        <!-- Banner Advertencia OPE -->
+                        <div class="flex items-start gap-2.5 bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/40 rounded-xl p-3.5 text-[12.5px] text-amber-900 dark:text-amber-300 leading-relaxed">
+                          <span class="shrink-0 font-extrabold text-amber-600 dark:text-amber-400 text-sm">!</span>
+                          <span>
+                            La Orden de Pago Electrónico <b>solo aplica a persona natural</b> y se cobra en ventanilla del <b>Banco de la Nación</b>. En esta modalidad el subsidio <b>pierde la protección de intangibilidad</b> y podría ser objeto de retención o embargo.
+                          </span>
+                        </div>
+
+                        <!-- Banco (Fijo) -->
+                        <div>
+                          <label class="block text-[12.5px] font-bold text-atu-text dark:text-[#E6EDF3] mb-1.5">
+                            Banco
+                          </label>
+                          <div class="flex items-center gap-2.5 bg-atu-surface-2 dark:bg-[#161B22] border border-atu-border dark:border-[#30363D] rounded-xl px-3.5 py-3">
+                            <span class="text-[14px] font-bold text-atu-text dark:text-[#E6EDF3]">Banco de la Nación</span>
+                            <span class="text-[11px] font-bold bg-gray-200 dark:bg-[#30363D] text-gray-600 dark:text-[#8B949E] rounded-md px-2 py-0.5">Fijo</span>
+                          </div>
+                        </div>
+
+                        <!-- Tipo doc & Num doc -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                          <div>
+                            <label class="block text-[12.5px] font-bold text-atu-text dark:text-[#E6EDF3] mb-1.5">
+                              Tipo de documento
+                            </label>
+                            <select
+                              [(ngModel)]="editOpeTipoDoc"
+                              class="w-full border border-atu-border dark:border-[#30363D] rounded-xl bg-white dark:bg-[#0D1117] px-3 py-3 text-[14px] text-atu-text dark:text-[#E6EDF3] focus:outline-none focus:border-atu-primary dark:focus:border-[#00A3E0] shadow-sm cursor-pointer"
+                            >
+                              <option value="DNI">DNI</option>
+                              <option value="CE">Carné de extranjería</option>
+                              <option value="PAS">Pasaporte</option>
+                            </select>
+                          </div>
+                          <div>
+                            <label class="block text-[12.5px] font-bold text-atu-text dark:text-[#E6EDF3] mb-1.5">
+                              N.° de documento
+                            </label>
+                            <input
+                              type="text"
+                              inputmode="numeric"
+                              [attr.maxlength]="editOpeTipoDoc === 'DNI' ? 8 : 12"
+                              [(ngModel)]="editDniBeneficiario"
+                              (input)="onOpeNumDocInput($event)"
+                              [placeholder]="editOpeTipoDoc === 'DNI' ? '8 dígitos' : 'Número de documento'"
+                              class="w-full border border-atu-border dark:border-[#30363D] rounded-xl bg-white dark:bg-[#0D1117] px-3 py-3 text-[14px] text-atu-text dark:text-[#E6EDF3] focus:outline-none focus:border-atu-primary dark:focus:border-[#00A3E0] font-mono shadow-sm"
+                            />
+                          </div>
+                        </div>
+
+                        <!-- Nombre completo beneficiario -->
+                        <div>
+                          <label class="block text-[12.5px] font-bold text-atu-text dark:text-[#E6EDF3] mb-1.5">
+                            Nombre completo del beneficiario
+                          </label>
+                          <input
+                            type="text"
+                            [(ngModel)]="editNombreBeneficiario"
+                            placeholder="Nombres y apellidos"
+                            class="w-full border border-atu-border dark:border-[#30363D] rounded-xl bg-white dark:bg-[#0D1117] px-3 py-3 text-[14px] text-atu-text dark:text-[#E6EDF3] focus:outline-none focus:border-atu-primary dark:focus:border-[#00A3E0] shadow-sm"
+                          />
+                        </div>
+                      </div>
+                    }
+
+                    <!-- Botones de Acción Formulario -->
+                    <div class="flex items-center gap-3 pt-3">
+                      <button
+                        type="button"
+                        (click)="cancelarEdicionCuenta()"
+                        [disabled]="isSavingCuenta"
+                        class="bg-white dark:bg-[#161B22] text-atu-text-2 dark:text-[#8B949E] border border-atu-border dark:border-[#484F58] rounded-xl px-4 py-3 text-[14px] font-semibold cursor-pointer disabled:opacity-60 hover:bg-gray-50 dark:hover:bg-[#21262D]"
+                      >
+                        Cancelar
+                      </button>
+                      <button
+                        type="button"
+                        (click)="guardarEdicionCuenta()"
+                        [disabled]="isSavingCuenta"
+                        class="flex-1 bg-atu-primary text-white border border-atu-primary rounded-xl px-4 py-3 text-[14px] font-bold cursor-pointer disabled:opacity-60 hover:bg-atu-primary-strong transition-colors flex items-center justify-center gap-2"
+                      >
+                        @if (isSavingCuenta) {
+                          <i class="fa-solid fa-spinner fa-spin text-sm"></i>
+                          <span>Guardando...</span>
+                        } @else {
+                          <span>Guardar cuenta</span>
+                        }
+                      </button>
                     </div>
-                  } @else {
-                    <!-- OPE -->
-                    <div
-                      class="sm:col-span-2 lg:col-span-3 grid grid-cols-1 sm:grid-cols-2 gap-5 gap-x-8"
-                    >
-                      <div class="space-y-1.5">
-                        <span
-                          class="text-atu-text-3 dark:text-[#6E7681] font-semibold uppercase tracking-wider block text-[10.5px]"
-                        >
-                          DNI Beneficiario
-                          <span class="text-red-600 dark:text-red-500 ml-0.5"
-                            >*</span
-                          >
-                        </span>
-                        <input
-                          type="text"
-                          maxlength="8"
-                          [(ngModel)]="editDniBeneficiario"
-                          placeholder="8 dígitos"
-                          class="w-full border-2 border-atu-border dark:border-[#30363D] rounded-xl bg-white dark:bg-[#0D1117] px-3 py-2.5 text-[14px] text-atu-text dark:text-[#E6EDF3] focus:outline-none focus:border-atu-primary font-mono shadow-sm"
-                        />
-                      </div>
-                      <div class="space-y-1.5">
-                        <span
-                          class="text-atu-text-3 dark:text-[#6E7681] font-semibold uppercase tracking-wider block text-[10.5px]"
-                        >
-                          Nombre Completo Beneficiario
-                          <span class="text-red-600 dark:text-red-500 ml-0.5"
-                            >*</span
-                          >
-                        </span>
-                        <input
-                          type="text"
-                          [(ngModel)]="editNombreBeneficiario"
-                          placeholder="Nombres y Apellidos completado"
-                          class="w-full border-2 border-atu-border dark:border-[#30363D] rounded-xl bg-white dark:bg-[#0D1117] px-3 py-2.5 text-[14px] text-atu-text dark:text-[#E6EDF3] focus:outline-none focus:border-atu-primary shadow-sm"
-                        />
-                      </div>
-                    </div>
-                  }
+                  </div>
                 } @else {
-                  <div class="space-y-1.5 sm:col-span-2 lg:col-span-3">
-                    <span
-                      class="text-atu-text-3 dark:text-[#6E7681] font-semibold uppercase tracking-wider block text-[10.5px]"
-                    >
-                      {{
-                        cuentaBancariaReal?.tipoAbono === 'OPE'
-                          ? 'Beneficiario OPE'
-                          : 'Código de Cuenta Interbancario (CCI)'
-                      }}
-                    </span>
-                    <strong
-                      class="text-[15px] text-atu-text dark:text-[#E6EDF3] font-semibold flex items-center gap-3 font-mono tracking-[0.1em]"
-                    >
-                      <i
-                        class="fa-solid text-gray-400 dark:text-[#8B949E]"
-                        [ngClass]="
-                          cuentaBancariaReal?.tipoAbono === 'OPE'
-                            ? 'fa-user-check'
-                            : 'fa-money-check'
-                        "
-                      ></i>
-                      @if (cuentaBancariaReal?.tipoAbono === 'OPE') {
-                        {{ cuentaBancariaReal?.nombreBeneficiario }} (DNI:
-                        {{ cuentaBancariaReal?.dniBeneficiario }})
-                      } @else {
-                        {{ cuentaAbono?.codigoCuentaInterbancario || '—' }}
-                      }
-                    </strong>
+                  <!-- Vista modo de lectura -->
+                  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 gap-x-8">
+                    <!-- Banco -->
+                    <div class="space-y-1.5 sm:col-span-2 lg:col-span-3">
+                      <span class="text-atu-text-3 dark:text-[#6E7681] font-semibold uppercase tracking-wider block text-[10.5px]">
+                        Banco
+                      </span>
+                      <strong class="text-[15px] text-atu-text dark:text-[#E6EDF3] font-semibold flex items-center gap-2">
+                        <div class="w-6 h-6 rounded-md bg-gray-100 dark:bg-[#21262D] flex items-center justify-center shrink-0">
+                          <i class="fa-solid fa-building-columns text-gray-500 dark:text-[#8B949E] text-[10px]"></i>
+                        </div>
+                        {{ bancoCuentaVisible || '—' }}
+                      </strong>
+                    </div>
+
+                    <!-- Datos de Abono: CCI vs OPE -->
+                    <div class="space-y-1.5 sm:col-span-2 lg:col-span-3">
+                      <span class="text-atu-text-3 dark:text-[#6E7681] font-semibold uppercase tracking-wider block text-[10.5px]">
+                        {{ cuentaBancariaReal?.tipoAbono === 'OPE' ? 'Beneficiario OPE' : 'Código de Cuenta Interbancario (CCI)' }}
+                      </span>
+                      <strong class="text-[15px] text-atu-text dark:text-[#E6EDF3] font-semibold flex items-center gap-3 font-mono tracking-[0.1em]">
+                        <i
+                          class="fa-solid text-gray-400 dark:text-[#8B949E]"
+                          [ngClass]="cuentaBancariaReal?.tipoAbono === 'OPE' ? 'fa-user-check' : 'fa-money-check'"
+                        ></i>
+                        @if (cuentaBancariaReal?.tipoAbono === 'OPE') {
+                          {{ cuentaBancariaReal?.nombreBeneficiario }} (DNI: {{ cuentaBancariaReal?.dniBeneficiario }})
+                        } @else {
+                          {{ cuentaAbono?.codigoCuentaInterbancario || '—' }}
+                        }
+                      </strong>
+                    </div>
+
+                    <!-- Documento de evidencia -->
+                    @if (cuentaBancariaReal?.archivo) {
+                      <div class="space-y-1.5 sm:col-span-2 lg:col-span-3">
+                        <span class="text-atu-text-3 dark:text-[#6E7681] font-semibold uppercase tracking-wider block text-[10.5px]">
+                          Documento de evidencia
+                        </span>
+                        <div class="flex items-center gap-3 mt-1">
+                          <div class="flex items-center gap-2 bg-atu-surface-2 dark:bg-[#161B22] border border-atu-border dark:border-[#30363D] rounded-xl px-3 py-2 text-[13px]">
+                            <i class="fa-solid fa-file-pdf text-red-500"></i>
+                            <span class="text-atu-text dark:text-[#E6EDF3] font-semibold">
+                              {{ cuentaBancariaReal?.archivo?.nombreOriginal }}
+                            </span>
+                            <button
+                              type="button"
+                              (click)="descargarEvidencia(cuentaBancariaReal?.archivo?.archivoUuid!, cuentaBancariaReal?.archivo?.nombreOriginal!)"
+                              class="ml-2 bg-atu-primary hover:bg-atu-primary-strong text-white border-0 rounded-lg px-2.5 py-1 text-xs font-bold cursor-pointer transition-colors"
+                            >
+                              <i class="fa-solid fa-download"></i> Descargar
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    }
                   </div>
                 }
-              </div>
 
-              <!-- Mensajes Informativos (Dependiendo del banco seleccionado) -->
-              @if (esBancoNacion) {
-                <div
-                  class="mx-5 mb-5 bg-red-50 dark:bg-red-950/20 border-l-4 border-red-500 rounded-r-xl p-4 transition-all"
-                >
-                  <div class="flex items-center gap-3 mb-2">
-                    <div
-                      class="w-7 h-7 rounded-full bg-red-100 dark:bg-red-900/50 text-red-600 dark:text-red-400 flex items-center justify-center shrink-0 shadow-sm"
-                    >
-                      <i class="fa-solid fa-triangle-exclamation text-xs"></i>
+                <!-- Mensajes Informativos de Intangibilidad -->
+                @if (esBancoNacion) {
+                  <div class="bg-red-50 dark:bg-red-950/20 border-l-4 border-red-500 rounded-r-xl p-4 transition-all mt-4">
+                    <div class="flex items-center gap-3 mb-2">
+                      <div class="w-7 h-7 rounded-full bg-red-100 dark:bg-red-900/50 text-red-600 dark:text-red-400 flex items-center justify-center shrink-0 shadow-sm">
+                        <i class="fa-solid fa-triangle-exclamation text-xs"></i>
+                      </div>
+                      <span class="text-[15px] font-extrabold text-red-700 dark:text-red-400">
+                        Atención: cuenta del Banco de la Nación
+                      </span>
                     </div>
-                    <span
-                      class="text-[15px] font-extrabold text-red-700 dark:text-red-400"
-                      >Atención: cuenta del Banco de la Nación</span
-                    >
+                    <p class="m-0 pl-10 text-[14px] text-red-900/80 dark:text-red-300/80 leading-relaxed">
+                      Si eliges una cuenta del <b>Banco de la Nación</b>, tu subsidio <b class="text-red-700 dark:text-red-400">pierde la protección de intangibilidad</b> y podría ser objeto de <b>retención o embargo</b>. En cualquier otro banco el monto está protegido. Te recomendamos usar una cuenta de otro banco.
+                    </p>
                   </div>
-                  <p
-                    class="m-0 pl-10 text-[14px] text-red-900/80 dark:text-red-300/80 leading-relaxed"
-                  >
-                    Si eliges una cuenta del <b>Banco de la Nación</b>, tu
-                    subsidio
-                    <b class="text-red-700 dark:text-red-400"
-                      >pierde la protección de intangibilidad</b
-                    >
-                    y podría ser objeto de <b>retención o embargo</b>. En
-                    cualquier otro banco el monto está protegido. Te
-                    recomendamos usar una cuenta de otro banco.
-                  </p>
-                </div>
-              } @else if (
-                bancoCuentaVisible &&
-                !esBancoNacion
-              ) {
-                <div
-                  class="mx-5 mb-5 bg-green-50 dark:bg-green-950/20 border-l-4 border-green-500 rounded-r-xl p-4 transition-all"
-                >
-                  <div class="flex items-center gap-3 mb-1.5">
-                    <div
-                      class="w-7 h-7 rounded-full bg-green-100 dark:bg-green-900/50 text-green-600 dark:text-green-400 flex items-center justify-center shrink-0 shadow-sm"
-                    >
-                      <i class="fa-solid fa-shield-halved text-xs"></i>
+                } @else if (bancoCuentaVisible && !esBancoNacion) {
+                  <div class="bg-green-50 dark:bg-green-950/20 border-l-4 border-green-500 rounded-r-xl p-4 transition-all mt-4">
+                    <div class="flex items-center gap-3 mb-1.5">
+                      <div class="w-7 h-7 rounded-full bg-green-100 dark:bg-green-900/50 text-green-600 dark:text-green-400 flex items-center justify-center shrink-0 shadow-sm">
+                        <i class="fa-solid fa-shield-halved text-xs"></i>
+                      </div>
+                      <span class="text-[15px] font-extrabold text-green-700 dark:text-green-400">
+                        Cuenta protegida por intangibilidad
+                      </span>
                     </div>
-                    <span
-                      class="text-[15px] font-extrabold text-green-700 dark:text-green-400"
-                      >Cuenta protegida por intangibilidad</span
-                    >
+                    <p class="m-0 pl-10 text-[13.5px] text-green-900/80 dark:text-green-300/80 leading-relaxed">
+                      Al no ser del Banco de la Nación, tu subsidio no puede ser retenido ni embargado.
+                    </p>
                   </div>
-                  <p
-                    class="m-0 pl-10 text-[13.5px] text-green-900/80 dark:text-green-300/80 leading-relaxed"
-                  >
-                    Al no ser del Banco de la Nación, tu subsidio no puede ser
-                    retenido ni embargado.
-                  </p>
-                </div>
-              }
+                }
 
-              @if (cuentaAlert) {
-                <div
-                  class="mx-5 mb-5 flex items-center gap-2.5 p-3 rounded-[10px] text-[13px] font-semibold border"
-                  [ngClass]="
-                    cuentaAlert.type === 'error'
-                      ? 'bg-red-50 text-red-600 dark:bg-[rgba(239,68,68,0.1)] dark:text-red-400 border-red-100 dark:border-red-900/50'
-                      : 'bg-green-50 text-green-600 dark:bg-[rgba(34,197,94,0.1)] dark:text-green-400 border-green-100 dark:border-green-900/50'
-                  "
-                >
-                  <i
-                    class="fa-solid"
+                @if (cuentaAlert) {
+                  <div
+                    class="flex items-center gap-2.5 p-3 rounded-[10px] text-[13px] font-semibold border mt-3"
                     [ngClass]="
                       cuentaAlert.type === 'error'
-                        ? 'fa-triangle-exclamation'
-                        : 'fa-check'
+                        ? 'bg-red-50 text-red-600 dark:bg-[rgba(239,68,68,0.1)] dark:text-red-400 border-red-100 dark:border-red-900/50'
+                        : 'bg-green-50 text-green-600 dark:bg-[rgba(34,197,94,0.1)] dark:text-green-400 border-green-100 dark:border-green-900/50'
                     "
-                  ></i>
-                  {{ cuentaAlert.message }}
-                </div>
-              }
+                  >
+                    <i
+                      class="fa-solid"
+                      [ngClass]="cuentaAlert.type === 'error' ? 'fa-triangle-exclamation' : 'fa-check'"
+                    ></i>
+                    {{ cuentaAlert.message }}
+                  </div>
+                }
+              </div>
             </div>
           </div>
 
@@ -1140,6 +1165,11 @@ export class PerfilInfoComponent implements OnInit {
   editContactoTelefono = '';
   editContactoCorreo = '';
 
+  editBancoOtro = '';
+  editCtaDocFile: File | null = null;
+  editCtaDocName = '';
+  editOpeTipoDoc = 'DNI';
+
   bancosList: BancoItemResponse[] = [];
   cuentaBancariaReal: CuentaBancariaTransportistaResponseData | null = null;
   editTipoAbonoId = 1; // 1 = CCI, 2 = OPE
@@ -1208,6 +1238,7 @@ export class PerfilInfoComponent implements OnInit {
               res.data.lista.uuidBanco ||
               'Banco de Crédito del Perú',
             codigoCuentaInterbancario: res.data.lista.cci || '',
+            nombreBancoOtro: res.data.lista.nombreBancoOtro || undefined,
           };
         } else {
           this.cuentaAbono = null;
@@ -1398,25 +1429,112 @@ export class PerfilInfoComponent implements OnInit {
     this.editCci = numericValue;
   }
 
+  setModoCobro(modoId: number): void {
+    this.editTipoAbonoId = modoId;
+    if (modoId === 2) {
+      const bn = this.bancosList.find(
+        (b) =>
+          b.nombre.toLowerCase().includes('nacion') ||
+          b.abreviatura.toLowerCase() === 'bn' ||
+          b.codigo.toLowerCase() === 'bn',
+      );
+      if (bn) {
+        this.editBanco = bn.uuidBanco;
+      }
+      this.editOpeTipoDoc = 'DNI';
+    }
+  }
+
+  onOpeNumDocInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const isDni = this.editOpeTipoDoc === 'DNI';
+    const max = isDni ? 8 : 12;
+    const raw = isDni
+      ? input.value.replace(/\D/g, '')
+      : input.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+    const val = raw.slice(0, max);
+    input.value = val;
+    this.editDniBeneficiario = val;
+  }
+
+  onCtaDocFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files.length > 0) {
+      const file = input.files[0];
+      this.editCtaDocFile = file;
+      this.editCtaDocName = file.name;
+    }
+  }
+
+  removeCtaDocFile(): void {
+    this.editCtaDocFile = null;
+    this.editCtaDocName = '';
+  }
+
+  descargarEvidencia(archivoUuid: string, nombreArchivo: string): void {
+    this.apiComprobanteService.descargarArchivo(archivoUuid).subscribe({
+      next: (blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = nombreArchivo;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+      },
+      error: (err) => {
+        console.error('Error al descargar archivo de evidencia:', err);
+        this.cuentaAlert = {
+          message: 'No fue posible descargar el archivo de evidencia.',
+          type: 'error',
+        };
+      },
+    });
+  }
+
   get bancoCuentaVisible(): string {
-    if (!this.cuentaEditMode) return this.cuentaAbono?.banco ?? '';
+    if (!this.cuentaEditMode) {
+      if (this.cuentaBancariaReal?.tipoAbono === 'OPE') return 'Banco de la Nación';
+      
+      const esOtro =
+        this.cuentaBancariaReal?.uuidBanco === '6f8d7349-fabc-4ef7-af92-e3255f968719' ||
+        this.cuentaAbono?.banco?.toUpperCase() === 'OTROS' ||
+        this.cuentaAbono?.banco?.toUpperCase() === 'OTRO';
+
+      if (esOtro) {
+        return (
+          this.cuentaBancariaReal?.nombreBancoOtro ??
+          this.cuentaAbono?.nombreBancoOtro ??
+          this.cuentaAbono?.banco ??
+          ''
+        );
+      }
+      return this.cuentaAbono?.banco ?? '';
+    }
+
+    if (this.editTipoAbonoId === 2) return 'Banco de la Nación';
+
+    if (this.editBanco === '6f8d7349-fabc-4ef7-af92-e3255f968719') {
+      return this.editBancoOtro || 'OTRO (Entidad personalizada)';
+    }
 
     return (
-      this.bancosList.find(
-        (banco) => banco.uuidBanco === this.editBanco,
-      )?.nombre ?? ''
+      this.bancosList.find((banco) => banco.uuidBanco === this.editBanco)?.nombre ?? ''
     );
   }
 
   get esBancoNacion(): boolean {
+    if (this.cuentaEditMode && this.editTipoAbonoId === 2) {
+      return true;
+    }
+
     const bancoSeleccionado = this.cuentaEditMode
-      ? this.bancosList.find(
-        (banco) => banco.uuidBanco === this.editBanco,
-      )
+      ? this.bancosList.find((b) => b.uuidBanco === this.editBanco)
       : this.bancosList.find(
-        (banco) =>
-          banco.uuidBanco === this.cuentaBancariaReal?.uuidBanco ||
-          banco.nombre === this.cuentaAbono?.banco,
+        (b) =>
+          b.uuidBanco === this.cuentaBancariaReal?.uuidBanco ||
+          b.nombre === this.cuentaAbono?.banco,
       );
 
     const normalizar = (value: string | null | undefined): string =>
@@ -1427,7 +1545,8 @@ export class PerfilInfoComponent implements OnInit {
         .replace(/[^a-z0-9]/g, '');
 
     const nombre = normalizar(
-      bancoSeleccionado?.nombre ?? this.bancoCuentaVisible,
+      bancoSeleccionado?.nombre ??
+      (this.editBanco === '6f8d7349-fabc-4ef7-af92-e3255f968719' ? this.editBancoOtro : this.bancoCuentaVisible),
     );
     const codigo = normalizar(bancoSeleccionado?.codigo);
     const abreviatura = normalizar(bancoSeleccionado?.abreviatura);
@@ -1446,11 +1565,15 @@ export class PerfilInfoComponent implements OnInit {
         (banco) => banco.nombre === this.cuentaAbono?.banco,
       )?.uuidBanco ??
       '';
+    this.editBancoOtro = this.cuentaBancariaReal?.nombreBancoOtro ?? this.cuentaAbono?.nombreBancoOtro ?? '';
     this.editCci = this.cuentaAbono?.codigoCuentaInterbancario ?? '';
     this.editTipoAbonoId = this.cuentaBancariaReal?.tipoAbono === 'OPE' ? 2 : 1;
+    this.editOpeTipoDoc = 'DNI';
     this.editDniBeneficiario = this.cuentaBancariaReal?.dniBeneficiario ?? '';
     this.editNombreBeneficiario =
       this.cuentaBancariaReal?.nombreBeneficiario ?? '';
+    this.editCtaDocFile = null;
+    this.editCtaDocName = this.cuentaBancariaReal?.archivo?.nombreOriginal ?? '';
     this.cuentaAlert = null;
     this.cuentaEditMode = true;
   }
@@ -1459,14 +1582,18 @@ export class PerfilInfoComponent implements OnInit {
     if (this.isSavingCuenta) return;
     this.cuentaEditMode = false;
     this.editBanco = '';
+    this.editBancoOtro = '';
     this.editCci = '';
     this.editDniBeneficiario = '';
     this.editNombreBeneficiario = '';
+    this.editCtaDocFile = null;
+    this.editCtaDocName = '';
     this.cuentaAlert = null;
   }
 
   guardarEdicionCuenta(): void {
     this.editBanco = String(this.editBanco ?? '').trim();
+    this.editBancoOtro = String(this.editBancoOtro ?? '').trim();
     this.editCci = String(this.editCci ?? '').trim();
     this.editDniBeneficiario = String(this.editDniBeneficiario ?? '').trim();
     this.editNombreBeneficiario = String(
@@ -1474,15 +1601,23 @@ export class PerfilInfoComponent implements OnInit {
     ).trim();
     this.cuentaAlert = null;
 
-    if (!this.editBanco) {
-      this.cuentaAlert = {
-        message: 'Seleccione el banco de la cuenta de abono.',
-        type: 'error',
-      };
-      return;
-    }
-
     if (this.editTipoAbonoId === 1) {
+      if (!this.editBanco) {
+        this.cuentaAlert = {
+          message: 'Selecciona un banco.',
+          type: 'error',
+        };
+        return;
+      }
+
+      if (this.editBanco === '6f8d7349-fabc-4ef7-af92-e3255f968719' && !this.editBancoOtro) {
+        this.cuentaAlert = {
+          message: 'Escribe el nombre de tu entidad bancaria.',
+          type: 'error',
+        };
+        return;
+      }
+
       if (!/^\d{20}$/.test(this.editCci)) {
         this.cuentaAlert = {
           message: 'El CCI debe contener exactamente 20 dígitos.',
@@ -1491,9 +1626,27 @@ export class PerfilInfoComponent implements OnInit {
         return;
       }
     } else {
-      if (!/^\d{8}$/.test(this.editDniBeneficiario)) {
+      // OPE Mode
+      const bn = this.bancosList.find(
+        (b) =>
+          b.nombre.toLowerCase().includes('nacion') ||
+          b.abreviatura.toLowerCase() === 'bn' ||
+          b.codigo.toLowerCase() === 'bn',
+      );
+      if (bn) {
+        this.editBanco = bn.uuidBanco;
+      }
+
+      if (this.editOpeTipoDoc === 'DNI' && !/^\d{8}$/.test(this.editDniBeneficiario)) {
         this.cuentaAlert = {
           message: 'El DNI del beneficiario debe contener 8 dígitos.',
+          type: 'error',
+        };
+        return;
+      }
+      if (!this.editDniBeneficiario) {
+        this.cuentaAlert = {
+          message: 'Ingrese el número de documento del beneficiario.',
           type: 'error',
         };
         return;
@@ -1507,9 +1660,30 @@ export class PerfilInfoComponent implements OnInit {
       }
     }
 
-    const bancoSeleccionado = this.bancosList.find(
+    let bancoSeleccionado = this.bancosList.find(
       (banco) => banco.uuidBanco === this.editBanco,
     );
+
+    if (!bancoSeleccionado && this.editBanco === 'otro') {
+      bancoSeleccionado = {
+        uuidBanco: 'otro',
+        codigo: 'OTRO',
+        nombre: this.editBancoOtro || 'Otro Banco',
+        abreviatura: 'OTRO',
+        permiteOpe: false,
+      };
+    }
+
+    if (!bancoSeleccionado && this.editTipoAbonoId === 2) {
+      bancoSeleccionado = {
+        uuidBanco: this.editBanco || 'bn',
+        codigo: 'BN',
+        nombre: 'Banco de la Nación',
+        abreviatura: 'BN',
+        permiteOpe: true,
+      };
+    }
+
     if (!bancoSeleccionado) {
       this.cuentaAlert = {
         message: 'El banco seleccionado no es válido.',
@@ -1518,9 +1692,19 @@ export class PerfilInfoComponent implements OnInit {
       return;
     }
 
+    const isNew = !this.cuentaBancariaReal?.uuidCuentaBancaria;
+    if (isNew && !this.editCtaDocFile) {
+      this.cuentaAlert = {
+        message: 'Debe adjuntar un archivo de evidencia (PDF o imagen) para registrar la cuenta bancaria.',
+        type: 'error',
+      };
+      return;
+    }
+
     this.isSavingCuenta = true;
     const payload = {
       uuidBanco: bancoSeleccionado.uuidBanco,
+      nombreBancoOtro: (bancoSeleccionado.codigo === 'OTROS' || bancoSeleccionado.abreviatura === 'OTROS' || this.editBanco === 'otro') ? this.editBancoOtro : null,
       tipoAbonoId: this.editTipoAbonoId,
       cci: this.editTipoAbonoId === 1 ? this.editCci : null,
       dniBeneficiario:
@@ -1532,26 +1716,31 @@ export class PerfilInfoComponent implements OnInit {
     const action$ = this.cuentaBancariaReal?.uuidCuentaBancaria
       ? this.apiComprobanteService.actualizarCuentaBancariaTransportista(
         payload,
+        this.editCtaDocFile,
       )
       : this.apiComprobanteService.registrarCuentaBancariaTransportista(
         payload,
+        this.editCtaDocFile!,
       );
 
     action$.subscribe({
       next: (response) => {
         this.isSavingCuenta = false;
-        this.cuentaBancariaReal = response.data.lista;
+        if (response.data?.lista) {
+          this.cuentaBancariaReal = response.data.lista;
+        }
         this.cuentaAbono = {
           banco: bancoSeleccionado.nombre,
           codigoCuentaInterbancario:
             this.editTipoAbonoId === 1 ? this.editCci : 'OPE - Orden de Pago',
+          nombreBancoOtro: (bancoSeleccionado.codigo === 'OTROS' || bancoSeleccionado.abreviatura === 'OTROS' || this.editBanco === 'otro') ? this.editBancoOtro : undefined,
         };
         this.cuentaAbonoLoaded = true;
         this.cuentaEditMode = false;
 
         this.cuentaAlert = {
           message:
-            response.data.mensaje || 'Cuenta bancaria guardada correctamente.',
+            response.data?.mensaje || 'Cuenta bancaria guardada correctamente.',
           type: 'success',
         };
         setTimeout(() => (this.cuentaAlert = null), 4000);

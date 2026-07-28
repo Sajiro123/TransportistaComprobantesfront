@@ -103,11 +103,21 @@ export class ApiAuthService {
 
   // ── Sesión ──────────────────────────────────────────────
   saveSession(response: LoginResponse): void {
+    const duration = response.data?.expiresIn ?? (15 * 60 * 1000);
     const session: ApiSession = {
-      expiresAt:    Date.now() + 15 * 60 * 1000, // 15 minutos de la cookie 
+      expiresAt:    Date.now() + duration,
       user:         response.data,
     };
     sessionStorage.setItem(KEY_API_SESSION, JSON.stringify(session));
+  }
+
+  renewSessionExpiration(): void {
+    const session = this.getSession();
+    if (session) {
+      const duration = session.user?.expiresIn ?? (15 * 60 * 1000);
+      session.expiresAt = Date.now() + duration;
+      sessionStorage.setItem(KEY_API_SESSION, JSON.stringify(session));
+    }
   }
 
   getSession(): ApiSession | null {
@@ -182,6 +192,9 @@ export class ApiAuthService {
     return this.http
       .post<void>(`${this.baseUrl}/auth/refresh`, {}, { withCredentials: true })
       .pipe(
+        map(() => {
+          this.renewSessionExpiration();
+        }),
         catchError(this.handleError.bind(this))
       );
   }
