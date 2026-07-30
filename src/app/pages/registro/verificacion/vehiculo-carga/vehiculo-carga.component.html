@@ -6,7 +6,7 @@
         <span
           class="text-[10.5px] font-extrabold tracking-wide text-[var(--primary-contrast)] bg-[var(--primary)] rounded-md px-2 py-0.5 uppercase">Validación</span>
       </div>
-      <h1 class="text-2xl font-extrabold m-0 mt-1 text-[var(--text)]">Mis vehículos</h1>
+      <h1 class="text-2xl font-extrabold m-0 mt-1 text-[var(--text)]">Habilitación Vehícular</h1>
       <p class="text-[var(--text-3)] text-[13.5px] m-0 mt-1.5 max-w-[560px]">
         Registra tus vehículos habilitados <b>uno por uno</b> o carga <b>varios</b> a la vez por Excel. La
         <b>categoría</b> define el tope de galones que el sistema valida contra el MTC.
@@ -165,7 +165,7 @@
               [style.background]="v.estadoBg" [style.color]="v.estadoColor">
               <span class="text-[11px]">{{ v.estadoGlyph }}</span> {{ v.estadoLabel }}
             </span>
-          </tr>
+        </tr>
       </ng-template>
 
       <ng-template pTemplate="emptymessage">
@@ -432,7 +432,7 @@
         </div>
       </div>
 
-      <div class="flex items-start gap-3.5 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] p-4">
+      <!-- <div class="flex items-start gap-3.5 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] p-4">
         <div
           class="w-10 h-10 shrink-0 rounded-xl bg-[var(--primary-soft)] text-[var(--primary)] flex items-center justify-center font-extrabold">
           D</div>
@@ -441,7 +441,7 @@
           <p class="m-0 mt-1 text-[12.5px] leading-relaxed text-[var(--text-3)]">Datos de identidad y licencia se
             validan con SUNAT / RENIEC y con MTC – Licencias.</p>
         </div>
-      </div>
+      </div> -->
 
       <div
         class="flex items-start gap-2.5 rounded-xl border border-[var(--border)] bg-[var(--primary-soft)] px-4 py-3 text-[12px] leading-relaxed text-[var(--text-2)]">

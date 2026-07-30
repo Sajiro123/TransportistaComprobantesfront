@@ -112,7 +112,6 @@
             <div class="aut-top-left">
               <i class="fa-solid fa-building-user aut-icon"></i>
               <span class="aut-servicio">{{ getDatoVal('Razón social') }}</span>
-              <p-tag [value]="getDatoVal('Estado')" severity="success" styleClass="aut-badge aut-badge-black-text" />
               @if (transportista && transportista.activoSunat !== undefined) {
               <p-tag [value]="transportista.activoSunat ? 'SUNAT ACTIVO' : 'SUNAT INACTIVO'"
                 [severity]="transportista.activoSunat ? 'info' : 'danger'"
@@ -284,7 +283,8 @@
         }
       </div>
       @if (errorVehiculosMtc) {
-      <div class="m-3.5 flex items-start gap-2.5 rounded-xl border border-[var(--bad)]/30 bg-[var(--bad-bg)] p-3.5 text-xs text-[var(--bad)] shadow-xs transition-all">
+      <div
+        class="m-3.5 flex items-start gap-2.5 rounded-xl border border-[var(--bad)]/30 bg-[var(--bad-bg)] p-3.5 text-xs text-[var(--bad)] shadow-xs transition-all">
         <i class="fa-solid fa-circle-exclamation text-sm shrink-0 mt-0.5"></i>
         <div class="flex-1 leading-relaxed font-medium">
           {{ errorVehiculosMtc }}

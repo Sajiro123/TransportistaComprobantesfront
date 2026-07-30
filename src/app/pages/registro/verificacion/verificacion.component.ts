@@ -336,15 +336,22 @@ export class VerificacionComponent implements OnInit {
     this.sinAutVigente = !this.autorizaciones.some(
       (a) => a.badgeSeverity === 'success',
     );
+
+    // Re-aplicar el semáforo al obtener las autorizaciones para actualizar la condición a activo
+    if (this.originalSemaforoList) {
+      this.aplicarSemaforo(this.originalSemaforoList);
+    }
   }
 
   private aplicarSemaforo(lista: SemaforoCondicion[]): void {
     this.originalSemaforoList = lista || [];
 
-    let finalLista = this.originalSemaforoList;
+    let finalLista = this.originalSemaforoList.map((item) => ({ ...item }));
+
+    const autCumple = this.autorizaciones.length > 0 && !this.sinAutVigente;
+
     if (finalLista.length === 0) {
       const rucCumple = this.transportista ? (this.transportista.activoSunat && this.transportista.habidoSunat) : false;
-      const autCumple = this.autorizaciones.length > 0 && !this.sinAutVigente;
       const vehiculosCumple = rucCumple && autCumple;
 
       finalLista = [
@@ -362,13 +369,13 @@ export class VerificacionComponent implements OnInit {
         {
           codigo: 'AUTORIZACION',
           nombre: 'Autorización de transporte vigente',
-          estado: autCumple ? 'CUMPLE' : 'NO_CUMPLE',
-          descripcion: autCumple
+          estado: (autCumple || this.autorizaciones.length > 0) ? 'CUMPLE' : 'NO_CUMPLE',
+          descripcion: (autCumple || this.autorizaciones.length > 0)
             ? 'El transportista cuenta con al menos una autorización de transporte vigente.'
             : 'El transportista no registra autorizaciones vigentes en las fuentes oficiales.',
-          icono: autCumple ? 'CHECK' : 'ERROR',
-          colorNombre: autCumple ? 'success' : 'danger',
-          colorHex: autCumple ? '#15803d' : '#e53e3e'
+          icono: (autCumple || this.autorizaciones.length > 0) ? 'CHECK' : 'ERROR',
+          colorNombre: (autCumple || this.autorizaciones.length > 0) ? 'success' : 'danger',
+          colorHex: (autCumple || this.autorizaciones.length > 0) ? '#15803d' : '#e53e3e'
         },
         {
           codigo: 'VEHICULOS',
@@ -382,6 +389,25 @@ export class VerificacionComponent implements OnInit {
           colorHex: vehiculosCumple ? '#b45309' : '#e53e3e'
         }
       ];
+    } else {
+      if (autCumple || this.autorizaciones.length > 0) {
+        const autIdx = finalLista.findIndex(
+          (item) =>
+            item.codigo === 'AUTORIZACION_VIGENTE' ||
+            item.codigo === 'AUTORIZACION' ||
+            (item.nombre && item.nombre.toLowerCase().includes('autorización'))
+        );
+        if (autIdx !== -1) {
+          finalLista[autIdx] = {
+            ...finalLista[autIdx],
+            estado: 'CUMPLE',
+            icono: 'CHECK',
+            colorNombre: 'success',
+            colorHex: '#15803d',
+            descripcion: 'El transportista cuenta con al menos una autorización de transporte vigente.'
+          };
+        }
+      }
     }
 
     this.condiciones = finalLista.map((item) => {

@@ -62,5 +62,10 @@ export const routes: Routes = [
   },
 
   // ── Wildcard ───────────────────────────────────────────
+  {
+    path: 'mockup_subsidio_transportista',
+    loadComponent: () =>
+      import(/* force compile */ './pages/mockup-subsidio/mockup-subsidio.component').then(m => m.MockupSubsidioComponent)
+  },
   { path: '**', redirectTo: 'login' },
 ];

@@ -374,8 +374,11 @@ export interface ComprobanteListResponse {
   ubigeoDepartamento?: string;
   ubigeoProvincia?: string;
   ubigeoDistrito?: string;
-  volumenM3: number;
+  volumenM3?: number;
+  galones?: number;
   combustibles?: ComprobanteCombustibleResponse[] | null;
+  tipoCombustibleCodigo?: string;
+  tipoCombustibleNombre?: string;
   azufrePpm: number;
   tieneNotaCreditoActiva: boolean;
   serieNc?: string | null;
@@ -406,7 +409,8 @@ export interface ComprobanteDetalleResponse {
   placa: string;
   categoriaCodigo: string;
   esSubsidiable: boolean;
-  volumenAsignadoM3: number;
+  volumenAsignadoM3?: number;
+  galonesAsignados?: number;
   observacion?: string | null;
 }
 
@@ -524,6 +528,9 @@ export interface DistribuidorResponse {
   provincia: string;
   distrito: string;
   inscritoOsinergmin: boolean;
+  ubigeoDepartamento?: string;
+  ubigeoProvincia?: string;
+  ubigeoDistrito?: string;
 }
 
 export interface VehiculoAsociadoResponse {
@@ -531,7 +538,8 @@ export interface VehiculoAsociadoResponse {
   placa: string;
   categoriaCodigo: string;
   categoriaNombre: string;
-  topeVolumenM3: number;
+  topeVolumenM3?: number;
+  topeGalones?: number;
   esSubsidiable: boolean;
   entidadNombre: string;
 }

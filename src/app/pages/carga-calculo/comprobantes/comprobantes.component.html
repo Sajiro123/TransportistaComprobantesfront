@@ -100,7 +100,7 @@
     </div>
 
     <div class="table-card">
-      <p-table [value]="comprobantesFiltrados" dataKey="comprobanteUuid" styleClass="comprobantes-table p-datatable-sm"
+      <p-table [value]="comprobantesFiltrados" [loading]="cargandoComprobantes" dataKey="comprobanteUuid" styleClass="comprobantes-table p-datatable-sm"
         [paginator]="true" [rows]="5" [rowsPerPageOptions]="[5, 10, 25]" [showCurrentPageReport]="true"
         currentPageReportTemplate="Mostrando {first}–{last} de {totalRecords} registros"
         paginatorDropdownAppendTo="body" [alwaysShowPaginator]="true" [scrollable]="true" scrollHeight="480px"
@@ -576,8 +576,8 @@
           <span>Departamento</span>
           <select [(ngModel)]="model.departamento" (ngModelChange)="onEditorDepartamentoChange()">
             <option value="">—</option>
-            @for (departamento of departamentosDisponibles; track departamento) {
-              <option [value]="departamento">{{ departamento }}</option>
+            @for (departamento of departamentosDisponibles; track departamento.id) {
+              <option [value]="departamento.id">{{ departamento.nombre }}</option>
             }
           </select>
         </label>
@@ -586,8 +586,8 @@
           <select [(ngModel)]="model.provincia" (ngModelChange)="onEditorProvinciaChange()"
             [disabled]="!model.departamento">
             <option value="">—</option>
-            @for (provincia of provinciasDisponibles; track provincia) {
-              <option [value]="provincia">{{ provincia }}</option>
+            @for (provincia of provinciasDisponibles; track provincia.id) {
+              <option [value]="provincia.id">{{ provincia.nombre }}</option>
             }
           </select>
         </label>
@@ -596,8 +596,8 @@
           <select [(ngModel)]="model.distrito" (ngModelChange)="onEditorDistritoChange()"
             [disabled]="!model.provincia">
             <option value="">—</option>
-            @for (distrito of distritosDisponibles; track distrito) {
-              <option [value]="distrito">{{ distrito }}</option>
+            @for (distrito of distritosDisponibles; track distrito.id) {
+              <option [value]="distrito.id">{{ distrito.nombre }}</option>
             }
           </select>
         </label>
