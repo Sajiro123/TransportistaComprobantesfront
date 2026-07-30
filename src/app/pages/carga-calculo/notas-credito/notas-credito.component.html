@@ -67,7 +67,7 @@
           </div>
 
           <p class="mb-0 mt-3 text-[13px] leading-relaxed text-[var(--text-2)]"><b>Motivo:</b> {{ nota.motivo }}</p>
-          <div class="impact-message">Inhabilita la factura <span class="mono">{{ nota.facturaReferencia }}</span> y resta <span class="mono">{{ nota.galones | number:'1.2-2' }}</span> gal del mes de {{ nota.mes }}.</div>
+          <div class="impact-message">Inhabilita la factura <span class="mono">{{ nota.facturaReferencia }}</span> y resta <span class="mono">{{ nota.volumenM3 | number:'1.2-2' }}</span> m³ del mes de {{ nota.mes }}.</div>
         </article>
       }
     </div>

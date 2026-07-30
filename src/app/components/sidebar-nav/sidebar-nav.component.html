@@ -1,226 +1,223 @@
-<nav class="flex flex-col p-4" [class.sidebar-nav--collapsed]="collapsed">
+<nav class="flex flex-col p-2.5" [class.sidebar-nav--collapsed]="collapsed">
 
   <!-- ── Etiqueta de sección ─────────────────────────────────── -->
-  <div class="sidebar-section-label mb-3 px-1">
-    <div class="flex items-center gap-2">
+  <div class="sidebar-section-label mb-2 px-1">
+    <div class="flex items-center gap-1.5">
       <div class="w-1.5 h-1.5 rounded-full bg-[#00A3E0] shadow-[0_0_8px_rgba(0,163,224,0.8)]"></div>
-      <span class="text-[10px] font-bold tracking-[0.15em] uppercase text-white/50 select-none">
+      <span class="text-[9.5px] font-bold tracking-[0.15em] uppercase text-white/50 select-none">
         TU TRÁMITE
       </span>
     </div>
   </div>
 
   <!-- ── Stepper de pasos ──────────────────────────────────────── -->
-  <div class="sidebar-stepper flex flex-col">
+  <div class="sidebar-stepper flex flex-col gap-0.5">
 
     <!-- ══ PASO 1: Validación ═══════════════════════════════════ -->
     <div class="sidebar-menu-item">
 
       <!-- Fila: indicador + header del paso -->
       <button type="button"
-        class="group relative flex w-full items-center gap-3 py-2 text-left transition-all duration-200"
-        [attr.aria-expanded]="validacionOpen"
-        aria-controls="validacion-submenu"
-        title="Validación"
+        class="group relative flex w-full items-center gap-2.5 py-1.5 text-left transition-all duration-200"
+        [attr.aria-expanded]="validacionOpen" aria-controls="validacion-submenu" title="Validación"
         (click)="toggleValidacion()">
 
         <!-- Indicador de paso (número en círculo) -->
         <div class="sidebar-step-indicator relative flex flex-col items-center self-stretch">
-          <div class="flex h-8 w-8 flex-none items-center justify-center rounded-full border-2 border-[#00A3E0] bg-[#00A3E0] text-[12px] font-extrabold text-white shadow-[0_0_10px_rgba(0,163,224,0.45)] transition-all duration-300 group-hover:bg-[#00A3E0]/80">
-            <i class="fa-solid fa-user-check text-[12px]"></i>
+          <div
+            class="flex h-7 w-7 flex-none items-center justify-center rounded-full border-2 border-[#00A3E0] bg-[#00A3E0] text-[11px] font-extrabold text-white shadow-[0_0_8px_rgba(0,163,224,0.45)] transition-all duration-300 group-hover:bg-[#00A3E0]/80">
+            <i class="fa-solid fa-user-check text-[11px]"></i>
           </div>
           <!-- Línea conectora hacia abajo -->
-          <div class="mt-1 w-px flex-1 bg-white/15"></div>
+          <div class="mt-0.5 w-px flex-1 bg-white/15"></div>
         </div>
 
         <!-- Contenido del paso -->
-        <div class="sidebar-menu-text flex flex-1 flex-col overflow-hidden pb-2">
-          <div class="flex items-center gap-2">
-            <span class="text-[10px] font-bold uppercase tracking-wider text-[#00A3E0]/80">Paso 1</span>
+        <div class="sidebar-menu-text flex flex-1 flex-col overflow-hidden pb-1">
+          <div class="flex items-center gap-1.5">
+            <span class="text-[9.5px] font-bold uppercase tracking-wider text-[#00A3E0]/80">Paso 1</span>
           </div>
-          <span class="truncate text-[13.5px] font-bold text-white/90 leading-tight">
+          <span class="truncate text-[12.5px] font-bold text-white/90 leading-tight">
             Validación
           </span>
-          <span class="mt-0.5 text-[10.5px] font-medium text-white/40">
+          <span class="mt-0.5 text-[10px] font-medium text-white/40">
             Transportista y vehículos
           </span>
         </div>
 
-        <i class="sidebar-menu-chevron fa-solid fa-chevron-down text-[9px] text-white/30 transition-transform duration-300 pr-1"
+        <i class="sidebar-menu-chevron fa-solid fa-chevron-down text-[8.5px] text-white/30 transition-transform duration-300 pr-1"
           [class.rotate-180]="validacionOpen"></i>
       </button>
 
       <!-- Sub-pasos de Validación -->
       @if (validacionOpen) {
-        <div id="validacion-submenu" class="sidebar-submenu relative ml-[15px] border-l border-white/10 py-1 pl-6 mb-1">
-          <a routerLink="/validacion/verificacion"
-            routerLinkActive="!text-white !bg-[#00A3E0]/15 !border-[#00A3E0]/30"
-            #verificacionLink="routerLinkActive"
-            class="group flex items-center gap-2.5 rounded-lg border border-transparent px-2.5 py-2 text-[12px] font-semibold text-white/55 transition-all duration-200 hover:bg-white/[.04] hover:text-white mb-0.5"
-            (click)="onNavigate()">
-            <span class="inline-flex h-5 w-5 flex-none items-center justify-center rounded-full text-[10px] font-extrabold transition-all duration-200"
-              [class.bg-[#00A3E0]]="verificacionLink.isActive"
-              [class.text-white]="verificacionLink.isActive"
-              [class.bg-white/10]="!verificacionLink.isActive"
-              [class.text-white/60]="!verificacionLink.isActive">1</span>
-            <span class="flex-1">Verificación</span>
-            @if (verificacionLink.isActive) {
-              <i class="fa-solid fa-circle text-[5px] text-[#00A3E0] animate-pulse"></i>
+      <div id="validacion-submenu"
+        class="sidebar-submenu relative ml-[13px] border-l border-white/10 py-0.5 pl-4 mb-0.5 flex flex-col gap-0.5">
+        <a routerLink="/validacion/verificacion" routerLinkActive="!text-white !bg-[#00A3E0]/15 !border-[#00A3E0]/30"
+          #verificacionLink="routerLinkActive"
+          class="group flex items-center gap-2 rounded-lg border border-transparent px-2 py-1.5 text-[11.5px] font-semibold text-white/55 transition-all duration-200 hover:bg-white/[.04] hover:text-white"
+          (click)="onNavigate()">
+
+          <span
+            class="inline-flex h-5 w-5 flex-none items-center justify-center rounded-full text-[10px] font-extrabold transition-all duration-200"
+            [class.bg-[#00A3E0]]="verificacionLink.isActive" [class.text-white]="verificacionLink.isActive"
+            [class.bg-white/10]="!verificacionLink.isActive" [class.text-white/60]="!verificacionLink.isActive">1</span>
+          <span class="flex-1">Verificación</span>
+          @if (verificacionLink.isActive) {
+          <i class="fa-solid fa-circle text-[4px] text-[#00A3E0] animate-pulse"></i>
+          }
+        </a>
+        <a [routerLink]="semaforoAprobado ? '/validacion/vehiculos' : null"
+          routerLinkActive="!text-white !bg-[#00A3E0]/15 !border-[#00A3E0]/30" #vehiculosLink="routerLinkActive"
+          class="group flex items-center gap-2 rounded-lg border border-transparent px-2 py-1.5 text-[11.5px] font-semibold transition-all duration-200"
+          [ngClass]="semaforoAprobado ? 'text-white/55 hover:bg-white/[.04] hover:text-white' : 'text-white/40 cursor-not-allowed opacity-60'"
+          (click)="semaforoAprobado ? onNavigate() : $event.preventDefault()">
+          <span
+            class="relative inline-flex h-5 w-5 flex-none items-center justify-center rounded-full text-[10px] font-extrabold transition-all duration-200"
+            [class.bg-[#00A3E0]]="vehiculosLink.isActive && semaforoAprobado"
+            [class.text-white]="vehiculosLink.isActive && semaforoAprobado"
+            [class.bg-white/10]="!vehiculosLink.isActive && semaforoAprobado"
+            [class.text-white/60]="!vehiculosLink.isActive && semaforoAprobado" [class.bg-white/5]="!semaforoAprobado"
+            [class.text-white/30]="!semaforoAprobado">
+            2
+            @if (!semaforoAprobado) {
+            <div
+              class="absolute -bottom-1 -right-1 flex h-2.5 w-2.5 items-center justify-center rounded-full bg-black/60 backdrop-blur-sm border border-white/10">
+              <i class="fa-solid fa-lock text-[5px] text-white/60"></i>
+            </div>
             }
-          </a>
-          <a [routerLink]="semaforoAprobado ? '/validacion/vehiculos' : null"
-            routerLinkActive="!text-white !bg-[#00A3E0]/15 !border-[#00A3E0]/30"
-            #vehiculosLink="routerLinkActive"
-            class="group flex items-center gap-2.5 rounded-lg border border-transparent px-2.5 py-2 text-[12px] font-semibold transition-all duration-200"
-            [ngClass]="semaforoAprobado ? 'text-white/55 hover:bg-white/[.04] hover:text-white' : 'text-white/40 cursor-not-allowed opacity-60'"
-            (click)="semaforoAprobado ? onNavigate() : $event.preventDefault()">
-            <span class="relative inline-flex h-5 w-5 flex-none items-center justify-center rounded-full text-[10px] font-extrabold transition-all duration-200"
-              [class.bg-[#00A3E0]]="vehiculosLink.isActive && semaforoAprobado"
-              [class.text-white]="vehiculosLink.isActive && semaforoAprobado"
-              [class.bg-white/10]="!vehiculosLink.isActive && semaforoAprobado"
-              [class.text-white/60]="!vehiculosLink.isActive && semaforoAprobado"
-              [class.bg-white/5]="!semaforoAprobado"
-              [class.text-white/30]="!semaforoAprobado">
-              2
-              @if (!semaforoAprobado) {
-                <div class="absolute -bottom-1 -right-1 flex h-3 w-3 items-center justify-center rounded-full bg-black/60 backdrop-blur-sm border border-white/10">
-                  <i class="fa-solid fa-lock text-[6px] text-white/60"></i>
-                </div>
-              }
-            </span>
-            <span class="flex-1">Vehículos</span>
-            @if (vehiculosLink.isActive && semaforoAprobado) {
-              <i class="fa-solid fa-circle text-[5px] text-[#00A3E0] animate-pulse"></i>
-            }
-          </a>
-        </div>
+          </span>
+          <span class="flex-1">Vehículos</span>
+          @if (vehiculosLink.isActive && semaforoAprobado) {
+          <i class="fa-solid fa-circle text-[4px] text-[#00A3E0] animate-pulse"></i>
+          }
+        </a>
+      </div>
       }
     </div>
 
     <!-- ══ PASO 2: Comprobantes ═══════════════════════════════════ -->
     <div class="sidebar-menu-item" [ngClass]="{'bg-white/[.02] rounded-lg opacity-60': !semaforoAprobado}">
       <button type="button"
-        class="group relative flex w-full items-center gap-3 py-2 text-left transition-all duration-200"
-        [ngClass]="{'cursor-not-allowed': !semaforoAprobado}"
-        [attr.aria-expanded]="cargaOpen"
-        aria-controls="carga-calculo-submenu"
-        (click)="toggleCarga()">
+        class="group relative flex w-full items-center gap-2.5 py-1.5 text-left transition-all duration-200"
+        [ngClass]="{'cursor-not-allowed': !semaforoAprobado}" [attr.aria-expanded]="cargaOpen"
+        aria-controls="carga-calculo-submenu" (click)="toggleCarga()">
 
         <div class="sidebar-step-indicator relative flex flex-col items-center self-stretch">
-          <div class="flex h-8 w-8 flex-none items-center justify-center rounded-full border-2 text-[12px] font-extrabold text-white transition-all duration-300"
-               [ngClass]="semaforoAprobado ? 'border-[#00A3E0] bg-[#00A3E0] shadow-[0_0_10px_rgba(0,163,224,0.45)] group-hover:bg-[#00A3E0]/80' : 'border-white/10 bg-white/5 text-white/40'">
-            <i class="fa-solid fa-calculator text-[12px]"></i>
+          <div
+            class="flex h-7 w-7 flex-none items-center justify-center rounded-full border-2 text-[11px] font-extrabold text-white transition-all duration-300"
+            [ngClass]="semaforoAprobado ? 'border-[#00A3E0] bg-[#00A3E0] shadow-[0_0_8px_rgba(0,163,224,0.45)] group-hover:bg-[#00A3E0]/80' : 'border-white/10 bg-white/5 text-white/40'">
+            <i class="fa-solid fa-calculator text-[11px]"></i>
             @if (!semaforoAprobado) {
-              <div class="absolute -bottom-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-black/60 backdrop-blur-sm border border-white/10">
-                <i class="fa-solid fa-lock text-[8px] text-white/60"></i>
-              </div>
+            <div
+              class="absolute -bottom-1 -right-1 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-black/60 backdrop-blur-sm border border-white/10">
+              <i class="fa-solid fa-lock text-[7px] text-white/60"></i>
+            </div>
             }
           </div>
-          <div class="mt-1 w-px flex-1 bg-white/15"></div>
+          <div class="mt-0.5 w-px flex-1 bg-white/15"></div>
         </div>
 
-        <div class="sidebar-menu-text flex flex-1 flex-col overflow-hidden pb-2">
-          <span class="text-[10px] font-bold uppercase tracking-wider"
-                [ngClass]="semaforoAprobado ? 'text-[#00A3E0]/80' : 'text-white/40'">Paso 2</span>
-          <span class="truncate text-[13.5px] font-bold leading-tight"
-                [ngClass]="semaforoAprobado ? 'text-white/90' : 'text-white/50'">
+        <div class="sidebar-menu-text flex flex-1 flex-col overflow-hidden pb-1">
+          <span class="text-[9.5px] font-bold uppercase tracking-wider"
+            [ngClass]="semaforoAprobado ? 'text-[#00A3E0]/80' : 'text-white/40'">Paso 2</span>
+          <span class="truncate text-[12.5px] font-bold leading-tight"
+            [ngClass]="semaforoAprobado ? 'text-white/90' : 'text-white/50'">
             Comprobantes
           </span>
-          <span class="mt-0.5 text-[10.5px] font-medium text-white/50">
+          <span class="mt-0.5 text-[10px] font-medium text-white/50">
             Gestión de comprobantes
           </span>
         </div>
 
-        <i class="sidebar-menu-chevron fa-solid fa-chevron-down text-[9px] text-white/20 transition-transform duration-300 pr-1"
+        <i class="sidebar-menu-chevron fa-solid fa-chevron-down text-[8.5px] text-white/20 transition-transform duration-300 pr-1"
           [class.rotate-180]="cargaOpen"></i>
       </button>
 
       @if (cargaOpen) {
-        <div id="carga-calculo-submenu" class="sidebar-submenu relative ml-[15px] border-l border-white/10 py-1 pl-6 mb-1">
-          <a routerLink="/carga-calculo/comprobantes"
-            routerLinkActive="!text-white !bg-[#00A3E0]/15 !border-[#00A3E0]/30"
-            #comprobantesLink="routerLinkActive"
-            class="group flex items-center gap-2.5 rounded-lg border border-transparent px-2.5 py-2 text-[12px] font-semibold text-white/40 transition-all duration-200 hover:bg-white/[.04] hover:text-white/70 mb-0.5"
-            (click)="onNavigate()">
-            <span class="inline-flex h-5 w-5 flex-none items-center justify-center rounded-full bg-white/[.07] text-[10px] font-extrabold text-white/40 transition-all duration-200"
-              [class.bg-[#00A3E0]]="comprobantesLink.isActive"
-              [class.text-white]="comprobantesLink.isActive">1</span>
-            <span class="flex-1">Flujo A · Surtido directo</span>
-            @if (comprobantesLink.isActive) {
-              <i class="fa-solid fa-circle text-[5px] text-[#00A3E0] animate-pulse"></i>
-            }
-          </a>
-          <a routerLink="/carga-calculo/notas-credito"
-            routerLinkActive="!text-white !bg-[#00A3E0]/15 !border-[#00A3E0]/30"
-            #notasLink="routerLinkActive"
-            class="group flex items-center gap-2.5 rounded-lg border border-transparent px-2.5 py-2 text-[12px] font-semibold text-white/40 transition-all duration-200 hover:bg-white/[.04] hover:text-white/70 mb-0.5"
-            (click)="onNavigate()">
-            <span class="inline-flex h-5 w-5 flex-none items-center justify-center rounded-full bg-white/[.07] text-[10px] font-extrabold text-white/40 transition-all duration-200"
-              [class.bg-[#00A3E0]]="notasLink.isActive"
-              [class.text-white]="notasLink.isActive">2</span>
-            <span class="flex-1">Flujo B · Consumidor directo</span>
-            @if (notasLink.isActive) {
-              <i class="fa-solid fa-circle text-[5px] text-[#00A3E0] animate-pulse"></i>
-            }
-          </a>
-        </div>
+      <div id="carga-calculo-submenu"
+        class="sidebar-submenu relative ml-[13px] border-l border-white/10 py-0.5 pl-4 mb-0.5 flex flex-col gap-0.5">
+        <a routerLink="/carga-calculo/comprobantes" routerLinkActive="!text-white !bg-[#00A3E0]/15 !border-[#00A3E0]/30"
+          #comprobantesLink="routerLinkActive"
+          class="group flex items-center gap-2 rounded-lg border border-transparent px-2 py-1.5 text-[11.5px] font-semibold text-white/40 transition-all duration-200 hover:bg-white/[.04] hover:text-white/70"
+          (click)="onNavigate()">
+          <span
+            class="inline-flex h-5 w-5 flex-none items-center justify-center rounded-full bg-white/[.07] text-[10px] font-extrabold text-white/40 transition-all duration-200"
+            [class.bg-[#00A3E0]]="comprobantesLink.isActive" [class.text-white]="comprobantesLink.isActive">1</span>
+          <span class="flex-1">Flujo A · Surtido directo</span>
+          @if (comprobantesLink.isActive) {
+          <i class="fa-solid fa-circle text-[4px] text-[#00A3E0] animate-pulse"></i>
+          }
+        </a>
+        <a routerLink="/carga-calculo/notas-credito"
+          routerLinkActive="!text-white !bg-[#00A3E0]/15 !border-[#00A3E0]/30" #notasLink="routerLinkActive"
+          class="group flex items-center gap-2 rounded-lg border border-transparent px-2 py-1.5 text-[11.5px] font-semibold text-white/40 transition-all duration-200 hover:bg-white/[.04] hover:text-white/70"
+          (click)="onNavigate()">
+          <span
+            class="inline-flex h-5 w-5 flex-none items-center justify-center rounded-full bg-white/[.07] text-[10px] font-extrabold text-white/40 transition-all duration-200"
+            [class.bg-[#00A3E0]]="notasLink.isActive" [class.text-white]="notasLink.isActive">2</span>
+          <span class="flex-1">Flujo B · Consumidor directo</span>
+          @if (notasLink.isActive) {
+          <i class="fa-solid fa-circle text-[4px] text-[#00A3E0] animate-pulse"></i>
+          }
+        </a>
+      </div>
       }
     </div>
 
     <!-- ══ PASO 3: Envío ══════════════════════════════════════════ -->
     <div class="sidebar-menu-item" [ngClass]="{'bg-white/[.02] rounded-lg opacity-60': !semaforoAprobado}">
       <button type="button"
-        class="group relative flex w-full items-center gap-3 py-2 text-left transition-all duration-200"
-        [ngClass]="{'cursor-not-allowed': !semaforoAprobado}"
-        [attr.aria-expanded]="envioOpen"
-        aria-controls="envio-submenu"
-        (click)="toggleEnvio()">
+        class="group relative flex w-full items-center gap-2.5 py-1.5 text-left transition-all duration-200"
+        [ngClass]="{'cursor-not-allowed': !semaforoAprobado}" [attr.aria-expanded]="envioOpen"
+        aria-controls="envio-submenu" (click)="toggleEnvio()">
 
         <div class="sidebar-step-indicator relative flex flex-col items-center self-stretch">
-          <div class="flex h-8 w-8 flex-none items-center justify-center rounded-full border-2 text-[12px] font-extrabold text-white transition-all duration-300"
-               [ngClass]="semaforoAprobado ? 'border-[#00A3E0] bg-[#00A3E0] shadow-[0_0_10px_rgba(0,163,224,0.45)] group-hover:bg-[#00A3E0]/80' : 'border-white/10 bg-white/5 text-white/40'">
-            <i class="fa-solid fa-paper-plane text-[12px]"></i>
+          <div
+            class="flex h-7 w-7 flex-none items-center justify-center rounded-full border-2 text-[11px] font-extrabold text-white transition-all duration-300"
+            [ngClass]="semaforoAprobado ? 'border-[#00A3E0] bg-[#00A3E0] shadow-[0_0_8px_rgba(0,163,224,0.45)] group-hover:bg-[#00A3E0]/80' : 'border-white/10 bg-white/5 text-white/40'">
+            <i class="fa-solid fa-paper-plane text-[11px]"></i>
             @if (!semaforoAprobado) {
-              <div class="absolute -bottom-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-black/60 backdrop-blur-sm border border-white/10">
-                <i class="fa-solid fa-lock text-[8px] text-white/60"></i>
-              </div>
+            <div
+              class="absolute -bottom-1 -right-1 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-black/60 backdrop-blur-sm border border-white/10">
+              <i class="fa-solid fa-lock text-[7px] text-white/60"></i>
+            </div>
             }
           </div>
           <!-- Último paso: sin línea conectora -->
         </div>
 
         <div class="sidebar-menu-text flex flex-1 flex-col overflow-hidden">
-          <span class="text-[10px] font-bold uppercase tracking-wider"
-                [ngClass]="semaforoAprobado ? 'text-[#00A3E0]/80' : 'text-white/40'">Paso 3</span>
-          <span class="truncate text-[13.5px] font-bold leading-tight"
-                [ngClass]="semaforoAprobado ? 'text-white/90' : 'text-white/50'">
+          <span class="text-[9.5px] font-bold uppercase tracking-wider"
+            [ngClass]="semaforoAprobado ? 'text-[#00A3E0]/80' : 'text-white/40'">Paso 3</span>
+          <span class="truncate text-[12.5px] font-bold leading-tight"
+            [ngClass]="semaforoAprobado ? 'text-white/90' : 'text-white/50'">
             Envío
           </span>
-          <span class="mt-0.5 text-[10.5px] font-medium text-white/50">
+          <span class="mt-0.5 text-[10px] font-medium text-white/50">
             Presentación de solicitud
           </span>
         </div>
 
-        <i class="sidebar-menu-chevron fa-solid fa-chevron-down text-[9px] text-white/20 transition-transform duration-300 pr-1"
+        <i class="sidebar-menu-chevron fa-solid fa-chevron-down text-[8.5px] text-white/20 transition-transform duration-300 pr-1"
           [class.rotate-180]="envioOpen"></i>
       </button>
 
       @if (envioOpen) {
-        <div id="envio-submenu" class="sidebar-submenu relative ml-[15px] border-l border-white/10 py-1 pl-6">
-          <a routerLink="/envio/declaracion-jurada"
-            routerLinkActive="!text-white !bg-[#00A3E0]/15 !border-[#00A3E0]/30"
-            #declaracionLink="routerLinkActive"
-            class="group flex items-center gap-2.5 rounded-lg border border-transparent px-2.5 py-2 text-[12px] font-semibold text-white/40 transition-all duration-200 hover:bg-white/[.04] hover:text-white/70"
-            (click)="onNavigate()">
-            <span class="inline-flex h-5 w-5 flex-none items-center justify-center rounded-full bg-white/[.07] text-[10px] font-extrabold text-white/40 transition-all duration-200"
-              [class.bg-[#00A3E0]]="declaracionLink.isActive"
-              [class.text-white]="declaracionLink.isActive">1</span>
-            <span class="flex-1">Declaración jurada</span>
-            @if (declaracionLink.isActive) {
-              <i class="fa-solid fa-circle text-[5px] text-[#00A3E0] animate-pulse"></i>
-            }
-          </a>
-        </div>
+      <div id="envio-submenu" class="sidebar-submenu relative ml-[13px] border-l border-white/10 py-0.5 pl-4">
+        <a routerLink="/envio/declaracion-jurada" routerLinkActive="!text-white !bg-[#00A3E0]/15 !border-[#00A3E0]/30"
+          #declaracionLink="routerLinkActive"
+          class="group flex items-center gap-2 rounded-lg border border-transparent px-2 py-1.5 text-[11.5px] font-semibold text-white/40 transition-all duration-200 hover:bg-white/[.04] hover:text-white/70"
+          (click)="onNavigate()">
+          <span
+            class="inline-flex h-5 w-5 flex-none items-center justify-center rounded-full bg-white/[.07] text-[10px] font-extrabold text-white/40 transition-all duration-200"
+            [class.bg-[#00A3E0]]="declaracionLink.isActive" [class.text-white]="declaracionLink.isActive">1</span>
+          <span class="flex-1">Declaración jurada</span>
+          @if (declaracionLink.isActive) {
+          <i class="fa-solid fa-circle text-[4px] text-[#00A3E0] animate-pulse"></i>
+          }
+        </a>
+      </div>
       }
     </div>
 

@@ -115,11 +115,12 @@
               <p-tag [value]="getDatoVal('Estado')" severity="success" styleClass="aut-badge aut-badge-black-text" />
               @if (transportista && transportista.activoSunat !== undefined) {
               <p-tag [value]="transportista.activoSunat ? 'SUNAT ACTIVO' : 'SUNAT INACTIVO'"
-                [severity]="transportista.activoSunat ? 'info' : 'danger'" styleClass="aut-badge" />
+                [severity]="transportista.activoSunat ? 'info' : 'danger'"
+                styleClass="aut-badge aut-badge-black-text" />
               }
               @if (transportista && transportista.habidoSunat !== undefined) {
               <p-tag [value]="transportista.habidoSunat ? 'HABIDO' : 'NO HABIDO '"
-                [severity]="transportista.habidoSunat ? 'info' : 'warn'" styleClass="aut-badge" />
+                [severity]="transportista.habidoSunat ? 'info' : 'warn'" styleClass="aut-badge aut-badge-black-text" />
               }
             </div>
           </div>
@@ -274,14 +275,22 @@
         <div class="vehicles-source-card__actions">
           <span>Te quedan {{ actualizacionesVehiculosRestantes }} de 5 actualizaciones hoy</span>
           <button type="button" class="refresh-button"
-            [disabled]="cargandoDatos || actualizacionesVehiculosRestantes === 0"
+            [disabled]="cargandoDatos || cargandoVehiculos || actualizacionesVehiculosRestantes === 0"
             (click)="actualizarSeccion('vehiculos')">
-            <i class="fa-solid fa-rotate-right" [class.fa-spin]="cargandoDatos"></i>
+            <i class="fa-solid fa-rotate-right" [class.fa-spin]="cargandoVehiculos"></i>
             Actualizar datos
           </button>
         </div>
         }
       </div>
+      @if (errorVehiculosMtc) {
+      <div class="m-3.5 flex items-start gap-2.5 rounded-xl border border-[var(--bad)]/30 bg-[var(--bad-bg)] p-3.5 text-xs text-[var(--bad)] shadow-xs transition-all">
+        <i class="fa-solid fa-circle-exclamation text-sm shrink-0 mt-0.5"></i>
+        <div class="flex-1 leading-relaxed font-medium">
+          {{ errorVehiculosMtc }}
+        </div>
+      </div>
+      }
       @if (actualizacionesVehiculosRestantes === 0) {
       <div class="refresh-footer refresh-footer--plain refresh-footer--exhausted">
         <span>Agotaste tus 5 actualizaciones de hoy</span>

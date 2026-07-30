@@ -120,8 +120,8 @@
             <th pSortableColumn="placa" style="width: 11%; min-width: 105px">
               <span class="sortable-heading">Placas <p-sortIcon field="placa" /></span>
             </th>
-            <th pSortableColumn="galones" style="width: 12%; min-width: 125px">
-              <span class="sortable-heading">Volumen total <p-sortIcon field="galones" /></span>
+            <th pSortableColumn="volumenM3" style="width: 12%; min-width: 125px">
+              <span class="sortable-heading">Volumen total <p-sortIcon field="volumenM3" /></span>
             </th>
             <th pSortableColumn="estadoComprobanteNombre" style="width: 17%; min-width: 165px">
               <span class="sortable-heading">Estado <p-sortIcon field="estadoComprobanteNombre" /></span>
@@ -142,7 +142,7 @@
               <small>{{ ubicacionDistribuidor(item) }}</small>
             </td>
             <td><span class="plate-count">{{ etiquetaPlacas(item.placa) }}</span></td>
-            <td><b class="mono">{{ item.galones | number:'1.2-2' }} gal</b></td>
+            <td><b class="mono">{{ item.volumenM3 | number:'1.2-2' }} m³</b></td>
             <td>
               <span class="status-badge"
                 [class.status-badge--ok]="item.estadoComprobanteCodigo === 'CONFORME'"
@@ -309,8 +309,8 @@
               <div class="meta-value">{{ compra.combustible }} · {{ compra.ppm }} ppm</div>
             </div>
             <div>
-              <div class="meta-label">Galones</div>
-              <div class="meta-value mono">{{ compra.galones | number:'1.2-2' }}</div>
+              <div class="meta-label">Volumen</div>
+              <div class="meta-value mono">{{ compra.volumenM3 | number:'1.2-2' }} m³</div>
             </div>
           </div>
         </article>
@@ -403,8 +403,8 @@
         </div>
 
         <div class="mt-[11px] text-[13px] leading-relaxed text-[var(--text-2)]">
-          De los <b>{{ totalGalonesMayorista | number:'1.2-2' }} gal</b> comprados se reconoce el {{ factorProrrateo |
-          percent:'1.0-0' }} → <b>{{ galonesSubsidiados | number:'1.2-2' }} gal</b> subsidiados = <b>S/ 6,000.00</b>.
+          De los <b>{{ totalGalonesMayorista | number:'1.2-2' }} m³</b> comprados se reconoce el {{ factorProrrateo |
+          percent:'1.0-0' }} → <b>{{ volumenSubsidiado | number:'1.2-2' }} m³</b> subsidiados = <b>S/ 6,000.00</b>.
         </div>
       </article>
     </div>
@@ -666,7 +666,7 @@
           </label>
           <label class="editor-field">
             <span>Volumen (m³) *</span>
-            <input [(ngModel)]="model.galones" type="number" min="0.01" step="0.01" class="mono" placeholder="0.00" />
+            <input [(ngModel)]="model.volumenM3" type="number" min="0.01" step="0.01" class="mono" placeholder="0.00" />
           </label>
         </div>
       } @else {
@@ -940,8 +940,8 @@
           <input [(ngModel)]="model.ppm" type="number" min="0" class="mono" placeholder="45" />
         </label>
         <label class="editor-field">
-          <span>Galones *</span>
-          <input [(ngModel)]="model.galones" type="number" min="0.01" step="0.01" class="mono" placeholder="0.00" />
+          <span>Volumen (m³) *</span>
+          <input [(ngModel)]="model.volumenM3" type="number" min="0.01" step="0.01" class="mono" placeholder="0.00" />
         </label>
         <label class="editor-field">
           <span>Costo total (S/)</span>

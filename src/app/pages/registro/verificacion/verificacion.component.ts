@@ -54,7 +54,10 @@ export class VerificacionComponent implements OnInit {
   datosTransportista: DatoTransportista[] = [];
   cargandoDatos = false;
   cargandoAutorizaciones = false;
+  cargandoVehiculos = false;
   errorDatos = '';
+  errorVehiculosMtc = '';
+  private errorVehiculosMtcTimer: any = null;
   rucConsulta = '';
   actualizacionesDatosRestantes = 5;
   actualizacionesAutorizacionesRestantes = 5;
@@ -97,6 +100,16 @@ export class VerificacionComponent implements OnInit {
     this.showValidationInfoModal = false;
   }
 
+  mostrarErrorVehiculosMtc(mensaje: string): void {
+    this.errorVehiculosMtc = mensaje;
+    if (this.errorVehiculosMtcTimer) {
+      clearTimeout(this.errorVehiculosMtcTimer);
+    }
+    this.errorVehiculosMtcTimer = setTimeout(() => {
+      this.errorVehiculosMtc = '';
+    }, 10000);
+  }
+
   cargarDatosTransportista(): void {
     const usuarioSesion = this.apiAuth.getUserFromSession();
     const rucSesion = usuarioSesion?.ruc || '';
@@ -125,6 +138,13 @@ export class VerificacionComponent implements OnInit {
       semaforo: this.apiVerificacion.obtenerSemaforo(this.rucConsulta).pipe(
         catchError(() => of([]))
       ),
+      vehiculosMtc: this.apiVerificacion.obtenerVehiculosMtc(this.rucConsulta).pipe(
+        catchError((err: VerificacionServiceError) => {
+          const msg = err?.descripcion || err?.message || 'Error consultando MTC vehículos';
+          this.mostrarErrorVehiculosMtc(msg);
+          return of(null);
+        })
+      ),
     })
       .pipe(
         finalize(() => {
@@ -133,16 +153,32 @@ export class VerificacionComponent implements OnInit {
         })
       )
       .subscribe({
-        next: ({ datos, autorizaciones, semaforo }) => {
+        next: ({ datos, autorizaciones, semaforo, vehiculosMtc }) => {
           if (datos) this.aplicarDatosTransportista(datos);
           this.aplicarAutorizaciones(autorizaciones.autorizaciones);
           this.aplicarSemaforo(semaforo);
+          if (vehiculosMtc) {
+            const respuesta = vehiculosMtc?.data?.respuesta;
+            const listaObj = vehiculosMtc?.data?.lista;
+            if (
+              respuesta === 'ERROR' ||
+              listaObj?.code ||
+              (listaObj && typeof listaObj === 'object' && 'descripcion' in listaObj)
+            ) {
+              const msg =
+                listaObj?.descripcion ||
+                listaObj?.message ||
+                vehiculosMtc?.data?.mensaje ||
+                'Error al consultar MTC vehículos';
+              this.mostrarErrorVehiculosMtc(msg);
+            }
+          }
         },
       });
   }
 
   actualizarSeccion(seccion: 'datos' | 'autorizaciones' | 'vehiculos'): void {
-    if (this.actualizacionesDisponibles(seccion) === 0 || this.cargandoDatos || this.cargandoAutorizaciones)
+    if (this.actualizacionesDisponibles(seccion) === 0 || this.cargandoDatos || this.cargandoAutorizaciones || this.cargandoVehiculos)
       return;
 
     const usuarioSesion = this.apiAuth.getUserFromSession();
@@ -186,8 +222,37 @@ export class VerificacionComponent implements OnInit {
             this.errorDatos = error.descripcion || error.message;
           },
         });
-    } else {
-      // Logic for vehicle updating if needed
+    } else if (seccion === 'vehiculos') {
+      this.cargandoVehiculos = true;
+      this.apiVerificacion
+        .obtenerVehiculosMtc(this.rucConsulta)
+        .pipe(finalize(() => (this.cargandoVehiculos = false)))
+        .subscribe({
+          next: (res) => {
+            const respuesta = res?.data?.respuesta;
+            const listaObj = res?.data?.lista;
+            if (
+              respuesta === 'ERROR' ||
+              listaObj?.code ||
+              (listaObj && typeof listaObj === 'object' && 'descripcion' in listaObj)
+            ) {
+              const msg =
+                listaObj?.descripcion ||
+                listaObj?.message ||
+                res?.data?.mensaje ||
+                'Error al consultar MTC vehículos';
+              this.mostrarErrorVehiculosMtc(msg);
+            } else {
+              this.descontarActualizacion(seccion);
+              this.aplicarSemaforo(this.originalSemaforoList);
+            }
+          },
+          error: (error: VerificacionServiceError) => {
+            const msg =
+              error.descripcion || error.message || 'Error consultando MTC vehículos';
+            this.mostrarErrorVehiculosMtc(msg);
+          },
+        });
     }
   }
 
