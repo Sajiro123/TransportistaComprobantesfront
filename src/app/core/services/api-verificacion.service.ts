@@ -119,6 +119,24 @@ export class ApiVerificacionService {
       );
   }
 
+  obtenerVehiculosMtc(ruc: string): Observable<any> {
+    if (!/^\d{11}$/.test(ruc)) {
+      return throwError(
+        (): VerificacionServiceError => ({
+          code: 'VER_RUC_INVALIDO',
+          message: 'RUC inválido',
+          descripcion: 'El RUC del transportista debe contener 11 dígitos.',
+        }),
+      );
+    }
+
+    return this.http
+      .get<any>(`${this.baseUrl}/externas/mtc/vehiculos/${ruc}`)
+      .pipe(
+        catchError((error) => throwError(() => this.normalizarError(error))),
+      );
+  }
+
   private normalizarError(error: HttpErrorResponse): VerificacionServiceError {
     const response = error.error as VerificacionErrorResponse | undefined;
     const detalle = response?.data?.lista;

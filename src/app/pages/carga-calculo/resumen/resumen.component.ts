@@ -15,7 +15,7 @@ interface ResumenForma {
 
 interface ResumenMes {
   mes: string;
-  galones: number;
+  volumenM3: number;
   monto: number;
 }
 
@@ -41,10 +41,10 @@ export class ResumenComponent {
   ];
 
   detalle: Record<FormaResumen, ResumenMes[]> = {
-    A: [{ mes: 'Junio', galones: 320.5, monto: 1282 }],
+    A: [{ mes: 'Junio', volumenM3: 320.5, monto: 1282 }],
     B: [
-      { mes: 'Junio', galones: 1000, monto: 4000 },
-      { mes: 'Julio', galones: 500, monto: 2000 },
+      { mes: 'Junio', volumenM3: 1000, monto: 4000 },
+      { mes: 'Julio', volumenM3: 500, monto: 2000 },
     ],
   };
 

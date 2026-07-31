@@ -8,16 +8,17 @@ import * as XLSX from 'xlsx';
 import { isValidRuc } from '../../../core/utils/validators';
 import { ApiComprobanteService } from '../../../core/services/api-comprobante.service';
 import { ApiAuthService } from '../../../core/services/api-auth.service';
+import { ApiExternaService } from '../../../core/services/api-externa.service';
 import {
   ComprobanteListResponse,
   ComprobanteRequest,
   ComprobanteBRequest,
+  ActualizarComprobanteRequest,
   DistribuidorResponse,
   VehiculoAsociadoResponse,
   TipoCombustibleResponse,
   EstadoComprobanteResponse,
   ComprobantePlacaRequest,
-  ComprobanteDetalleRequest,
 } from '../../../core/models/models';
 import Swal from 'sweetalert2';
 type EstadoFiltro = 'todos' | 'val' | 'pend' | 'obs';
@@ -43,7 +44,7 @@ interface Comprobante {
   ubicacion: string;
   combustible: string;
   ppm: number;
-  galones: number;
+  volumenM3: number;
   estado: Exclude<EstadoFiltro, 'todos'>;
   estadoLabel: string;
   estadoIcon: string;
@@ -71,7 +72,7 @@ interface CompraMayorista {
   ruc: string;
   combustible: string;
   ppm: number;
-  galones: number;
+  volumenM3: number;
 }
 
 interface VehiculoAbastecido {
@@ -98,7 +99,7 @@ interface ComprobanteEditor {
   distrito: string;
   combustible: string;
   ppm: number;
-  galones: number;
+  volumenM3: number;
 }
 
 @Component({
@@ -111,6 +112,7 @@ interface ComprobanteEditor {
 export class ComprobantesComponent implements OnInit {
   private readonly apiComprobante = inject(ApiComprobanteService);
   private readonly apiAuth = inject(ApiAuthService);
+  private readonly apiExterna = inject(ApiExternaService);
 
   maxDateObj: Date = new Date();
 
@@ -127,6 +129,11 @@ export class ComprobantesComponent implements OnInit {
   tiposCombustible: TipoCombustibleResponse[] = [];
   estados: EstadoComprobanteResponse[] = [];
   comprasMayorista: any[] = []; // Not covered in the 11 endpoints yet, keeping empty
+
+  // Ubigeo data from ApiExternaService
+  departamentosUbigeo: any[] = [];
+  provinciasUbigeo: any[] = [];
+  distritosUbigeo: any[] = [];
 
   // Editor models
   editorModo: 'crear' | 'editar' = 'editar';
@@ -212,6 +219,7 @@ export class ComprobantesComponent implements OnInit {
     this.apiComprobante.listarDistribuidores().subscribe((res) => {
       if (res.data?.lista) this.distribuidores = res.data.lista;
     });
+    this.cargarDepartamentosUbigeo();
     this.apiComprobante
       .listarAcumuladoVehiculos(this.rucTransportista)
       .subscribe({
@@ -221,8 +229,8 @@ export class ComprobantesComponent implements OnInit {
           if (list.length > 0) {
             this.acumulados = list.map((item: any) => ({
               placa: item.placa || '',
-              consumido: Number(item.galonesAcumulados ?? item.consumido ?? 0),
-              tope: Number(item.topeGalones ?? item.tope ?? 0),
+              consumido: Number(item.volumenAcumuladoM3 ?? item.consumido ?? 0),
+              tope: Number(item.topeVolumenM3 ?? item.tope ?? 0),
             }));
           } else {
             this.calcularAcumuladosFallback();
@@ -234,7 +242,10 @@ export class ComprobantesComponent implements OnInit {
       });
   }
 
+  cargandoComprobantes = false;
+
   listarComprobantes() {
+    this.cargandoComprobantes = true;
     this.apiComprobante
       .listarComprobantes(
         this.rucTransportista,
@@ -244,6 +255,7 @@ export class ComprobantesComponent implements OnInit {
       )
       .subscribe({
         next: (res) => {
+          this.cargandoComprobantes = false;
           if (res.data?.lista) {
             this.comprobantes = res.data.lista;
           } else {
@@ -251,6 +263,7 @@ export class ComprobantesComponent implements OnInit {
           }
         },
         error: () => {
+          this.cargandoComprobantes = false;
           Swal.fire(
             'Error',
             'No se pudieron cargar los comprobantes.',
@@ -290,7 +303,7 @@ export class ComprobantesComponent implements OnInit {
         c.distritoDistribuidor,
         c.provinciaDistribuidor,
         c.departamentoDistribuidor,
-        c.tipoCombustibleCodigo,
+        c.combustibles?.map((combustible) => combustible.tipoCombustibleCodigo).join(' ') || '',
       ]
         .join(' ')
         .toLocaleLowerCase('es');
@@ -371,7 +384,7 @@ export class ComprobantesComponent implements OnInit {
 
   // --- Helpers UI Form B ---
   calcularVehiculosAbastecidos() {
-    this.vehiculosAbastecidos = this.vehiculos.map((v) => ({
+    this.vehiculosAbastecidos = this.vehiculos.map((v: any) => ({
       placa: v.placa,
       subsidiable: v.esSubsidiable,
     }));
@@ -381,10 +394,10 @@ export class ComprobantesComponent implements OnInit {
   }
 
   private calcularAcumuladosFallback() {
-    this.acumulados = this.vehiculos.map((v) => ({
+    this.acumulados = this.vehiculos.map((v: any) => ({
       placa: v.placa,
       consumido: 0,
-      tope: v.topeGalones,
+      tope: v.topeVolumenM3 ?? v.topeGalones ?? 0,
     }));
   }
 
@@ -395,7 +408,7 @@ export class ComprobantesComponent implements OnInit {
 
   get totalGalonesMayorista(): number {
     return this.comprasMayorista.reduce(
-      (total, compra) => total + compra.galones,
+      (total, compra) => total + (compra.volumenM3 ?? compra.galones ?? 0),
       0,
     );
   }
@@ -410,7 +423,7 @@ export class ComprobantesComponent implements OnInit {
       : 0;
   }
 
-  get galonesSubsidiados(): number {
+  get volumenSubsidiado(): number {
     return this.totalGalonesMayorista * this.factorProrrateo;
   }
 
@@ -537,9 +550,12 @@ export class ComprobantesComponent implements OnInit {
       combustible: 'B5',
       ppm: 45,
       costo: 0,
-      galones: 0,
+      volumenM3: 0,
     };
     this.editorError = '';
+    this.provinciasUbigeo = [];
+    this.distritosUbigeo = [];
+    this.cargarDepartamentosUbigeo();
   }
 
   abrirConfirmacionEliminar(comprobante: ComprobanteListResponse): void {
@@ -582,28 +598,39 @@ export class ComprobantesComponent implements OnInit {
           this.tieneNotaCredito = !!c.tieneNotaCreditoActiva;
           this.archivoNotaCredito = null;
           this.archivoNotaCreditoError = '';
-          this.fechaComprobanteModo = 'EMISION';
-          this.periodoComprobante = c.fechaEmision?.slice(0, 7) || '';
-          this.periodoDesde = c.fechaEmision || '';
-          this.periodoHasta = c.fechaEmision || '';
-          this.seleccionPlacasModo = 'UNA';
-          this.placasConjunto = [];
-          this.volumenPorPlaca = {};
-          this.filasPlacas = [];
-          this.excelPlacasError = '';
-
-          let p = '';
-          if (c.tipoComprobanteCodigo === 'FORMA_A') {
-            p =
-              c.placa ||
-              (c.detalle && c.detalle.length > 0 ? c.detalle[0].placa : '');
+          this.fechaComprobanteModo = c.tienePeriodo ? 'PERIODO' : 'EMISION';
+          this.periodoComprobante = c.fechaEmision?.slice(0, 7) || c.fechaDesde?.slice(0, 7) || '';
+          this.periodoDesde = c.fechaDesde || '';
+          this.periodoHasta = c.fechaHasta || '';
+          
+          if (c.placas && c.placas.length > 1) {
+            this.seleccionPlacasModo = 'CONJUNTO';
+            this.placasConjunto = c.placas.map((p: any) => p.placa);
+            this.filasPlacas = c.placas.map((p: any, idx: number) => ({
+              id: idx + 1,
+              placa: p.placa,
+              combustible: p.tipoCombustibleCodigo,
+              volumen: p.volumenAsignadoM3
+            }));
+            this.siguienteFilaPlacaId = c.placas.length + 1;
+            this.placaBusqueda = '';
+          } else {
+            this.seleccionPlacasModo = 'UNA';
+            this.placasConjunto = [];
+            this.filasPlacas = [];
+            let p = '';
+            if (c.placas && c.placas.length === 1) {
+              p = c.placas[0].placa;
+            } else if (c.tipoComprobanteCodigo === 'FORMA_A') {
+              p = c.placa || (c.detalle && c.detalle.length > 0 ? c.detalle[0].placa : '');
+            }
+            this.placaBusqueda = p;
           }
-          this.placaBusqueda = p;
 
           this.editor = {
             uuid: c.comprobanteUuid,
-            placa: p,
-            conductor: '', // No viene en el DTO
+            placa: this.placaBusqueda,
+            conductor: '', 
             tipoDocumento: 'DNI',
             numeroDocumento: '',
             licencia: '',
@@ -614,16 +641,22 @@ export class ComprobantesComponent implements OnInit {
             anio: c.anio,
             rucGrifo: c.rucDistribuidor,
             razonSocial: c.razonSocialDistribuidor,
-            direccion: '',
-            departamento: '',
-            provincia: '',
-            distrito: c.distritoDistribuidor,
-            combustible: c.tipoCombustibleCodigo,
+            direccion: c.direccionDistribuidor || '',
+            departamento: String(c.ubigeoDepartamento || c.departamentoDistribuidor || ''),
+            provincia: String(c.ubigeoProvincia || c.provinciaDistribuidor || ''),
+            distrito: String(c.ubigeoDistrito || c.distritoDistribuidor || ''),
+            combustible: (c as any).tipoCombustibleCodigo || (c.placas?.[0]?.tipoCombustibleCodigo) || (c.combustibles?.[0]?.tipoCombustibleCodigo) || '',
             ppm: c.azufrePpm,
-            costo: 0, // Ajustar segun DTO si viene
-            galones: c.galones,
+            costo: c.costo || 0,
+            volumenM3: c.volumenM3,
           };
+          
           this.editorError = '';
+          this.cargarDepartamentosUbigeo(() => {
+            if (this.editor?.departamento) {
+              this.cargarProvinciasUbigeo(this.editor.departamento, this.editor.provincia, this.editor.distrito);
+            }
+          });
         }
       },
       error: () =>
@@ -812,33 +845,171 @@ export class ComprobantesComponent implements OnInit {
       this.editor.provincia = distribuidor.provincia;
       this.editor.distrito = distribuidor.distrito;
       this.editor.direccion = distribuidor.direccion;
+      if (distribuidor.departamento) {
+        this.cargarProvinciasUbigeo(distribuidor.departamento, distribuidor.provincia, distribuidor.distrito);
+      }
     }
   }
 
-  get departamentosDisponibles(): string[] {
-    return this.valoresUnicos(this.distribuidores.map((item) => item.departamento));
+  // --- 🗺️ Ubigeo logic using ApiExternaService ---
+
+  private extractArrayFromResponse(res: any): any[] {
+    if (!res) return [];
+    if (Array.isArray(res)) return res;
+    if (Array.isArray(res.data)) return res.data;
+    if (res.data && Array.isArray(res.data.lista)) return res.data.lista;
+    if (res.data && Array.isArray(res.data.data)) return res.data.data;
+    return [];
   }
 
-  get provinciasDisponibles(): string[] {
+  private getItemNombre(item: any): string {
+    if (!item) return '';
+    if (typeof item === 'string') return item;
+    return item.nombre || item.descripcion || item.departamento || item.provincia || item.distrito || item.id || '';
+  }
+
+  private getItemId(item: any): string {
+    if (!item) return '';
+    if (typeof item === 'number' || typeof item === 'string') return String(item);
+    const id = item.ubigeoId ?? item.id ?? item.departamentoId ?? item.provinciaId ?? item.distritoId ?? item.codigoUbigeo ?? item.codigo ?? item.nombre ?? '';
+    return String(id);
+  }
+
+  cargarDepartamentosUbigeo(onLoaded?: () => void): void {
+    this.apiExterna.obtenerDepartamentos().subscribe({
+      next: (res) => {
+        this.departamentosUbigeo = this.extractArrayFromResponse(res);
+        if (onLoaded) onLoaded();
+      },
+      error: (err) => {
+        console.warn('No se pudo cargar departamentos de ApiExternaService:', err);
+        this.departamentosUbigeo = [];
+        if (onLoaded) onLoaded();
+      },
+    });
+  }
+
+  cargarProvinciasUbigeo(depIdOrName: string, selectProvinciaName?: string, selectDistritoName?: string): void {
+    if (!depIdOrName) {
+      this.provinciasUbigeo = [];
+      this.distritosUbigeo = [];
+      return;
+    }
+
+    let targetId = depIdOrName;
+    const matchDep = this.departamentosUbigeo.find(
+      (d) =>
+        this.getItemId(d).toLowerCase() === depIdOrName.toLowerCase() ||
+        this.getItemNombre(d).toLowerCase() === depIdOrName.toLowerCase(),
+    );
+    if (matchDep) {
+      targetId = this.getItemId(matchDep);
+    }
+
+    this.apiExterna.obtenerProvincias(targetId).subscribe({
+      next: (res) => {
+        this.provinciasUbigeo = this.extractArrayFromResponse(res);
+        if (selectProvinciaName) {
+          this.cargarDistritosUbigeo(selectProvinciaName);
+        }
+      },
+      error: (err) => {
+        console.warn('No se pudo cargar provincias de ApiExternaService:', err);
+        this.provinciasUbigeo = [];
+      },
+    });
+  }
+
+  cargarDistritosUbigeo(provIdOrName: string): void {
+    if (!provIdOrName) {
+      this.distritosUbigeo = [];
+      return;
+    }
+
+    let targetId = provIdOrName;
+    const matchProv = this.provinciasUbigeo.find(
+      (p) =>
+        this.getItemId(p).toLowerCase() === provIdOrName.toLowerCase() ||
+        this.getItemNombre(p).toLowerCase() === provIdOrName.toLowerCase(),
+    );
+    if (matchProv) {
+      targetId = this.getItemId(matchProv);
+    }
+
+    this.apiExterna.obtenerDistritos(targetId).subscribe({
+      next: (res) => {
+        this.distritosUbigeo = this.extractArrayFromResponse(res);
+      },
+      error: (err) => {
+        console.warn('No se pudo cargar distritos de ApiExternaService:', err);
+        this.distritosUbigeo = [];
+      },
+    });
+  }
+
+  private unicosPorId(lista: { id: string; nombre: string }[]): { id: string; nombre: string }[] {
+    const mapa = new Map<string, { id: string; nombre: string }>();
+    for (const item of lista) {
+      if (item.id && !mapa.has(String(item.id))) {
+        mapa.set(String(item.id), item);
+      }
+    }
+    return Array.from(mapa.values());
+  }
+
+  get departamentosDisponibles(): { id: string; nombre: string }[] {
+    if (this.departamentosUbigeo.length > 0) {
+      const items = this.departamentosUbigeo.map((d) => ({
+        id: this.getItemId(d),
+        nombre: this.getItemNombre(d),
+      }));
+      return this.unicosPorId(items);
+    }
+    const fallback = this.distribuidores.map((item) => ({
+      id: String(item.ubigeoDepartamento || item.departamento || ''),
+      nombre: item.departamento || '',
+    })).filter((x) => !!x.nombre);
+    return this.unicosPorId(fallback);
+  }
+
+  get provinciasDisponibles(): { id: string; nombre: string }[] {
+    if (this.provinciasUbigeo.length > 0) {
+      const items = this.provinciasUbigeo.map((p) => ({
+        id: this.getItemId(p),
+        nombre: this.getItemNombre(p),
+      }));
+      return this.unicosPorId(items);
+    }
     if (!this.editor?.departamento) return [];
-    return this.valoresUnicos(
-      this.distribuidores
-        .filter((item) => item.departamento === this.editor.departamento)
-        .map((item) => item.provincia),
-    );
+    const fallback = this.distribuidores
+      .filter((item) => String(item.ubigeoDepartamento || item.departamento) === String(this.editor.departamento))
+      .map((item) => ({
+        id: String(item.ubigeoProvincia || item.provincia || ''),
+        nombre: item.provincia || '',
+      })).filter((x) => !!x.nombre);
+    return this.unicosPorId(fallback);
   }
 
-  get distritosDisponibles(): string[] {
+  get distritosDisponibles(): { id: string; nombre: string }[] {
+    if (this.distritosUbigeo.length > 0) {
+      const items = this.distritosUbigeo.map((d) => ({
+        id: this.getItemId(d),
+        nombre: this.getItemNombre(d),
+      }));
+      return this.unicosPorId(items);
+    }
     if (!this.editor?.departamento || !this.editor?.provincia) return [];
-    return this.valoresUnicos(
-      this.distribuidores
-        .filter(
-          (item) =>
-            item.departamento === this.editor.departamento &&
-            item.provincia === this.editor.provincia,
-        )
-        .map((item) => item.distrito),
-    );
+    const fallback = this.distribuidores
+      .filter(
+        (item) =>
+          String(item.ubigeoDepartamento || item.departamento) === String(this.editor.departamento) &&
+          String(item.ubigeoProvincia || item.provincia) === String(this.editor.provincia),
+      )
+      .map((item) => ({
+        id: String(item.ubigeoDistrito || item.distrito || ''),
+        nombre: item.distrito || '',
+      })).filter((x) => !!x.nombre);
+    return this.unicosPorId(fallback);
   }
 
   get direccionesDisponibles(): DistribuidorResponse[] {
@@ -859,12 +1030,21 @@ export class ComprobantesComponent implements OnInit {
     this.editor.provincia = '';
     this.editor.distrito = '';
     this.editor.direccion = '';
+    this.provinciasUbigeo = [];
+    this.distritosUbigeo = [];
+    if (this.editor.departamento) {
+      this.cargarProvinciasUbigeo(this.editor.departamento);
+    }
   }
 
   onEditorProvinciaChange(): void {
     if (!this.editor) return;
     this.editor.distrito = '';
     this.editor.direccion = '';
+    this.distritosUbigeo = [];
+    if (this.editor.provincia) {
+      this.cargarDistritosUbigeo(this.editor.provincia);
+    }
   }
 
   onEditorDistritoChange(): void {
@@ -1047,7 +1227,7 @@ export class ComprobantesComponent implements OnInit {
 
   get volumenTotalEditor(): number {
     if (this.seleccionPlacasModo === 'UNA') {
-      return Number(this.editor?.galones || 0);
+      return Number(this.editor?.volumenM3 || 0);
     }
     return this.filasPlacas.reduce(
       (total, fila) => total + Number(fila.volumen || 0),
@@ -1136,7 +1316,7 @@ export class ComprobantesComponent implements OnInit {
       this.editorError = 'Selecciona la placa del vehículo.';
       return;
     }
-    if (this.seleccionPlacasModo === 'UNA' && Number(modelo.galones) <= 0) {
+    if (this.seleccionPlacasModo === 'UNA' && Number(modelo.volumenM3) <= 0) {
       this.editorError = 'El volumen debe ser mayor a cero.';
       return;
     }
@@ -1190,7 +1370,7 @@ export class ComprobantesComponent implements OnInit {
             .filter((vehiculo) => vehiculo.placa === modelo.placa)
             .map((vehiculo) => ({
               vehiculoUuid: vehiculo.vehiculoUuid,
-              galonesAsignados: Number(modelo.galones),
+              volumenAsignadoM3: Number(modelo.volumenM3),
             }))
         : this.filasPlacas.reduce<ComprobantePlacaRequest[]>(
             (resultado, fila) => {
@@ -1200,7 +1380,7 @@ export class ComprobantesComponent implements OnInit {
               if (vehiculo) {
                 resultado.push({
                   vehiculoUuid: vehiculo.vehiculoUuid,
-                  galonesAsignados: Number(fila.volumen),
+                  volumenAsignadoM3: Number(fila.volumen),
                 });
               }
               return resultado;
@@ -1216,16 +1396,16 @@ export class ComprobantesComponent implements OnInit {
       this.seleccionPlacasModo === 'UNA'
         ? modelo.placa
         : this.filasPlacas[0].placa;
-    modelo.galones = this.volumenTotalEditor;
+    modelo.volumenM3 = this.volumenTotalEditor;
 
     if (
       !modelo.placa ||
       !modelo.numero.trim() ||
-      !modelo.galones ||
-      modelo.galones <= 0
+      !modelo.volumenM3 ||
+      modelo.volumenM3 <= 0
     ) {
       this.editorError =
-        'Completa la placa, el número de factura y una cantidad válida de galones.';
+        'Completa la placa, el número de factura y una cantidad válida de volumen.';
       return;
     }
 
@@ -1240,7 +1420,7 @@ export class ComprobantesComponent implements OnInit {
         'Ubicación pendiente',
       combustible: modelo.combustible,
       ppm: Number(modelo.ppm),
-      galones: Number(modelo.galones),
+      volumenM3: Number(modelo.volumenM3),
       tipoDocumento: modelo.tipoDocumento,
       numeroDocumento: modelo.numeroDocumento.trim(),
       licencia: modelo.licencia.trim(),
@@ -1265,7 +1445,10 @@ export class ComprobantesComponent implements OnInit {
       const req: ComprobanteRequest = {
         serie: modelo.serie,
         numero: modelo.numero,
-        fechaEmision: modelo.emision,
+        tienePeriodo: this.fechaComprobanteModo === 'PERIODO',
+        fechaEmision: this.fechaComprobanteModo === 'EMISION' ? modelo.emision : null,
+        fechaDesde: this.fechaComprobanteModo === 'PERIODO' ? this.periodoDesde : null,
+        fechaHasta: this.fechaComprobanteModo === 'PERIODO' ? this.periodoHasta : null,
         mes: modelo.mes,
         anio: Number(modelo.anio),
         rucDistribuidor: modelo.rucGrifo,
@@ -1275,17 +1458,22 @@ export class ComprobantesComponent implements OnInit {
         distribuidorProvincia: modelo.provincia,
         distribuidorDistrito: modelo.distrito,
         tipoCombustibleCodigo: modelo.combustible,
-        galones: Number(modelo.galones),
-        costo: Number(modelo.costo || 0),
+        azufrePpm: Number(modelo.ppm) || undefined,
+        volumenM3: Number(modelo.volumenM3),
+        tieneNotaCredito: this.tieneNotaCredito,
+        serieNc: this.tieneNotaCredito ? (modelo.serieNc || undefined) : undefined,
+        numeroNc: this.tieneNotaCredito ? (modelo.numeroNc || undefined) : undefined,
         placas: placasRequest,
       };
 
       if (this.forma === 'A') {
+        const archivoNcFormaA = this.tieneNotaCredito ? this.archivoNotaCredito : null;
         this.apiComprobante
           .registrarComprobante(
             this.rucTransportista,
             req,
             archivoRespaldo,
+            archivoNcFormaA,
           )
           .subscribe({
             next: () => {
@@ -1300,13 +1488,32 @@ export class ComprobantesComponent implements OnInit {
             },
           });
       } else {
-        // Para Forma B (Granel)
-        const reqB: ComprobanteBRequest = { ...req };
+        // Para Forma B (Granel) - uses combustibles array
+        const reqB: ComprobanteBRequest = {
+          serie: modelo.serie,
+          numero: modelo.numero,
+          fechaEmision: modelo.emision,
+          mes: modelo.mes,
+          anio: Number(modelo.anio),
+          rucDistribuidor: modelo.rucGrifo,
+          distribuidorRazonSocial: modelo.razonSocial,
+          distribuidorDireccion: modelo.direccion,
+          distribuidorDepartamento: modelo.departamento,
+          distribuidorProvincia: modelo.provincia,
+          distribuidorDistrito: modelo.distrito,
+          azufrePpm: Number(modelo.ppm) || undefined,
+          combustibles: [{ codigo: modelo.combustible, volumenM3: Number(modelo.volumenM3) }],
+          tieneNotaCredito: this.tieneNotaCredito,
+          serieNc: this.tieneNotaCredito ? (modelo.serieNc || undefined) : undefined,
+          numeroNc: this.tieneNotaCredito ? (modelo.numeroNc || undefined) : undefined,
+        };
+        const archivoNcFormaB = this.tieneNotaCredito ? this.archivoNotaCredito : null;
         this.apiComprobante
           .registrarComprobanteB(
             this.rucTransportista,
             reqB,
             archivoRespaldo,
+            archivoNcFormaB,
           )
           .subscribe({
             next: () => {
@@ -1323,16 +1530,17 @@ export class ComprobantesComponent implements OnInit {
       }
     } else {
       // Actualizar
-      const reqActualizar: any = {
+      const reqActualizar: ActualizarComprobanteRequest = {
         serie: modelo.serie,
         numero: modelo.numero,
-        fechaEmision: modelo.emision,
+        fechaEmision: this.fechaComprobanteModo === 'EMISION' ? modelo.emision : undefined,
+        fechaDesde: this.fechaComprobanteModo === 'PERIODO' ? this.periodoDesde : undefined,
+        fechaHasta: this.fechaComprobanteModo === 'PERIODO' ? this.periodoHasta : undefined,
         mes: modelo.mes,
         anio: Number(modelo.anio),
         rucDistribuidor: modelo.rucGrifo,
         tipoCombustibleCodigo: modelo.combustible,
-        galones: Number(modelo.galones),
-        costo: Number(modelo.costo || 0),
+        volumenM3: Number(modelo.volumenM3),
         placas: placasRequest,
       };
 

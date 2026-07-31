@@ -54,7 +54,10 @@ export class VerificacionComponent implements OnInit {
   datosTransportista: DatoTransportista[] = [];
   cargandoDatos = false;
   cargandoAutorizaciones = false;
+  cargandoVehiculos = false;
   errorDatos = '';
+  errorVehiculosMtc = '';
+  private errorVehiculosMtcTimer: any = null;
   rucConsulta = '';
   actualizacionesDatosRestantes = 5;
   actualizacionesAutorizacionesRestantes = 5;
@@ -97,6 +100,16 @@ export class VerificacionComponent implements OnInit {
     this.showValidationInfoModal = false;
   }
 
+  mostrarErrorVehiculosMtc(mensaje: string): void {
+    this.errorVehiculosMtc = mensaje;
+    if (this.errorVehiculosMtcTimer) {
+      clearTimeout(this.errorVehiculosMtcTimer);
+    }
+    this.errorVehiculosMtcTimer = setTimeout(() => {
+      this.errorVehiculosMtc = '';
+    }, 10000);
+  }
+
   cargarDatosTransportista(): void {
     const usuarioSesion = this.apiAuth.getUserFromSession();
     const rucSesion = usuarioSesion?.ruc || '';
@@ -125,6 +138,13 @@ export class VerificacionComponent implements OnInit {
       semaforo: this.apiVerificacion.obtenerSemaforo(this.rucConsulta).pipe(
         catchError(() => of([]))
       ),
+      vehiculosMtc: this.apiVerificacion.obtenerVehiculosMtc(this.rucConsulta).pipe(
+        catchError((err: VerificacionServiceError) => {
+          const msg = err?.descripcion || err?.message || 'Error consultando MTC vehículos';
+          this.mostrarErrorVehiculosMtc(msg);
+          return of(null);
+        })
+      ),
     })
       .pipe(
         finalize(() => {
@@ -133,16 +153,32 @@ export class VerificacionComponent implements OnInit {
         })
       )
       .subscribe({
-        next: ({ datos, autorizaciones, semaforo }) => {
+        next: ({ datos, autorizaciones, semaforo, vehiculosMtc }) => {
           if (datos) this.aplicarDatosTransportista(datos);
           this.aplicarAutorizaciones(autorizaciones.autorizaciones);
           this.aplicarSemaforo(semaforo);
+          if (vehiculosMtc) {
+            const respuesta = vehiculosMtc?.data?.respuesta;
+            const listaObj = vehiculosMtc?.data?.lista;
+            if (
+              respuesta === 'ERROR' ||
+              listaObj?.code ||
+              (listaObj && typeof listaObj === 'object' && 'descripcion' in listaObj)
+            ) {
+              const msg =
+                listaObj?.descripcion ||
+                listaObj?.message ||
+                vehiculosMtc?.data?.mensaje ||
+                'Error al consultar MTC vehículos';
+              this.mostrarErrorVehiculosMtc(msg);
+            }
+          }
         },
       });
   }
 
   actualizarSeccion(seccion: 'datos' | 'autorizaciones' | 'vehiculos'): void {
-    if (this.actualizacionesDisponibles(seccion) === 0 || this.cargandoDatos || this.cargandoAutorizaciones)
+    if (this.actualizacionesDisponibles(seccion) === 0 || this.cargandoDatos || this.cargandoAutorizaciones || this.cargandoVehiculos)
       return;
 
     const usuarioSesion = this.apiAuth.getUserFromSession();
@@ -186,8 +222,37 @@ export class VerificacionComponent implements OnInit {
             this.errorDatos = error.descripcion || error.message;
           },
         });
-    } else {
-      // Logic for vehicle updating if needed
+    } else if (seccion === 'vehiculos') {
+      this.cargandoVehiculos = true;
+      this.apiVerificacion
+        .obtenerVehiculosMtc(this.rucConsulta)
+        .pipe(finalize(() => (this.cargandoVehiculos = false)))
+        .subscribe({
+          next: (res) => {
+            const respuesta = res?.data?.respuesta;
+            const listaObj = res?.data?.lista;
+            if (
+              respuesta === 'ERROR' ||
+              listaObj?.code ||
+              (listaObj && typeof listaObj === 'object' && 'descripcion' in listaObj)
+            ) {
+              const msg =
+                listaObj?.descripcion ||
+                listaObj?.message ||
+                res?.data?.mensaje ||
+                'Error al consultar MTC vehículos';
+              this.mostrarErrorVehiculosMtc(msg);
+            } else {
+              this.descontarActualizacion(seccion);
+              this.aplicarSemaforo(this.originalSemaforoList);
+            }
+          },
+          error: (error: VerificacionServiceError) => {
+            const msg =
+              error.descripcion || error.message || 'Error consultando MTC vehículos';
+            this.mostrarErrorVehiculosMtc(msg);
+          },
+        });
     }
   }
 
@@ -271,15 +336,22 @@ export class VerificacionComponent implements OnInit {
     this.sinAutVigente = !this.autorizaciones.some(
       (a) => a.badgeSeverity === 'success',
     );
+
+    // Re-aplicar el semáforo al obtener las autorizaciones para actualizar la condición a activo
+    if (this.originalSemaforoList) {
+      this.aplicarSemaforo(this.originalSemaforoList);
+    }
   }
 
   private aplicarSemaforo(lista: SemaforoCondicion[]): void {
     this.originalSemaforoList = lista || [];
 
-    let finalLista = this.originalSemaforoList;
+    let finalLista = this.originalSemaforoList.map((item) => ({ ...item }));
+
+    const autCumple = this.autorizaciones.length > 0 && !this.sinAutVigente;
+
     if (finalLista.length === 0) {
       const rucCumple = this.transportista ? (this.transportista.activoSunat && this.transportista.habidoSunat) : false;
-      const autCumple = this.autorizaciones.length > 0 && !this.sinAutVigente;
       const vehiculosCumple = rucCumple && autCumple;
 
       finalLista = [
@@ -297,13 +369,13 @@ export class VerificacionComponent implements OnInit {
         {
           codigo: 'AUTORIZACION',
           nombre: 'Autorización de transporte vigente',
-          estado: autCumple ? 'CUMPLE' : 'NO_CUMPLE',
-          descripcion: autCumple
+          estado: (autCumple || this.autorizaciones.length > 0) ? 'CUMPLE' : 'NO_CUMPLE',
+          descripcion: (autCumple || this.autorizaciones.length > 0)
             ? 'El transportista cuenta con al menos una autorización de transporte vigente.'
             : 'El transportista no registra autorizaciones vigentes en las fuentes oficiales.',
-          icono: autCumple ? 'CHECK' : 'ERROR',
-          colorNombre: autCumple ? 'success' : 'danger',
-          colorHex: autCumple ? '#15803d' : '#e53e3e'
+          icono: (autCumple || this.autorizaciones.length > 0) ? 'CHECK' : 'ERROR',
+          colorNombre: (autCumple || this.autorizaciones.length > 0) ? 'success' : 'danger',
+          colorHex: (autCumple || this.autorizaciones.length > 0) ? '#15803d' : '#e53e3e'
         },
         {
           codigo: 'VEHICULOS',
@@ -317,6 +389,25 @@ export class VerificacionComponent implements OnInit {
           colorHex: vehiculosCumple ? '#b45309' : '#e53e3e'
         }
       ];
+    } else {
+      if (autCumple || this.autorizaciones.length > 0) {
+        const autIdx = finalLista.findIndex(
+          (item) =>
+            item.codigo === 'AUTORIZACION_VIGENTE' ||
+            item.codigo === 'AUTORIZACION' ||
+            (item.nombre && item.nombre.toLowerCase().includes('autorización'))
+        );
+        if (autIdx !== -1) {
+          finalLista[autIdx] = {
+            ...finalLista[autIdx],
+            estado: 'CUMPLE',
+            icono: 'CHECK',
+            colorNombre: 'success',
+            colorHex: '#15803d',
+            descripcion: 'El transportista cuenta con al menos una autorización de transporte vigente.'
+          };
+        }
+      }
     }
 
     this.condiciones = finalLista.map((item) => {

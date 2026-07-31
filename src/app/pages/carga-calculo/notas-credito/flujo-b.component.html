@@ -139,10 +139,10 @@
               <td>
                 <div class="fuel-volume">
                   <span>{{ item.tipoCombustibleCodigo }}</span>
-                  <b class="mono">{{ item.galones | number:'1.2-2' }} gal</b>
+                  <b class="mono">{{ item.volumenM3 | number:'1.2-2' }} m³</b>
                 </div>
               </td>
-              <td><b class="mono">{{ item.galones | number:'1.2-2' }} gal</b></td>
+              <td><b class="mono">{{ item.volumenM3 | number:'1.2-2' }} m³</b></td>
               <td>
                 <span class="status-badge"
                   [class.status-badge--ok]="item.estadoComprobanteCodigo === 'CONFORME'"
@@ -437,7 +437,7 @@
             </select>
           </label>
           @if (nota.alcance === 'PARCIAL') {
-            <label><span>Galones afectados *</span><input name="galonesNc" [(ngModel)]="nota.galonesAfectados" type="number" min="0.01" step="0.01" /></label>
+            <label><span>Volumen afectado (m³) *</span><input name="galonesNc" [(ngModel)]="nota.volumenAfectadoM3" type="number" min="0.01" step="0.01" /></label>
           }
           <label class="form-grid--wide"><span>Motivo *</span><textarea name="motivoNc" [(ngModel)]="nota.motivo" rows="3"></textarea></label>
         </div>

@@ -37,4 +37,10 @@ export class ApiExternaService {
     let params = new HttpParams().set('dni', dni);
     return this.http.get<any>(`${this.apiUrl}/validacion/reniec`, { params });
   }
+
+  // --- 🚛 MTC Vehículos ---
+
+  obtenerVehiculosMtc(ruc: string): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/externas/mtc/vehiculos/${ruc}`);
+  }
 }

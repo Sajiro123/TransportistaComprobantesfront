@@ -7,6 +7,7 @@ import * as XLSX from 'xlsx';
 
 import {
   ComprobanteBRequest,
+  ComprobanteCombustibleRequest,
   ComprobanteListResponse,
   NotaCreditoRequest,
   TipoCombustibleResponse,
@@ -42,7 +43,7 @@ interface NotaForm {
   numero: string;
   fechaEmision: string;
   alcance: AlcanceNota;
-  galonesAfectados: number | null;
+  volumenAfectadoM3: number | null;
   motivo: string;
 }
 
@@ -150,7 +151,7 @@ export class NotasCreditoComponent implements OnInit {
   get volumenTotal(): number {
     return this.comprasGranel
       .filter((item) => !item.tieneNotaCreditoActiva && item.estadoComprobanteCodigo !== 'INHABILITADO')
-      .reduce((total, item) => total + Number(item.galones || 0), 0);
+      .reduce((total, item) => total + Number(item.volumenM3 || 0), 0);
   }
 
   get volumenTotalCompra(): number {
@@ -404,6 +405,10 @@ export class NotasCreditoComponent implements OnInit {
     }
     const combustible = combustiblesSeleccionados[0];
 
+    const combustibles: ComprobanteCombustibleRequest[] = combustiblesSeleccionados.map(
+      (item) => ({ codigo: item.codigo, volumenM3: Number(item.volumen) }),
+    );
+
     const request: ComprobanteBRequest = {
       serie: form.serie.trim().toUpperCase(),
       numero: form.numero.trim(),
@@ -411,17 +416,21 @@ export class NotasCreditoComponent implements OnInit {
       mes: this.mesDesdeFecha(form.fechaEmision),
       anio: Number(form.fechaEmision.slice(0, 4)),
       rucDistribuidor: form.rucDistribuidor.trim(),
-      tipoCombustibleCodigo: combustible.codigo,
-      azufrePpm: combustible.ppmMaximo,
-      galones: Number(combustible.volumen),
-      costo: 0,
-      detalle: [],
+      combustibles,
+      tieneNotaCredito: form.tieneNotaCredito,
+      serieNc: form.tieneNotaCredito ? form.serieNotaCredito.trim().toUpperCase() : undefined,
+      numeroNc: form.tieneNotaCredito ? form.numeroNotaCredito.trim() : undefined,
     };
 
     this.guardandoCompra = true;
     this.compraError = '';
     this.apiComprobante
-      .registrarComprobanteB(this.rucTransportista, request, this.archivoCompra)
+      .registrarComprobanteB(
+        this.rucTransportista,
+        request,
+        this.archivoCompra,
+        form.tieneNotaCredito ? this.archivoNotaCompra : null,
+      )
       .subscribe({
         next: () => {
           this.guardandoCompra = false;
@@ -456,7 +465,7 @@ export class NotasCreditoComponent implements OnInit {
       !/^\d{1,8}$/.test(form.numero.trim()) ||
       !form.fechaEmision ||
       !form.motivo.trim() ||
-      (form.alcance === 'PARCIAL' && Number(form.galonesAfectados) <= 0)
+      (form.alcance === 'PARCIAL' && Number(form.volumenAfectadoM3) <= 0)
     ) {
       this.notaError = 'Completa los datos obligatorios de la nota de crédito.';
       return;
@@ -469,8 +478,8 @@ export class NotasCreditoComponent implements OnInit {
       fechaEmisionNc: form.fechaEmision,
       motivo: form.motivo.trim(),
       alcance: form.alcance,
-      galonesAfectados:
-        form.alcance === 'PARCIAL' ? Number(form.galonesAfectados) : undefined,
+      volumenAfectadoM3:
+        form.alcance === 'PARCIAL' ? Number(form.volumenAfectadoM3) : undefined,
       mes: this.mesDesdeFecha(form.fechaEmision),
     };
 
@@ -591,7 +600,7 @@ export class NotasCreditoComponent implements OnInit {
       numero: '',
       fechaEmision: this.fechaLocal(),
       alcance: 'TOTAL',
-      galonesAfectados: null,
+      volumenAfectadoM3: null,
       motivo: '',
     };
   }
