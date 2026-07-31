@@ -113,9 +113,8 @@
               <i class="fa-solid fa-building-user aut-icon"></i>
               <span class="aut-servicio">{{ getDatoVal('Razón social') }}</span>
               @if (transportista && transportista.activoSunat !== undefined) {
-              <p-tag [value]="transportista.activoSunat ? 'SUNAT ACTIVO' : 'SUNAT INACTIVO'"
-                [severity]="transportista.activoSunat ? 'success' : 'danger'"
-                styleClass="aut-badge" />
+              <p-tag [value]="transportista.activoSunat ? 'ACTIVO' : 'INACTIVO'"
+                [severity]="transportista.activoSunat ? 'success' : 'danger'" styleClass="aut-badge" />
               }
               @if (transportista && transportista.habidoSunat !== undefined) {
               <p-tag [value]="transportista.habidoSunat ? 'HABIDO' : 'NO HABIDO '"

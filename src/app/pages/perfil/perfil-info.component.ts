@@ -751,7 +751,7 @@ import {
                             [(ngModel)]="editCci"
                             (input)="onCciInput($event)"
                             placeholder="20 dígitos"
-                            class="w-full border border-atu-border dark:border-[#30363D] rounded-xl bg-white dark:bg-[#0D1117] px-3 py-3 text-[14px] text-atu-text dark:text-[#E6EDF3] focus:outline-none focus:border-atu-primary dark:focus:border-[#00A3E0] font-mono tracking-wider shadow-sm"
+                            class="w-full pl-9 border-2 rounded-xl bg-white dark:bg-[#0D1117] px-3 py-2.5 text-[14px] text-atu-text dark:text-[#E6EDF3] focus:outline-none focus:ring-4 focus:ring-atu-primary/10 transition-all shadow-sm"
                           />
                           @if (editCci && editCci.length !== 20) {
                             <p class="mt-1.5 text-[11.5px] font-semibold text-red-600 dark:text-red-400">
@@ -934,7 +934,7 @@ import {
                     </div>
 
                     <!-- Documento de evidencia -->
-                    @if (cuentaBancariaReal?.archivo) {
+                    @if (cuentaBancariaReal?.archivo && !esBancoNacion) {
                       <div class="space-y-1.5 sm:col-span-2 lg:col-span-3">
                         <span class="text-atu-text-3 dark:text-[#6E7681] font-semibold uppercase tracking-wider block text-[10.5px]">
                           Documento de evidencia
@@ -1496,7 +1496,7 @@ export class PerfilInfoComponent implements OnInit {
   get bancoCuentaVisible(): string {
     if (!this.cuentaEditMode) {
       if (this.cuentaBancariaReal?.tipoAbono === 'OPE') return 'Banco de la Nación';
-      
+
       const esOtro =
         this.cuentaBancariaReal?.uuidBanco === '6f8d7349-fabc-4ef7-af92-e3255f968719' ||
         this.cuentaAbono?.banco?.toUpperCase() === 'OTROS' ||
@@ -1726,16 +1726,6 @@ export class PerfilInfoComponent implements OnInit {
     action$.subscribe({
       next: (response) => {
         this.isSavingCuenta = false;
-        if (response.data?.lista) {
-          this.cuentaBancariaReal = response.data.lista;
-        }
-        this.cuentaAbono = {
-          banco: bancoSeleccionado.nombre,
-          codigoCuentaInterbancario:
-            this.editTipoAbonoId === 1 ? this.editCci : 'OPE - Orden de Pago',
-          nombreBancoOtro: (bancoSeleccionado.codigo === 'OTROS' || bancoSeleccionado.abreviatura === 'OTROS' || this.editBanco === 'otro') ? this.editBancoOtro : undefined,
-        };
-        this.cuentaAbonoLoaded = true;
         this.cuentaEditMode = false;
 
         this.cuentaAlert = {
@@ -1744,6 +1734,9 @@ export class PerfilInfoComponent implements OnInit {
           type: 'success',
         };
         setTimeout(() => (this.cuentaAlert = null), 4000);
+
+        // Volver a listar/consultar la cuenta bancaria (GET transportistas/cuenta-bancaria)
+        this.cargarCuentaAbono();
       },
       error: (error) => {
         this.isSavingCuenta = false;
