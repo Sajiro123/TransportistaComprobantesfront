@@ -124,10 +124,21 @@ export class LoginComponent implements OnInit, OnDestroy {
   registrationSendingOtp = false;
   registrationVerifying = false;
   registrationResendCooldown = 0;
+  registrationExpiraEnSegundos = 0;
+  registrationOtpExpirado = false;
   private registrationCooldownInterval: ReturnType<typeof setInterval> | null =
+    null;
+  private registrationExpiraInterval: ReturnType<typeof setInterval> | null =
     null;
   private registrationValidationTimeout: ReturnType<typeof setTimeout> | null =
     null;
+
+  get registrationExpiraFormatado(): string {
+    if (this.registrationExpiraEnSegundos <= 0) return '00:00';
+    const m = Math.floor(this.registrationExpiraEnSegundos / 60).toString().padStart(2, '0');
+    const s = (this.registrationExpiraEnSegundos % 60).toString().padStart(2, '0');
+    return `${m}:${s}`;
+  }
 
   get registrationRucError(): string {
     if (!this.registrationRucTouched) return '';
@@ -226,12 +237,19 @@ export class LoginComponent implements OnInit, OnDestroy {
                 code === 'RUC_003' ||
                 code === 'NETWORK_ERROR' ||
                 code.startsWith('HTTP_5');
-              const msg =
+              let msg =
                 err?.error?.message ||
                 err?.error?.descripcion ||
                 err?.descripcion ||
                 err?.message ||
                 'Error al validar el RUC.';
+                
+              if (code === 'RUC_004') {
+                msg = 'El RUC no está ACTIVO y HABIDO en SUNAT.';
+              } else if (code === 'REG_THROTTLE_RUC') {
+                msg = 'Demasiados intentos. Espera unos minutos.';
+              }
+              
               this.showAlert(msg, 'error');
             });
           },
@@ -268,6 +286,7 @@ export class LoginComponent implements OnInit, OnDestroy {
       this.registrationValidationTimeout = null;
     }
     this.stopResendCooldown();
+    this.stopExpiraCooldown();
     this.registrationValidating = false;
     this.registrationRucValidated = false;
     this.registrationManualEntryAvailable = false;
@@ -287,6 +306,7 @@ export class LoginComponent implements OnInit, OnDestroy {
     this.registrationCodeResent = false;
     this.registrationSendingOtp = false;
     this.registrationVerifying = false;
+    this.registrationOtpExpirado = false;
     this.clearAlert();
   }
 
@@ -337,18 +357,34 @@ export class LoginComponent implements OnInit, OnDestroy {
             this.registrationCode = '';
             this.registrationCodeError = '';
             this.registrationCodeResent = false;
+            this.registrationOtpExpirado = false;
             this.startResendCooldown(60);
+            this.startExpiraCooldown(res.expiraEnSegundos || 180);
           });
         },
         error: (err: any) => {
           this.ngZone.run(() => {
             this.registrationSendingOtp = false;
-            const msg =
+            const code = err?.code || err?.error?.code || '';
+            let msg =
               err?.error?.message ||
               err?.error?.descripcion ||
               err?.descripcion ||
               err?.message ||
               'Error al enviar el código.';
+              
+            if (code === 'RUC_005') {
+              msg = err?.message || 'El RUC ya se encuentra registrado.';
+            } else if (code === 'REG_006') {
+              msg = 'La razón social es obligatoria cuando SUNAT no está disponible.';
+            } else if (code === 'PWD_001') {
+              msg = 'La contraseña no cumple los requisitos de seguridad.';
+            } else if (code === 'REG_THROTTLE_OTP') {
+              msg = 'Demasiados intentos. Espera unos minutos.';
+            } else if (code === 'VAL_001') {
+              msg = err?.descripcion || err?.error?.descripcion || 'Datos inválidos.';
+            }
+            
             this.showAlert(msg, 'error');
           });
         },
@@ -386,6 +422,26 @@ export class LoginComponent implements OnInit, OnDestroy {
     this.registrationResendCooldown = 0;
   }
 
+  private startExpiraCooldown(seconds: number): void {
+    this.stopExpiraCooldown();
+    this.registrationExpiraEnSegundos = seconds;
+    this.registrationOtpExpirado = false;
+    this.registrationExpiraInterval = setInterval(() => {
+      this.registrationExpiraEnSegundos--;
+      if (this.registrationExpiraEnSegundos <= 0) {
+        this.stopExpiraCooldown();
+        this.registrationOtpExpirado = true;
+      }
+    }, 1000);
+  }
+
+  private stopExpiraCooldown(): void {
+    if (this.registrationExpiraInterval) {
+      clearInterval(this.registrationExpiraInterval);
+      this.registrationExpiraInterval = null;
+    }
+  }
+
   onRegistrationCodeInput(): void {
     this.registrationCode = this.registrationCode
       .replace(/\D/g, '')
@@ -416,17 +472,30 @@ export class LoginComponent implements OnInit, OnDestroy {
               this.registrationCodeError = '';
               this.registrationStage = 'success';
               this.stopResendCooldown();
+              this.stopExpiraCooldown();
             });
           },
           error: (err: any) => {
             this.ngZone.run(() => {
               this.registrationVerifying = false;
-              this.registrationCodeError =
-                err?.error?.message ||
-                err?.error?.descripcion ||
-                err?.descripcion ||
-                err?.message ||
-                'Código incorrecto. Revísalo e intenta de nuevo.';
+              const code = err?.code || err?.error?.code || '';
+              
+              if (code === 'OTP_001') {
+                this.registrationCodeError = 'El código es inválido o expiró. Solicita uno nuevo.';
+              } else if (code === 'REG_002') {
+                this.registrationCodeError = err?.message || err?.error?.message || 'El usuario o correo ya está registrado. Inicia sesión.';
+              } else if (code === 'REG_003') {
+                this.registrationCodeError = err?.message || err?.error?.message || 'No se pudo completar el registro.';
+              } else if (code === 'CAPTCHA_001') {
+                this.registrationCodeError = 'No se pudo validar el reCAPTCHA. Reintenta.';
+              } else {
+                this.registrationCodeError =
+                  err?.error?.message ||
+                  err?.error?.descripcion ||
+                  err?.descripcion ||
+                  err?.message ||
+                  'Código incorrecto. Revísalo e intenta de nuevo.';
+              }
             });
           },
         });
@@ -465,22 +534,29 @@ export class LoginComponent implements OnInit, OnDestroy {
       };
 
       this.apiAuthService.enviarOtp(payload).subscribe({
-        next: () => {
+        next: (res) => {
           this.ngZone.run(() => {
             this.registrationSendingOtp = false;
             this.registrationCodeResent = true;
+            this.registrationOtpExpirado = false;
             this.startResendCooldown(60);
+            this.startExpiraCooldown(res.expiraEnSegundos || 180);
           });
         },
         error: (err: any) => {
           this.ngZone.run(() => {
             this.registrationSendingOtp = false;
-            this.registrationCodeError =
-              err?.error?.message ||
-              err?.error?.descripcion ||
-              err?.descripcion ||
-              err?.message ||
-              'No se pudo reenviar el código.';
+            const code = err?.code || err?.error?.code || '';
+            if (code === 'REG_THROTTLE_OTP') {
+              this.registrationCodeError = 'Demasiados intentos. Espera unos minutos.';
+            } else {
+              this.registrationCodeError =
+                err?.error?.message ||
+                err?.error?.descripcion ||
+                err?.descripcion ||
+                err?.message ||
+                'No se pudo reenviar el código.';
+            }
           });
         },
       });
@@ -503,7 +579,9 @@ export class LoginComponent implements OnInit, OnDestroy {
     this.registrationCode = '';
     this.registrationCodeError = '';
     this.registrationCodeResent = false;
+    this.registrationOtpExpirado = false;
     this.stopResendCooldown();
+    this.stopExpiraCooldown();
     this.clearAlert();
   }
 

@@ -438,14 +438,25 @@
               {{ registrationEmail }}
             </p>
 
-            <label for="registration-code"
-              style="display:block; font-size:12.5px; font-weight:700; color:var(--text-2); margin-bottom:7px">
-              Código de confirmación
-            </label>
+            <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:7px">
+              <label for="registration-code"
+                style="display:block; font-size:12.5px; font-weight:700; color:var(--text-2)">
+                Código de confirmación
+              </label>
+              @if (!registrationOtpExpirado) {
+              <span style="font-size:12px; font-weight:700; color:var(--primary); font-variant-numeric:tabular-nums">
+                <i class="fa-regular fa-clock" style="margin-right:4px"></i> {{ registrationExpiraFormatado }}
+              </span>
+              } @else {
+              <span style="font-size:12px; font-weight:700; color:var(--bad)">Expirado</span>
+              }
+            </div>
+            
             <input id="registration-code" type="text" inputmode="numeric" maxlength="6" placeholder="______"
-              [(ngModel)]="registrationCode" (input)="onRegistrationCodeInput()"
+              [(ngModel)]="registrationCode" (input)="onRegistrationCodeInput()" [disabled]="registrationOtpExpirado"
               (keydown.enter)="verifyDummyRegistrationCode()" [attr.aria-invalid]="!!registrationCodeError"
-              style="width:100%; background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:14px; font-size:26px; letter-spacing:14px; text-align:center; color:var(--text); font-family:'JetBrains Mono',monospace; margin-bottom:10px; outline:none" />
+              style="width:100%; background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:14px; font-size:26px; letter-spacing:14px; text-align:center; color:var(--text); font-family:'JetBrains Mono',monospace; margin-bottom:10px; outline:none"
+              [style.opacity]="registrationOtpExpirado ? '0.6' : '1'" />
 
             @if (registrationCodeError) {
             <div style="font-size:12px; font-weight:600; color:var(--bad); margin-bottom:10px" role="alert">
@@ -473,9 +484,9 @@
               }
             </div>
 
-            <button type="button" (click)="verifyDummyRegistrationCode()" [disabled]="registrationVerifying"
+            <button type="button" (click)="verifyDummyRegistrationCode()" [disabled]="registrationVerifying || registrationOtpExpirado"
               style="width:100%; background:var(--primary); color:var(--primary-contrast); border:none; border-radius:10px; padding:14px; font-size:15px; font-weight:700; cursor:pointer; box-shadow:0 8px 20px rgba(14,90,138,.28)"
-              [style.opacity]="registrationVerifying ? '0.7' : '1'">
+              [style.opacity]="(registrationVerifying || registrationOtpExpirado) ? '0.7' : '1'">
               {{ registrationVerifying ? 'Verificando...' : 'Verificar código' }}
             </button>
             <div style="text-align:center; margin-top:14px">

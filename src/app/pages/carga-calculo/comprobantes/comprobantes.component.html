@@ -53,8 +53,10 @@
       <div class="flow-guidance">
         <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
         <p>
-          Registra tus facturas de compra <b>con placa</b> — una por una, asociando el comprobante a una o varias placas.
-          Cada comprobante se valida en <b>SUNAT</b> (que exista) y en <b>Osinergmin</b> (grifo inscrito, B5/B20 ≤50 ppm).
+          Registra tus facturas de compra <b>con placa</b> — una por una, asociando el comprobante a una o varias
+          placas.
+          Cada comprobante se valida en <b>SUNAT</b> (que exista) y en <b>Osinergmin</b> (grifo inscrito, B5/B20 ≤50
+          ppm).
           Si una factura tiene una nota de crédito activa, queda <b>inhabilitada</b>.
         </p>
       </div>
@@ -100,9 +102,9 @@
     </div>
 
     <div class="table-card">
-      <p-table [value]="comprobantesFiltrados" [loading]="cargandoComprobantes" dataKey="comprobanteUuid" styleClass="comprobantes-table p-datatable-sm"
-        [paginator]="true" [rows]="5" [rowsPerPageOptions]="[5, 10, 25]" [showCurrentPageReport]="true"
-        currentPageReportTemplate="Mostrando {first}–{last} de {totalRecords} registros"
+      <p-table [value]="comprobantesFiltrados" [loading]="cargandoComprobantes" dataKey="comprobanteUuid"
+        styleClass="comprobantes-table p-datatable-sm" [paginator]="true" [rows]="5" [rowsPerPageOptions]="[5, 10, 25]"
+        [showCurrentPageReport]="true" currentPageReportTemplate="Mostrando {first}–{last} de {totalRecords} registros"
         paginatorDropdownAppendTo="body" [alwaysShowPaginator]="true" [scrollable]="true" scrollHeight="480px"
         [tableStyle]="{'min-width': '1040px'}">
 
@@ -141,11 +143,10 @@
               <b class="mono">{{ item.rucDistribuidor || '—' }}</b>
               <small>{{ ubicacionDistribuidor(item) }}</small>
             </td>
-            <td><span class="plate-count">{{ etiquetaPlacas(item.placa) }}</span></td>
+            <td><span class="plate-count">Placas: {{ item.cantidadPlacas }}</span></td>
             <td><b class="mono">{{ item.volumenM3 | number:'1.2-2' }} m³</b></td>
             <td>
-              <span class="status-badge"
-                [class.status-badge--ok]="item.estadoComprobanteCodigo === 'CONFORME'"
+              <span class="status-badge" [class.status-badge--ok]="item.estadoComprobanteCodigo === 'CONFORME'"
                 [class.status-badge--pending]="item.estadoComprobanteCodigo === 'PENDIENTE'"
                 [class.status-badge--warning]="item.estadoComprobanteCodigo === 'OBSERVADO'"
                 [class.status-badge--bad]="item.estadoComprobanteCodigo === 'INHABILITADO' || item.tieneNotaCreditoActiva">
@@ -206,28 +207,24 @@
         <span class="text-[12px] font-extrabold uppercase tracking-wider text-[var(--text-3)]">
           Acumulado por vehículo
         </span>
-        <span class="inline-flex items-center justify-center rounded-full bg-[var(--surface-2)] border border-[var(--border)] px-2.5 py-0.5 text-[11px] font-bold text-[var(--primary)]">
+        <span
+          class="inline-flex items-center justify-center rounded-full bg-[var(--surface-2)] border border-[var(--border)] px-2.5 py-0.5 text-[11px] font-bold text-[var(--primary)]">
           {{ acumuladosFiltrados.length }} {{ acumuladosFiltrados.length === 1 ? 'vehículo' : 'vehículos' }}
         </span>
       </div>
 
       <!-- Buscador de acumulados -->
       <div class="relative min-w-[220px] sm:min-w-[260px]">
-        <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-xs text-[var(--text-3)] pointer-events-none"></i>
-        <input
-          type="text"
-          [(ngModel)]="busquedaAcumulado"
-          placeholder="Buscar por placa..."
-          class="w-full rounded-xl border border-[var(--border)] bg-[var(--surface-2)] pl-8 pr-8 py-1.5 text-xs text-[var(--text)] outline-none focus:border-[var(--primary)] transition-colors"
-        />
+        <i
+          class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-xs text-[var(--text-3)] pointer-events-none"></i>
+        <input type="text" [(ngModel)]="busquedaAcumulado" placeholder="Buscar por placa..."
+          class="w-full rounded-xl border border-[var(--border)] bg-[var(--surface-2)] pl-8 pr-8 py-1.5 text-xs text-[var(--text)] outline-none focus:border-[var(--primary)] transition-colors" />
         @if (busquedaAcumulado) {
-          <button
-            type="button"
-            (click)="busquedaAcumulado = ''"
-            class="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs text-[var(--text-3)] hover:text-[var(--text)]"
-            title="Limpiar búsqueda">
-            <i class="fa-solid fa-xmark"></i>
-          </button>
+        <button type="button" (click)="busquedaAcumulado = ''"
+          class="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs text-[var(--text-3)] hover:text-[var(--text)]"
+          title="Limpiar búsqueda">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
         }
       </div>
     </div>
@@ -236,42 +233,43 @@
     <div class="acumulados-scroll-container max-h-[320px] overflow-y-auto pr-1">
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
         @for (item of acumuladosFiltrados; track item.placa) {
-          <article class="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-3.5 shadow-sm hover:border-[var(--border-strong)] transition-all">
-            <div class="mb-2 flex items-center justify-between gap-2 text-[13px] font-bold">
-              <span class="mono inline-flex min-w-[88px] items-center justify-center rounded-lg border border-[var(--border-strong)] bg-[var(--surface-2)] px-2.5 py-1 text-[12.5px] font-extrabold uppercase tracking-wider text-[var(--text)] shadow-xs">
-                {{ item.placa }}
+        <article
+          class="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-3.5 shadow-sm hover:border-[var(--border-strong)] transition-all">
+          <div class="mb-2 flex items-center justify-between gap-2 text-[13px] font-bold">
+            <span
+              class="mono inline-flex min-w-[88px] items-center justify-center rounded-lg border border-[var(--border-strong)] bg-[var(--surface-2)] px-2.5 py-1 text-[12.5px] font-extrabold uppercase tracking-wider text-[var(--text)] shadow-xs">
+              {{ item.placa }}
+            </span>
+            <div class="flex items-center gap-1.5">
+              <span class="mono text-xs font-semibold text-[var(--text-2)]">
+                {{ item.consumido | number:'1.2-2' }} / {{ item.tope | number:'1.2-2' }} gal
               </span>
-              <div class="flex items-center gap-1.5">
-                <span class="mono text-xs font-semibold text-[var(--text-2)]">
-                  {{ item.consumido | number:'1.2-2' }} / {{ item.tope | number:'1.2-2' }} gal
-                </span>
-                <span class="rounded-md px-1.5 py-0.5 text-[10.5px] font-extrabold"
-                  [ngClass]="{
+              <span class="rounded-md px-1.5 py-0.5 text-[10.5px] font-extrabold" [ngClass]="{
                     'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400': porcentaje(item) < 80,
                     'bg-amber-500/10 text-amber-600 dark:text-amber-400': porcentaje(item) >= 80 && porcentaje(item) < 100,
                     'bg-rose-500/10 text-rose-600 dark:text-rose-400': porcentaje(item) >= 100
                   }">
-                  {{ porcentaje(item) | number:'1.0-0' }}%
-                </span>
-              </div>
+                {{ porcentaje(item) | number:'1.0-0' }}%
+              </span>
             </div>
-            <div class="h-2 overflow-hidden rounded-full bg-[var(--surface-3)]">
-              <div class="h-full rounded-full transition-all duration-500"
-                [ngClass]="{
+          </div>
+          <div class="h-2 overflow-hidden rounded-full bg-[var(--surface-3)]">
+            <div class="h-full rounded-full transition-all duration-500" [ngClass]="{
                   'bg-[var(--ok)]': porcentaje(item) < 80,
                   'bg-amber-500': porcentaje(item) >= 80 && porcentaje(item) < 100,
                   'bg-[var(--bad)]': porcentaje(item) >= 100
-                }"
-                [style.width.%]="porcentaje(item)">
-              </div>
+                }" [style.width.%]="porcentaje(item)">
             </div>
-          </article>
-        } @empty {
-          <div class="col-span-full flex flex-col items-center justify-center gap-1.5 py-8 text-center border border-dashed border-[var(--border)] rounded-xl bg-[var(--surface-2)]">
-            <i class="fa-solid fa-car-rear text-xl text-[var(--text-3)] mb-1"></i>
-            <span class="text-xs font-bold text-[var(--text-2)]">No se encontraron vehículos</span>
-            <span class="text-[11px] text-[var(--text-3)]">No hay resultados que coincidan con "{{ busquedaAcumulado }}".</span>
           </div>
+        </article>
+        } @empty {
+        <div
+          class="col-span-full flex flex-col items-center justify-center gap-1.5 py-8 text-center border border-dashed border-[var(--border)] rounded-xl bg-[var(--surface-2)]">
+          <i class="fa-solid fa-car-rear text-xl text-[var(--text-3)] mb-1"></i>
+          <span class="text-xs font-bold text-[var(--text-2)]">No se encontraron vehículos</span>
+          <span class="text-[11px] text-[var(--text-3)]">No hay resultados que coincidan con "{{ busquedaAcumulado
+            }}".</span>
+        </div>
         }
       </div>
     </div>
@@ -323,34 +321,32 @@
       </button>
 
       <!-- Card para (ii) Vehículos que abastece este combustible -->
-      <div class="mt-6 mb-6 rounded-[16px] border border-[var(--border)] bg-[var(--surface)] p-5 shadow-[var(--shadow)]">
+      <div
+        class="mt-6 mb-6 rounded-[16px] border border-[var(--border)] bg-[var(--surface)] p-5 shadow-[var(--shadow)]">
         <div class="mb-4 flex flex-wrap items-center justify-between gap-3 border-b border-[var(--border)] pb-3.5">
           <div class="flex items-center gap-2.5">
             <span class="text-[12.5px] font-extrabold uppercase tracking-wider text-[var(--text-3)]">
               (ii) Vehículos que abastece este combustible
             </span>
-            <span class="inline-flex items-center justify-center rounded-full bg-[var(--surface-2)] border border-[var(--border)] px-2.5 py-0.5 text-[11px] font-bold text-[var(--primary)]">
-              {{ vehiculosAbastecidosFiltrados.length }} {{ vehiculosAbastecidosFiltrados.length === 1 ? 'vehículo' : 'vehículos' }}
+            <span
+              class="inline-flex items-center justify-center rounded-full bg-[var(--surface-2)] border border-[var(--border)] px-2.5 py-0.5 text-[11px] font-bold text-[var(--primary)]">
+              {{ vehiculosAbastecidosFiltrados.length }} {{ vehiculosAbastecidosFiltrados.length === 1 ? 'vehículo' :
+              'vehículos' }}
             </span>
           </div>
 
           <!-- Buscador de vehículos abastecidos -->
           <div class="relative min-w-[220px] sm:min-w-[260px]">
-            <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-xs text-[var(--text-3)] pointer-events-none"></i>
-            <input
-              type="text"
-              [(ngModel)]="busquedaVehiculoAbastecido"
-              placeholder="Buscar por placa..."
-              class="w-full rounded-xl border border-[var(--border)] bg-[var(--surface-2)] pl-8 pr-8 py-1.5 text-xs text-[var(--text)] outline-none focus:border-[var(--primary)] transition-colors"
-            />
+            <i
+              class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-xs text-[var(--text-3)] pointer-events-none"></i>
+            <input type="text" [(ngModel)]="busquedaVehiculoAbastecido" placeholder="Buscar por placa..."
+              class="w-full rounded-xl border border-[var(--border)] bg-[var(--surface-2)] pl-8 pr-8 py-1.5 text-xs text-[var(--text)] outline-none focus:border-[var(--primary)] transition-colors" />
             @if (busquedaVehiculoAbastecido) {
-              <button
-                type="button"
-                (click)="busquedaVehiculoAbastecido = ''"
-                class="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs text-[var(--text-3)] hover:text-[var(--text)]"
-                title="Limpiar búsqueda">
-                <i class="fa-solid fa-xmark"></i>
-              </button>
+            <button type="button" (click)="busquedaVehiculoAbastecido = ''"
+              class="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs text-[var(--text-3)] hover:text-[var(--text)]"
+              title="Limpiar búsqueda">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
             }
           </div>
         </div>
@@ -359,20 +355,25 @@
         <div class="acumulados-scroll-container max-h-[280px] overflow-y-auto pr-1">
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
             @for (vehiculo of vehiculosAbastecidosFiltrados; track vehiculo.placa) {
-              <div class="flex items-center justify-between gap-2.5 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 py-3 shadow-xs hover:border-[var(--border-strong)] transition-all">
-                <span class="mono text-sm font-extrabold uppercase tracking-wider text-[var(--text)]">{{ vehiculo.placa }}</span>
-                <span class="rounded-full px-2.5 py-1 text-[11px] font-bold shrink-0"
-                  [class.bg-[var(--ok-bg)]]="vehiculo.subsidiable" [class.text-[var(--ok)]]="vehiculo.subsidiable"
-                  [class.bg-[var(--surface-3)]]="!vehiculo.subsidiable" [class.text-[var(--text-3)]]="!vehiculo.subsidiable">
-                  {{ vehiculo.subsidiable ? 'Subsidiable' : 'No subsidiable' }}
-                </span>
-              </div>
+            <div
+              class="flex items-center justify-between gap-2.5 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 py-3 shadow-xs hover:border-[var(--border-strong)] transition-all">
+              <span class="mono text-sm font-extrabold uppercase tracking-wider text-[var(--text)]">{{ vehiculo.placa
+                }}</span>
+              <span class="rounded-full px-2.5 py-1 text-[11px] font-bold shrink-0"
+                [class.bg-[var(--ok-bg)]]="vehiculo.subsidiable" [class.text-[var(--ok)]]="vehiculo.subsidiable"
+                [class.bg-[var(--surface-3)]]="!vehiculo.subsidiable"
+                [class.text-[var(--text-3)]]="!vehiculo.subsidiable">
+                {{ vehiculo.subsidiable ? 'Subsidiable' : 'No subsidiable' }}
+              </span>
+            </div>
             } @empty {
-              <div class="col-span-full flex flex-col items-center justify-center gap-1.5 py-8 text-center border border-dashed border-[var(--border)] rounded-xl bg-[var(--surface-2)]">
-                <i class="fa-solid fa-car-rear text-xl text-[var(--text-3)] mb-1"></i>
-                <span class="text-xs font-bold text-[var(--text-2)]">No se encontraron vehículos</span>
-                <span class="text-[11px] text-[var(--text-3)]">No hay resultados que coincidan con "{{ busquedaVehiculoAbastecido }}".</span>
-              </div>
+            <div
+              class="col-span-full flex flex-col items-center justify-center gap-1.5 py-8 text-center border border-dashed border-[var(--border)] rounded-xl bg-[var(--surface-2)]">
+              <i class="fa-solid fa-car-rear text-xl text-[var(--text-3)] mb-1"></i>
+              <span class="text-xs font-bold text-[var(--text-2)]">No se encontraron vehículos</span>
+              <span class="text-[11px] text-[var(--text-3)]">No hay resultados que coincidan con "{{
+                busquedaVehiculoAbastecido }}".</span>
+            </div>
             }
           </div>
         </div>
@@ -428,76 +429,76 @@
 
     <div class="editor-modal__body">
       @if (editorModo === 'crear') {
-        <div class="editor-section-title">1 · Comprobante (archivo)</div>
-        <label for="receipt-file-new" class="receipt-upload" [class.receipt-upload--dragging]="isFileDragging"
-          [class.receipt-upload--error]="!!archivoError || (editorSubmitted && !archivoSeleccionado)"
-          (dragover)="onFileDragOver($event)" (dragleave)="onFileDragLeave($event)" (drop)="onFileDrop($event)">
-          <input id="receipt-file-new" type="file" (change)="onFileSelected($event)"
-            accept="application/pdf,image/jpeg,image/png" class="receipt-upload__input" />
-          <span class="receipt-upload__icon"><i class="fa-solid fa-arrow-up-from-bracket"></i></span>
-          <strong>Arrastra el comprobante o haz clic para seleccionar</strong>
-          <small>PDF o imagen JPG/PNG · máx. 5 MB</small>
-        </label>
+      <div class="editor-section-title">1 · Comprobante (archivo)</div>
+      <label for="receipt-file-new" class="receipt-upload" [class.receipt-upload--dragging]="isFileDragging"
+        [class.receipt-upload--error]="!!archivoError || (editorSubmitted && !archivoSeleccionado)"
+        (dragover)="onFileDragOver($event)" (dragleave)="onFileDragLeave($event)" (drop)="onFileDrop($event)">
+        <input id="receipt-file-new" type="file" (change)="onFileSelected($event)"
+          accept="application/pdf,image/jpeg,image/png" class="receipt-upload__input" />
+        <span class="receipt-upload__icon"><i class="fa-solid fa-arrow-up-from-bracket"></i></span>
+        <strong>Arrastra el comprobante o haz clic para seleccionar</strong>
+        <small>PDF o imagen JPG/PNG · máx. 5 MB</small>
+      </label>
 
-        @if (archivoSeleccionado) {
-          <div class="receipt-file">
+      @if (archivoSeleccionado) {
+      <div class="receipt-file">
+        <i class="fa-solid fa-file-circle-check"></i>
+        <span>
+          <strong>{{ archivoSeleccionado.name }}</strong>
+          <small>{{ archivoSeleccionado.size / 1048576 | number:'1.2-2' }} MB</small>
+        </span>
+        <button type="button" aria-label="Quitar archivo" (click)="quitarArchivo()">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      }
+      @if (archivoError) {
+      <div class="receipt-upload-error"><i class="fa-solid fa-circle-exclamation"></i>{{ archivoError }}</div>
+      }
+
+      <p class="editor-help">
+        El archivo es tu respaldo. El sistema verificará que la factura exista en SUNAT y que el grifo esté inscrito
+        en Osinergmin.
+      </p>
+
+      <div class="editor-choice-card">
+        <span>¿Tiene Nota de Crédito?</span>
+        <div class="segmented-control">
+          <button type="button" [class.segmented-control--active]="!tieneNotaCredito"
+            (click)="cambiarTieneNotaCredito(false)">No</button>
+          <button type="button" [class.segmented-control--active]="tieneNotaCredito"
+            (click)="cambiarTieneNotaCredito(true)">Sí</button>
+        </div>
+        @if (tieneNotaCredito) {
+        <div class="credit-note-upload">
+          <label class="credit-note-upload__button">
+            <input type="file" accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png"
+              (change)="onNotaCreditoFileSelected($event)" />
+            Cargar la Nota de Crédito (PDF o imagen)
+          </label>
+          @if (archivoNotaCredito) {
+          <div class="credit-note-upload__file">
             <i class="fa-solid fa-file-circle-check"></i>
-            <span>
-              <strong>{{ archivoSeleccionado.name }}</strong>
-              <small>{{ archivoSeleccionado.size / 1048576 | number:'1.2-2' }} MB</small>
-            </span>
-            <button type="button" aria-label="Quitar archivo" (click)="quitarArchivo()">
+            <span>{{ archivoNotaCredito.name }}</span>
+            <button type="button" title="Quitar archivo" aria-label="Quitar Nota de Crédito"
+              (click)="quitarArchivoNotaCredito()">
               <i class="fa-solid fa-xmark"></i>
             </button>
           </div>
-        }
-        @if (archivoError) {
-          <div class="receipt-upload-error"><i class="fa-solid fa-circle-exclamation"></i>{{ archivoError }}</div>
-        }
-
-        <p class="editor-help">
-          El archivo es tu respaldo. El sistema verificará que la factura exista en SUNAT y que el grifo esté inscrito
-          en Osinergmin.
-        </p>
-
-        <div class="editor-choice-card">
-          <span>¿Tiene Nota de Crédito?</span>
-          <div class="segmented-control">
-            <button type="button" [class.segmented-control--active]="!tieneNotaCredito"
-              (click)="cambiarTieneNotaCredito(false)">No</button>
-            <button type="button" [class.segmented-control--active]="tieneNotaCredito"
-              (click)="cambiarTieneNotaCredito(true)">Sí</button>
-          </div>
-          @if (tieneNotaCredito) {
-            <div class="credit-note-upload">
-              <label class="credit-note-upload__button">
-                <input type="file" accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png"
-                  (change)="onNotaCreditoFileSelected($event)" />
-                Cargar la Nota de Crédito (PDF o imagen)
-              </label>
-              @if (archivoNotaCredito) {
-                <div class="credit-note-upload__file">
-                  <i class="fa-solid fa-file-circle-check"></i>
-                  <span>{{ archivoNotaCredito.name }}</span>
-                  <button type="button" title="Quitar archivo" aria-label="Quitar Nota de Crédito"
-                    (click)="quitarArchivoNotaCredito()">
-                    <i class="fa-solid fa-xmark"></i>
-                  </button>
-                </div>
-              }
-              @if (archivoNotaCreditoError) {
-                <div class="receipt-upload-error">
-                  <i class="fa-solid fa-circle-exclamation"></i>{{ archivoNotaCreditoError }}
-                </div>
-              }
-              <p>
-                La Nota de Crédito y la factura electrónica se registran en un
-                <strong>mismo PDF de respaldo</strong>. Mientras la N/C esté vigente, la factura queda
-                <strong>inhabilitada</strong>.
-              </p>
-            </div>
           }
+          @if (archivoNotaCreditoError) {
+          <div class="receipt-upload-error">
+            <i class="fa-solid fa-circle-exclamation"></i>{{ archivoNotaCreditoError }}
+          </div>
+          }
+          <p>
+            La Nota de Crédito y la factura electrónica se registran en un
+            <strong>mismo PDF de respaldo</strong>. Mientras la N/C esté vigente, la factura queda
+            <strong>inhabilitada</strong>.
+          </p>
         </div>
+        }
+      </div>
       }
 
       <div class="editor-section-title">{{ editorModo === 'crear' ? 2 : 1 }} · Factura</div>
@@ -531,44 +532,43 @@
       </div>
 
       @if (fechaComprobanteModo === 'EMISION') {
-        <label class="editor-field editor-date-field">
-          <span>Fecha de emisión *</span>
-          <input [(ngModel)]="model.emision" (change)="onEditorEmissionChange()" type="date" class="mono"
-            [max]="todayDate" [class.editor-field--invalid]="editorSubmitted && !isEditorEmissionValid" />
-          <small [class.editor-field-error]="editorSubmitted && !isEditorEmissionValid"
-            [class.editor-field-hint]="!editorSubmitted || isEditorEmissionValid">
-            Usa la fecha de emisión que figura en la factura; no puede ser posterior a hoy.
-          </small>
-        </label>
+      <label class="editor-field editor-date-field">
+        <span>Fecha de emisión *</span>
+        <input [(ngModel)]="model.emision" (change)="onEditorEmissionChange()" type="date" class="mono"
+          [max]="todayDate" [class.editor-field--invalid]="editorSubmitted && !isEditorEmissionValid" />
+        <small [class.editor-field-error]="editorSubmitted && !isEditorEmissionValid"
+          [class.editor-field-hint]="!editorSubmitted || isEditorEmissionValid">
+          Usa la fecha de emisión que figura en la factura; no puede ser posterior a hoy.
+        </small>
+      </label>
       } @else {
-        <div class="period-range">
-          <label class="editor-field">
-            <span>Desde *</span>
-            <input [(ngModel)]="periodoDesde" (change)="onPeriodoRangoChange()" type="date" class="mono"
-              [max]="periodoHasta || todayDate"
-              [class.editor-field--invalid]="editorSubmitted && !isEditorPeriodValid" />
-          </label>
-          <label class="editor-field">
-            <span>Hasta *</span>
-            <input [(ngModel)]="periodoHasta" (change)="onPeriodoRangoChange()" type="date" class="mono"
-              [min]="periodoDesde" [max]="todayDate"
-              [class.editor-field--invalid]="editorSubmitted && !isEditorPeriodValid" />
-          </label>
-        </div>
-        <p class="editor-help period-range-help"
-          [class.editor-field-error]="editorSubmitted && !isEditorPeriodValid">
-          Usa periodo cuando el comprobante cubre un rango de días de consumo.
-        </p>
+      <div class="period-range">
+        <label class="editor-field">
+          <span>Desde *</span>
+          <input [(ngModel)]="periodoDesde" (change)="onPeriodoRangoChange()" type="date" class="mono"
+            [max]="periodoHasta || todayDate" [class.editor-field--invalid]="editorSubmitted && !isEditorPeriodValid" />
+        </label>
+        <label class="editor-field">
+          <span>Hasta *</span>
+          <input [(ngModel)]="periodoHasta" (change)="onPeriodoRangoChange()" type="date" class="mono"
+            [min]="periodoDesde" [max]="todayDate"
+            [class.editor-field--invalid]="editorSubmitted && !isEditorPeriodValid" />
+        </label>
+      </div>
+      <p class="editor-help period-range-help" [class.editor-field-error]="editorSubmitted && !isEditorPeriodValid">
+        Usa periodo cuando el comprobante cubre un rango de días de consumo.
+      </p>
       }
 
       <div class="editor-section-title">{{ editorModo === 'crear' ? 3 : 2 }} · Grifo</div>
       <label class="editor-field editor-ruc-field">
         <span>RUC del grifo *</span>
-        <input [(ngModel)]="model.rucGrifo" (input)="onEditorStationRucInput($event)" maxlength="11"
-          inputmode="numeric" class="mono" placeholder="20xxxxxxxxx"
+        <input [(ngModel)]="model.rucGrifo" (input)="onEditorStationRucInput($event)" maxlength="11" inputmode="numeric"
+          class="mono" placeholder="20xxxxxxxxx"
           [class.editor-field--invalid]="editorSubmitted && !isEditorStationRucValid" />
         <small [class.editor-field-error]="editorSubmitted && !isEditorStationRucValid"
-          [class.editor-field-hint]="!editorSubmitted || isEditorStationRucValid">Ingresa un RUC válido de 11 dígitos.</small>
+          [class.editor-field-hint]="!editorSubmitted || isEditorStationRucValid">Ingresa un RUC válido de 11
+          dígitos.</small>
       </label>
 
       <div class="editor-grid editor-grid--location">
@@ -577,7 +577,7 @@
           <select [(ngModel)]="model.departamento" (ngModelChange)="onEditorDepartamentoChange()">
             <option value="">—</option>
             @for (departamento of departamentosDisponibles; track departamento.id) {
-              <option [value]="departamento.id">{{ departamento.nombre }}</option>
+            <option [value]="departamento.id">{{ departamento.nombre }}</option>
             }
           </select>
         </label>
@@ -587,17 +587,16 @@
             [disabled]="!model.departamento">
             <option value="">—</option>
             @for (provincia of provinciasDisponibles; track provincia.id) {
-              <option [value]="provincia.id">{{ provincia.nombre }}</option>
+            <option [value]="provincia.id">{{ provincia.nombre }}</option>
             }
           </select>
         </label>
         <label class="editor-field">
           <span>Distrito</span>
-          <select [(ngModel)]="model.distrito" (ngModelChange)="onEditorDistritoChange()"
-            [disabled]="!model.provincia">
+          <select [(ngModel)]="model.distrito" (ngModelChange)="onEditorDistritoChange()" [disabled]="!model.provincia">
             <option value="">—</option>
             @for (distrito of distritosDisponibles; track distrito.id) {
-              <option [value]="distrito.id">{{ distrito.nombre }}</option>
+            <option [value]="distrito.id">{{ distrito.nombre }}</option>
             }
           </select>
         </label>
@@ -609,11 +608,11 @@
           [disabled]="!model.departamento || !model.provincia || !model.distrito">
           <option value="">
             {{ model.departamento && model.provincia && model.distrito
-              ? 'Selecciona una dirección…'
-              : 'Elige departamento, provincia y distrito primero' }}
+            ? 'Selecciona una dirección…'
+            : 'Elige departamento, provincia y distrito primero' }}
           </option>
           @for (distribuidor of direccionesDisponibles; track distribuidor.distribuidorUuid) {
-            <option [value]="distribuidor.direccion">{{ distribuidor.direccion }}</option>
+          <option [value]="distribuidor.direccion">{{ distribuidor.direccion }}</option>
           }
         </select>
         <small class="editor-field-hint">
@@ -634,109 +633,107 @@
       </div>
 
       @if (seleccionPlacasModo === 'UNA') {
-        <p class="editor-help">
-          Un comprobante para un solo vehículo: elige su placa, el tipo de combustible y el volumen. La categoría la
-          asigna el sistema.
-        </p>
-        <div class="editor-grid editor-grid--vehicle-single">
-          <label class="editor-field">
-            <span>Placa *</span>
-            <p-select [(ngModel)]="model.placa" [options]="vehiculosFiltradosPorPlaca"
-              optionLabel="placa" optionValue="placa" [filter]="true" filterBy="placa"
-              filterPlaceholder="Digite al menos 3 caracteres" emptyMessage="Digite al menos 3 caracteres"
-              emptyFilterMessage="No se encontraron placas coincidentes" placeholder="Selecciona la placa…"
-              styleClass="plate-filter-select mono" panelStyleClass="plate-filter-panel"
-              appendTo="body" [resetFilterOnHide]="true"
-              (onShow)="reiniciarFiltroPlaca()" (onFilter)="onFiltroPlacaSelect($event)"
-              (ngModelChange)="onPlacaSeleccionada($event)">
-            </p-select>
-            <small class="editor-field-hint">Abre el selector y busca desde el tercer carácter.</small>
-          </label>
-          <label class="editor-field">
-            <span>Categoría</span>
-            <div class="readonly-value">{{ categoriaVehiculoSeleccionado }}</div>
-          </label>
-          <label class="editor-field">
-            <span>Combustible *</span>
-            <select [(ngModel)]="model.combustible">
-              @for (tipo of tiposCombustible; track tipo.codigo) {
-                <option [value]="tipo.codigo">{{ tipo.nombre }} (≤ {{ tipo.ppmMaximo }} ppm)</option>
-              }
-            </select>
-          </label>
-          <label class="editor-field">
-            <span>Volumen (m³) *</span>
-            <input [(ngModel)]="model.volumenM3" type="number" min="0.01" step="0.01" class="mono" placeholder="0.00" />
-          </label>
-        </div>
+      <p class="editor-help">
+        Un comprobante para un solo vehículo: elige su placa, el tipo de combustible y el volumen. La categoría la
+        asigna el sistema.
+      </p>
+      <div class="editor-grid editor-grid--vehicle-single">
+        <label class="editor-field">
+          <span>Placa *</span>
+          <p-select [(ngModel)]="model.placa" [options]="vehiculosFiltradosPorPlaca" optionLabel="placa"
+            optionValue="placa" [filter]="true" filterBy="placa" filterPlaceholder="Digite al menos 3 caracteres"
+            emptyMessage="Digite al menos 3 caracteres" emptyFilterMessage="No se encontraron placas coincidentes"
+            placeholder="Selecciona la placa…" styleClass="plate-filter-select mono"
+            panelStyleClass="plate-filter-panel" appendTo="body" [resetFilterOnHide]="true"
+            (onShow)="reiniciarFiltroPlaca()" (onFilter)="onFiltroPlacaSelect($event)"
+            (ngModelChange)="onPlacaSeleccionada($event)">
+          </p-select>
+          <small class="editor-field-hint">Abre el selector y busca desde el tercer carácter.</small>
+        </label>
+        <label class="editor-field">
+          <span>Categoría</span>
+          <div class="readonly-value">{{ categoriaVehiculoSeleccionado }}</div>
+        </label>
+        <label class="editor-field">
+          <span>Combustible *</span>
+          <select [(ngModel)]="model.combustible">
+            @for (tipo of tiposCombustible; track tipo.codigo) {
+            <option [value]="tipo.codigo">{{ tipo.nombre }} (≤ {{ tipo.ppmMaximo }} ppm)</option>
+            }
+          </select>
+        </label>
+        <label class="editor-field">
+          <span>Volumen (m³) *</span>
+          <input [(ngModel)]="model.volumenM3" type="number" min="0.01" step="0.01" class="mono" placeholder="0.00" />
+        </label>
+      </div>
       } @else {
-        <p class="editor-help">
-          Un mismo comprobante repartido entre varias placas: indica por cada una su combustible y su volumen, o
-          cárgalas desde tu Excel.
-        </p>
-        <div class="plate-toolbar">
-          <button type="button" class="plate-toolbar__primary" (click)="agregarFilaPlaca()">
-            <i class="fa-solid fa-plus"></i> Agregar placa
-          </button>
-          <label class="plate-toolbar__secondary">
-            <input type="file" accept=".xlsx,.xls" (change)="onExcelPlacasSelected($event)" />
-            <i class="fa-solid fa-arrow-up-from-bracket"></i> Cargar Excel de placas
-          </label>
-        </div>
-        @if (excelPlacasError) {
-          <div class="receipt-upload-error plate-excel-error">
-            <i class="fa-solid fa-circle-exclamation"></i>{{ excelPlacasError }}
-          </div>
-        }
-        <div class="plate-table">
-          <div class="plate-table__scroll">
-            <div class="plate-table__content">
-              <div class="plate-table__row plate-table__header">
-                <div>Placa</div>
-                <div>Categoría</div>
-                <div>Comb.</div>
-                <div>Volumen (m³)</div>
-                <div></div>
-              </div>
-              @for (fila of filasPlacas; track fila.id) {
-                <div class="plate-table__row">
-                  <select [(ngModel)]="fila.placa" class="mono"
-                    [class.editor-field--invalid]="editorSubmitted && (!fila.placa || placaUsadaEnOtraFila(fila.placa, fila.id))">
-                    <option value="">Placa…</option>
-                    @for (vehiculo of vehiculos; track vehiculo.vehiculoUuid) {
-                      <option [value]="vehiculo.placa"
-                        [disabled]="placaUsadaEnOtraFila(vehiculo.placa, fila.id)">
-                        {{ vehiculo.placa }}
-                      </option>
-                    }
-                  </select>
-                  <div class="plate-table__category">{{ categoriaFila(fila) }}</div>
-                  <select [(ngModel)]="fila.combustible"
-                    [class.editor-field--invalid]="editorSubmitted && !fila.combustible">
-                    @for (tipo of tiposCombustible; track tipo.codigo) {
-                      <option [value]="tipo.codigo">{{ tipo.codigo }} (≤ {{ tipo.ppmMaximo }} ppm)</option>
-                    }
-                  </select>
-                  <input [(ngModel)]="fila.volumen" type="number" inputmode="decimal" min="0.01" step="0.01"
-                    class="mono" placeholder="0.00"
-                    [class.editor-field--invalid]="editorSubmitted && (!fila.volumen || fila.volumen <= 0)" />
-                  <button type="button" class="plate-table__remove" title="Quitar"
-                    (click)="quitarFilaPlaca(fila.id)">×</button>
-                </div>
-              } @empty {
-                <div class="plate-table__empty">Agrega placas una por una o cárgalas desde tu Excel.</div>
-              }
+      <p class="editor-help">
+        Un mismo comprobante repartido entre varias placas: indica por cada una su combustible y su volumen, o
+        cárgalas desde tu Excel.
+      </p>
+      <div class="plate-toolbar">
+        <button type="button" class="plate-toolbar__primary" (click)="agregarFilaPlaca()">
+          <i class="fa-solid fa-plus"></i> Agregar placa
+        </button>
+        <label class="plate-toolbar__secondary">
+          <input type="file" accept=".xlsx,.xls" (change)="onExcelPlacasSelected($event)" />
+          <i class="fa-solid fa-arrow-up-from-bracket"></i> Cargar Excel de placas
+        </label>
+      </div>
+      @if (excelPlacasError) {
+      <div class="receipt-upload-error plate-excel-error">
+        <i class="fa-solid fa-circle-exclamation"></i>{{ excelPlacasError }}
+      </div>
+      }
+      <div class="plate-table">
+        <div class="plate-table__scroll">
+          <div class="plate-table__content">
+            <div class="plate-table__row plate-table__header">
+              <div>Placa</div>
+              <div>Categoría</div>
+              <div>Comb.</div>
+              <div>Volumen (m³)</div>
+              <div></div>
             </div>
-          </div>
-          <div class="plate-table__total">
-            <span>Total del comprobante:</span>
-            <strong class="mono">{{ volumenTotalEditor | number:'1.2-2' }} m³</strong>
+            @for (fila of filasPlacas; track fila.id) {
+            <div class="plate-table__row">
+              <select [(ngModel)]="fila.placa" class="mono"
+                [class.editor-field--invalid]="editorSubmitted && (!fila.placa || placaUsadaEnOtraFila(fila.placa, fila.id))">
+                <option value="">Placa…</option>
+                @for (vehiculo of vehiculos; track vehiculo.vehiculoUuid) {
+                <option [value]="vehiculo.placa" [disabled]="placaUsadaEnOtraFila(vehiculo.placa, fila.id)">
+                  {{ vehiculo.placa }}
+                </option>
+                }
+              </select>
+              <div class="plate-table__category">{{ categoriaFila(fila) }}</div>
+              <select [(ngModel)]="fila.combustible"
+                [class.editor-field--invalid]="editorSubmitted && !fila.combustible">
+                @for (tipo of tiposCombustible; track tipo.codigo) {
+                <option [value]="tipo.codigo">{{ tipo.codigo }} (≤ {{ tipo.ppmMaximo }} ppm)</option>
+                }
+              </select>
+              <input [(ngModel)]="fila.volumen" type="number" inputmode="decimal" min="0.01" step="0.01" class="mono"
+                placeholder="0.00"
+                [class.editor-field--invalid]="editorSubmitted && (!fila.volumen || fila.volumen <= 0)" />
+              <button type="button" class="plate-table__remove" title="Quitar"
+                (click)="quitarFilaPlaca(fila.id)">×</button>
+            </div>
+            } @empty {
+            <div class="plate-table__empty">Agrega placas una por una o cárgalas desde tu Excel.</div>
+            }
           </div>
         </div>
+        <div class="plate-table__total">
+          <span>Total del comprobante:</span>
+          <strong class="mono">{{ volumenTotalEditor | number:'1.2-2' }} m³</strong>
+        </div>
+      </div>
       }
 
       @if (editorError) {
-        <div class="editor-error" role="alert"><i class="fa-solid fa-circle-exclamation"></i>{{ editorError }}</div>
+      <div class="editor-error" role="alert"><i class="fa-solid fa-circle-exclamation"></i>{{ editorError }}</div>
       }
     </div>
 
@@ -819,17 +816,9 @@
         </label>
         <label class="editor-field">
           <span>Emisión *</span>
-          <p-datepicker
-            [(ngModel)]="model.emision"
-            (ngModelChange)="onEditorEmissionChange()"
-            dateFormat="yy-mm-dd"
-            dataType="string"
-            [maxDate]="maxDateObj"
-            [showIcon]="true"
-            placeholder="AAAA-MM-DD"
-            styleClass="w-full"
-            inputStyleClass="mono w-full"
-            [class.editor-field--invalid]="editorSubmitted && !isEditorEmissionValid">
+          <p-datepicker [(ngModel)]="model.emision" (ngModelChange)="onEditorEmissionChange()" dateFormat="yy-mm-dd"
+            dataType="string" [maxDate]="maxDateObj" [showIcon]="true" placeholder="AAAA-MM-DD" styleClass="w-full"
+            inputStyleClass="mono w-full" [class.editor-field--invalid]="editorSubmitted && !isEditorEmissionValid">
           </p-datepicker>
           <small [class.editor-field-error]="editorSubmitted && !isEditorEmissionValid"
             [class.editor-field-hint]="!editorSubmitted || isEditorEmissionValid">No puede ser posterior a hoy.</small>
