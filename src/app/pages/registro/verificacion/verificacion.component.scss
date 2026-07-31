@@ -334,15 +334,33 @@
   letter-spacing: -0.2px;
 }
 
-.aut-badge {
+:host ::ng-deep .aut-badge {
   font-size: 11px !important;
-  font-weight: 700 !important;
+  font-weight: 800 !important;
   padding: 3px 10px !important;
+  border: 1px solid currentColor !important;
   border-radius: 999px !important;
-}
+  box-shadow: none !important;
 
-.aut-badge-black-text {
-  color: #000000 !important;
+  &.p-tag-success {
+    background: var(--ok-bg) !important;
+    color: var(--ok) !important;
+  }
+
+  &.p-tag-warn {
+    background: var(--warn-bg) !important;
+    color: var(--warn) !important;
+  }
+
+  &.p-tag-danger {
+    background: var(--bad-bg) !important;
+    color: var(--bad) !important;
+  }
+
+  &.p-tag-secondary {
+    background: var(--neutral-bg) !important;
+    color: var(--neutral) !important;
+  }
 }
 
 .aut-resolucion-chip {

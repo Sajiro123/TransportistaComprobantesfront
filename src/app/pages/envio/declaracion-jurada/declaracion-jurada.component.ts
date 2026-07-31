@@ -22,6 +22,11 @@ export class DeclaracionJuradaComponent {
   enviado = false;
   cargoDescargado = false;
   modificacionesRestantes = 1;
+  comprobantesRegistrados = 7;
+  placasRegistradas = 4;
+  volumenRegistrado = '2,120.50 m³';
+  razonSocial = 'Transportes Lima Sur S.A.C.';
+  ruc = '20512345678';
 
   montos: MontoForma[] = [
     { codigo: 'A', nombre: 'Surtido directo', porcentaje: 18, monto: 1282, tono: 'primary' },

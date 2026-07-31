@@ -2,7 +2,7 @@
   <div class="mb-5 grid gap-4 md:grid-cols-2">
     <!-- Alerta de Plazo -->
     <div
-      class="relative overflow-hidden rounded-lg bg-white border border-[#DCE4EC] shadow-[0_1px_3px_rgba(16,36,52,0.05)]">
+      class="relative overflow-hidden rounded-lg bg-[var(--surface)] border border-[var(--border)] shadow-[var(--shadow)]">
       <div class="absolute left-0 top-0 bottom-0 w-1 bg-[var(--warn)]"></div>
       <div class="flex items-center gap-3.5 px-4 py-3.5">
         <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--warn-bg)]">
@@ -23,7 +23,7 @@
 
     <!-- Alerta de Información -->
     <div
-      class="relative overflow-hidden rounded-lg bg-white border border-[#DCE4EC] shadow-[0_1px_3px_rgba(16,36,52,0.05)]">
+      class="relative overflow-hidden rounded-lg bg-[var(--surface)] border border-[var(--border)] shadow-[var(--shadow)]">
       <div class="absolute left-0 top-0 bottom-0 w-1 bg-[var(--primary-mid)]"></div>
       <div class="flex items-center gap-3.5 px-4 py-3.5">
         <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--primary-soft)]">
@@ -84,33 +84,54 @@
           <span class="text-[10.5px] font-bold uppercase tracking-wide text-[var(--text-3)]">Hoja 1 de 1</span>
         </div>
         <h1 class="mt-1 text-2xl font-extrabold text-[var(--text)]">Declaración jurada y envío</h1>
-        <p class="mt-1.5 text-[13.5px] text-[var(--text-3)]">Revisa el monto y declara la veracidad de tu información antes de enviar.</p>
+        <p class="mt-1.5 text-[13.5px] text-[var(--text-3)]">Declara la veracidad de tu información antes de enviar tu expediente.</p>
       </header>
 
-      <article class="amount-card">
-        <div class="section-label">Monto del subsidio por forma de adquisición</div>
-        <div class="flex flex-col gap-[15px]">
-          @for (forma of montos; track forma.codigo) {
-            <div>
-              <div class="mb-1.5 flex items-baseline justify-between gap-3 text-[13px]">
-                <span class="font-bold text-[var(--text-2)]">Forma {{ forma.codigo }} · {{ forma.nombre }} <span class="font-semibold text-[var(--text-3)]">({{ forma.porcentaje }}%)</span></span>
-                <span class="mono font-extrabold" [class.text-[var(--primary)]]="forma.tono === 'primary'" [class.text-[var(--warn)]]="forma.tono === 'warn'">S/ {{ forma.monto | number:'1.2-2' }}</span>
-              </div>
-              <div class="h-[15px] overflow-hidden rounded-lg bg-[var(--surface-3)]"><div class="h-full rounded-lg transition-all duration-700" [class.bg-[var(--primary)]]="forma.tono === 'primary'" [class.bg-[var(--warn)]]="forma.tono === 'warn'" [style.width.%]="forma.porcentaje"></div></div>
-            </div>
-          }
-        </div>
-        <div class="mt-[17px] flex items-center justify-between gap-3 border-t border-[var(--border)] pt-[15px]"><span class="text-sm font-extrabold text-[var(--text)]">Total del subsidio</span><span class="mono text-2xl font-extrabold text-[var(--primary)]">S/ {{ totalSubsidio | number:'1.2-2' }}</span></div>
-      </article>
+      <div class="expediente-summary" aria-label="Resumen del expediente">
+        <article class="summary-card">
+          <span>Comprobantes registrados</span>
+          <strong class="mono">{{ comprobantesRegistrados }}</strong>
+        </article>
+        <article class="summary-card">
+          <span>Placas registradas</span>
+          <strong class="mono">{{ placasRegistradas }}</strong>
+        </article>
+        <article class="summary-card">
+          <span>Volumen registrado</span>
+          <strong class="mono">{{ volumenRegistrado }}</strong>
+        </article>
+      </div>
 
-      <div class="info-message"><i class="fa-solid fa-circle-info mt-0.5 text-[var(--primary)]"></i><span>Al enviar, tu solicitud <b>queda bloqueada para edición</b> y pasa a <b>validación y evaluación</b> para el pase a subsidio. Conforme al DU 004-2026, el monto <b>solo podrá modificarse una (1) sola vez</b>.</span></div>
+      <div class="detail-message">
+        <span class="detail-message__icon"><i class="fa-regular fa-calendar"></i></span>
+        <span>Solo se reconocen compras de diésel B5/B20 con azufre ≤50 ppm realizadas entre el
+          <b>29/05/2026</b> y el <b>28/07/2026</b>.</span>
+      </div>
+
+      <div class="detail-message">
+        <span class="detail-message__icon"><i class="fa-regular fa-user"></i></span>
+        <span>El beneficiario del subsidio es el <b>transportista titular de la autorización</b>
+          ({{ razonSocial }} · RUC {{ ruc }}), no el propietario del vehículo.</span>
+      </div>
+
+      <div class="info-message">
+        <i class="fa-solid fa-circle-info mt-0.5 text-[var(--primary)]"></i>
+        <span>Al enviar, tu expediente <b>queda bloqueado para edición</b> y pasa a
+          <b>validación y evaluación</b>. Conforme al DU 004-2026,
+          <b>solo podrá modificarse una (1) sola vez</b> dentro de los
+          <b>5 días calendario</b> siguientes al envío.</span>
+      </div>
 
       <label class="declaration-check" [class.declaration-check--active]="aceptada">
         <input type="checkbox" [(ngModel)]="aceptada" />
-        <span>Declaro bajo juramento que la información registrada es veraz. Entiendo que <b>presentar información falsa causa la pérdida automática del subsidio</b>, sin perjuicio de las responsabilidades legales que correspondan.</span>
+        <span>Declaro bajo juramento que la información registrada es veraz. Entiendo que
+          <b>presentar información falsa causa la pérdida automática del subsidio</b>,
+          sin perjuicio de las responsabilidades legales que correspondan.</span>
       </label>
 
-      <button type="button" class="send-button" [disabled]="!aceptada" (click)="enviarDeclaracion()"><i class="fa-solid fa-paper-plane"></i> Enviar declaración jurada</button>
+      <button type="button" class="send-button" [disabled]="!aceptada" (click)="enviarDeclaracion()">
+        Enviar declaración jurada
+      </button>
     </section>
   }
 </div>

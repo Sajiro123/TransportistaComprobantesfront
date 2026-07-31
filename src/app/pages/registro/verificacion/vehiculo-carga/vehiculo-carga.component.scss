@@ -1,5 +1,10 @@
 // Variables and custom styles for the table
 
+.vehicle-status-badge {
+  border: 1px solid currentColor;
+  font-weight: 800;
+}
+
 ::ng-deep .vehiculos-table {
   .p-datatable-table-container {
     scrollbar-width: thin;

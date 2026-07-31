@@ -395,7 +395,7 @@
                 Teléfono de contacto <span style="color:var(--bad)">*</span>
               </label>
               <input id="registration-phone" type="text" inputmode="tel" maxlength="9" [(ngModel)]="registrationPhone"
-                (input)="onRegistrationPhoneInput()" placeholder="+51 987 654 321"
+                (input)="onRegistrationPhoneInput()" placeholder="987 654 321"
                 style="width:100%; background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:12px 13px; font-size:14px; color:var(--text); font-family:'JetBrains Mono',monospace" />
               @if (registrationPhoneError) {
               <p class="registration-field-error">{{ registrationPhoneError }}</p>
@@ -451,7 +451,7 @@
               <span style="font-size:12px; font-weight:700; color:var(--bad)">Expirado</span>
               }
             </div>
-            
+
             <input id="registration-code" type="text" inputmode="numeric" maxlength="6" placeholder="______"
               [(ngModel)]="registrationCode" (input)="onRegistrationCodeInput()" [disabled]="registrationOtpExpirado"
               (keydown.enter)="verifyDummyRegistrationCode()" [attr.aria-invalid]="!!registrationCodeError"
