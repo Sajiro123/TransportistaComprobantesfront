@@ -115,11 +115,11 @@
               <p-tag [value]="getDatoVal('Estado')" severity="success" styleClass="aut-badge aut-badge-black-text" />
               @if (transportista && transportista.activoSunat !== undefined) {
               <p-tag [value]="transportista.activoSunat ? 'SUNAT ACTIVO' : 'SUNAT INACTIVO'"
-                [severity]="transportista.activoSunat ? 'info' : 'danger'" styleClass="aut-badge" />
+                [severity]="transportista.activoSunat ? 'info' : 'danger'" styleClass="aut-badge aut-badge-black-text" />
               }
               @if (transportista && transportista.habidoSunat !== undefined) {
               <p-tag [value]="transportista.habidoSunat ? 'HABIDO' : 'NO HABIDO '"
-                [severity]="transportista.habidoSunat ? 'info' : 'warn'" styleClass="aut-badge" />
+                [severity]="transportista.habidoSunat ? 'info' : 'warn'" styleClass="aut-badge aut-badge-black-text" />
               }
             </div>
           </div>
